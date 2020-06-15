@@ -61,8 +61,7 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
   private var lastSequence: UInt = 0
   public let minimumTolerance: SchedulerTimeType.Stride = .zero
   public private(set) var now: SchedulerTimeType
-  private var scheduled: [(sequence: UInt, date: SchedulerTimeType, action: () -> Void)] =
-    []
+  private var scheduled: [(sequence: UInt, date: SchedulerTimeType, action: () -> Void)] = []
 
   /// Creates a test scheduler with the given date.
   ///
@@ -73,9 +72,9 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
 
   /// Advances the scheduler by the given stride.
   ///
-  /// - Parameter stride: A stride. By default this argument is `.zero`, which does not advance
-  ///                     the scheduler's time but does cause the scheduler to execute any
-  ///                     units of work that are waiting to be performed for right now.
+  /// - Parameter stride: A stride. By default this argument is `.zero`, which does not advance the
+  ///   scheduler's time but does cause the scheduler to execute any units of work that are waiting
+  ///   to be performed for right now.
   public func advance(by stride: SchedulerTimeType.Stride = .zero) {
     let finalDate = self.now.advanced(by: stride)
 

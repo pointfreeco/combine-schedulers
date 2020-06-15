@@ -3,12 +3,100 @@ import Foundation
 
 /// A scheduler for performing synchronous actions.
 ///
-/// You can only use this scheduler for immediate actions. If you attempt to schedule actions
-/// after a specific date, this scheduler ignores the date and performs them immediately.
+/// You can only use this scheduler for immediate actions. If you attempt to schedule actions after
+/// a specific date, this scheduler ignores the date and performs them immediately.
 ///
-/// This scheduler can be useful for writing tests against publishers that use `receive(on:)`
-/// or `subscribe(on:)` because it will force the publisher to emit immediately, rather than
-/// needing to wait for a thread hop using `XCTestExpectation`.
+/// This scheduler is useful for writing tests against publishers that use asynchrony operators,
+/// such as `receive(on:)`, `subscribe(on:)` and others, because it forces the publisher to emit
+/// immediately rather than needing to wait for thread hops or delays using `XCTestExpectation`.
+///
+/// This scheduler is different from `TestScheduler` in that you cannot explicitly control how time
+/// flows through your publisher, but rather you are instantly collapsing time into a single point.
+///
+/// As a basic example, suppose you have a view model that loads some data after waiting for 10
+/// seconds from when a button is tapped:
+///
+///     class HomeViewModel: ObservableObject {
+///       @Published var episodes: [Episode]?
+///       var cancellables: Set<AnyCancellable> = []
+///
+///       let apiClient: ApiClient
+///
+///       init(apiClient: ApiClient) {
+///         self.apiClient = apiClient
+///       }
+///
+///       func reloadButtonTapped() {
+///         Just(())
+///           .delay(for: .seconds(10), scheduler: DispachQueue.main)
+///           .flatMap { apiClient.fetchEpisodes() }
+///           .sink { self.episodes = $0 }
+///           .store(in: &self.cancellables)
+///       }
+///     }
+///
+/// In order to test this code you would literally need to wait 10 seconds for the publisher to
+/// emit:
+///
+///     func testViewModel() {
+///       let viewModel(apiClient: .mock)
+///
+///       var output: [Episode] = []
+///       viewModel.$episodes
+///         .sink { output.append($0) }
+///         .store(in: &self.cancellables)
+///
+///       viewModel.reloadButtonTapped()
+///
+///       _ = XCTWaiter.wait(for: [XCTestExpectation()], timeout: 10)
+///
+///       XCTAssert(output, [Episode(id: 42)])
+///     }
+///
+/// Alternatively, we can explicitly pass a scheduler into the view model initializer so that it can
+/// be controller from the outside:
+///
+///     class HomeViewModel: ObservableObject {
+///       @Published var episodes: [Episode]?
+///
+///       let apiClient: ApiClient
+///       let scheduler: AnySchedulerOf<DispatchQueue>
+///       var cancellables: Set<AnyCancellable> = []
+///
+///       init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
+///         self.apiClient = apiClient
+///         self.scheduler = scheduler
+///       }
+///
+///       func reloadButtonTapped() {
+///         Just(())
+///           .delay(for: .seconds(10), scheduler: self.scheduler)
+///           .flatMap { self.apiClient.fetchEpisodes() }
+///           .sink { self.episodes = $0 }
+///           .store(in: &self.cancellables)
+///       }
+///     }
+///
+/// And then in tests use an immediate scheduler:
+///
+///     func testViewModel() {
+///       let viewModel(
+///         apiClient: .mock,
+///         scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
+///       )
+///
+///       var output: [Episode] = []
+///       viewModel.$episodes
+///         .sink { output.append($0) }
+///         .store(in: &self.cancellables)
+///
+///       viewModel.reloadButtonTapped()
+///
+///       // No more waiting...
+///
+///       XCTAssert(output, [Episode(id: 42)])
+///     }
+///
 public struct ImmediateScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
 where
   SchedulerTimeType: Strideable,

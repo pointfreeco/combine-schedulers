@@ -23,9 +23,9 @@
     /// 
     /// - Parameters:
     ///   - interval: The time interval on which to publish events. For example, a value of `0.5`
-    ///               publishes an event approximately every half-second.
+    ///     publishes an event approximately every half-second.
     ///   - tolerance: The allowed timing variance when emitting events. Defaults to `nil`, which
-    ///                allows any variance.
+    ///     allows any variance.
     ///   - options: Scheduler options passed to the timer. Defaults to `nil`.
     /// - Returns: A publisher that repeatedly emits the current date on the given interval.
     public func timerPublisher(
@@ -55,7 +55,7 @@
     ///       .sink { print("Timer", $0) }
     ///
     /// But more importantly, you can use it with `TestScheduler` so that any Combine code you write
-    /// involving timers because more testable. This shows how we can easily simulate the idea of
+    /// involving timers becomes more testable. This shows how we can easily simulate the idea of
     /// moving time forward 1,000 seconds in a timer:
     ///
     ///     let scheduler = DispatchQueue.testScheduler

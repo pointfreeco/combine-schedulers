@@ -8,7 +8,8 @@ import Dispatch
 /// a thread hop before executing since it uses `DispatchQueue.main.async` under the hood.
 ///
 /// This scheduler can be useful for situations where you need work executed as quickly as
-/// possible on the main thread, and for which a thread hop would be problematic.
+/// possible on the main thread, and for which a thread hop would be problematic, such as when
+/// performing animations.
 public struct UIScheduler: Scheduler {
   public typealias SchedulerOptions = Never
   public typealias SchedulerTimeType = DispatchQueue.SchedulerTimeType

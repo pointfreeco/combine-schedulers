@@ -35,13 +35,14 @@ The design of this library was explored in the following [Point-Free](https://ww
 
 ### `AnyScheduler`
 
-The `AnyScheduler` provides a type-erasing wrapper for the `Scheduler` protocol, which can be useful for being generic over many types of schedulers without needing to actually introduce a generic to your code. The Combine framework ships with many type-erasing operators, such as `AnySubscriber`, `AnyPublisher` and `AnyCancellable`, yet for some reason does not ship with `AnyScheduler`.
+The `AnyScheduler` provides a type-erasing wrapper for the `Scheduler` protocol, which can be useful for being generic over many types of schedulers without needing to actually introduce a generic to your code. The Combine framework ships with many type-erasing wrappers, such as `AnySubscriber`, `AnyPublisher` and `AnyCancellable`, yet for some reason does not ship with `AnyScheduler`.
 
-This type is useful for times that you want to be able to customize the scheduler used in some code from the outside, but you don't want to introduce a generic to make it customizable. For example, suppose you have a view model `ObservableObject` that performs an API request when a method is called:
+This type is useful for times that you want to be able to customize the scheduler used in some code from the outside, but you don't want to introduce a generic to make it customizable. For example, suppose you have an `ObservableObject` view model that performs an API request when a method is called:
 
 ```swift
 class EpisodeViewModel: ObservableObject {
   @Published var episode: Episode?
+  private var cancellables: Set<AnyCancellable> = []
 
   let apiClient: ApiClient
 
@@ -53,6 +54,7 @@ class EpisodeViewModel: ObservableObject {
     self.apiClient.fetchEpisode()
       .receive(on: DispatchQueue.main)
       .sink { self.episode = $0 }
+      .store(in: &self.cancellables)
   }
 }
 ```
@@ -61,11 +63,12 @@ Notice that we are using `DispatchQueue.main` in the `reloadButtonTapped` method
 
 This code seems innocent enough, but the presence of `.receive(on: DispatchQueue.main)` makes this code harder to test since you have to use `XCTest` expectations to explicitly wait a small amount of time for the queue to execute. This can lead to flakiness in tests and make test suites take longer to execute than necessary.
 
-One way to fix this testing problem is to use an "immediate" scheduler instead of `DispatchQueue.main`, which will cause `fetchEpisode` to deliver its output as soon as possible with no thread hops. In order to allow for this we would need to inject a scheduler into our view model so that we can control it from the outside:
+One way to fix this testing problem is to use an ["immediate" scheduler](#immediatescheduler) instead of `DispatchQueue.main`, which will cause `fetchEpisode` to deliver its output as soon as possible with no thread hops. In order to allow for this we would need to inject a scheduler into our view model so that we can control it from the outside:
 
 ```swift
 class EpisodeViewModel<S: Scheduler>: ObservableObject {
   @Published var episode: Episode?
+  private var cancellables: Set<AnyCancellable> = []
 
   let apiClient: ApiClient
   let scheduler: S
@@ -79,21 +82,23 @@ class EpisodeViewModel<S: Scheduler>: ObservableObject {
     self.apiClient.fetchEpisode()
       .receive(on: self.scheduler)
       .sink { self.episode = $0 }
+      .store(in: &self.cancellables)
   }
 }
 ```
 
 Now we can initialize this view model in production by using `DispatchQueue.main` and we can initialize it in tests using `DispatchQueue.immediateScheduler`. Sounds like a win!
 
-However, introducing this generic to our view model is quite heavyweight as it is loudly announcing to the outside world that this type uses a scheduler, and worse it will end up infecting any code that touches this view model that also wants to be testable. For example, any view that uses this view model will need to introduce a generic if it wants to also be able to control the scheduler, which would be useful if we wanted to write snapshot tests.
+However, introducing this generic to our view model is quite heavyweight as it is loudly announcing to the outside world that this type uses a scheduler, and worse it will end up infecting any code that touches this view model that also wants to be testable. For example, any view that uses this view model will need to introduce a generic if it wants to also be able to control the scheduler, which would be useful if we wanted to write [snapshot tests](https://github.com/pointfreeco/swift-snapshot-testing).
 
-Instead of introducing a generic to allow for substituting in different schedulers we can use the `AnyScheduler`. It allows us to be somewhat generic in the scheduler, but without actually introducing a generic.
+Instead of introducing a generic to allow for substituting in different schedulers we can use `AnyScheduler`. It allows us to be somewhat generic in the scheduler, but without actually introducing a generic.
 
 Instead of holding a generic scheduler in our view model we can say that we only want a scheduler whose associated types match that of `DispatchQueue`:
 
 ```swift
 class EpisodeViewModel: ObservableObject {
   @Published var episode: Episode?
+  private var cancellables: Set<AnyCancellable> = []
 
   let apiClient: ApiClient
   let scheduler: AnySchedulerOf<DispatchQueue>
@@ -107,6 +112,7 @@ class EpisodeViewModel: ObservableObject {
     self.apiClient.fetchEpisode()
       .receive(on: self.scheduler)
       .sink { self.episode = $0 }
+      .store(in: &self.cancellables)
   }
 }
 ```
@@ -193,11 +199,11 @@ A scheduler that executes its work on the main queue as soon as possible.
 
 If `UIScheduler.shared.schedule` is invoked from the main thread then the unit of work will be performed immediately. This is in contrast to `DispatchQueue.main.schedule`, which will incur a thread hop before executing since it uses `DispatchQueue.main.async` under the hood.
 
-This scheduler can be useful for situations where you need work executed as quickly as possible on the main thread, and for which a thread hop would be problematic, such as when perform animations.
+This scheduler can be useful for situations where you need work executed as quickly as possible on the main thread, and for which a thread hop would be problematic, such as when performing animations.
 
 ### `ImmediateScheduler`
 
-The Combine framework comes with an `ImmediateScheduler` type, but it defines all new types for the associated types of `SchedulerTimeType` and `SchedulerOptions`. This means you cannot easily swap between a live `DispatchQueue` and an "immediate" `DispatchQueue` that executes work synchronously. The only way to do that would be to introduce generics to any code making use of that scheduler, which can become unwiedly.
+The Combine framework comes with an `ImmediateScheduler` type of its own, but it defines all new types for the associated types of `SchedulerTimeType` and `SchedulerOptions`. This means you cannot easily swap between a live `DispatchQueue` and an "immediate" `DispatchQueue` that executes work synchronously. The only way to do that would be to introduce generics to any code making use of that scheduler, which can become unwieldly.
 
 So, instead, this library's `ImmediateScheduler` uses the same associated types as an existing scheduler, which means you can use `DispatchQueue.immediateScheduler` to have a scheduler that looks like a dispatch queue but executes its work immediately. Similarly you can construct `RunLoop.immediateScheduler` and `OperationQueue.immediateScheduler`.
 
@@ -210,9 +216,9 @@ As a basic example, suppose you have a view model that loads some data after wai
 ```swift
 class HomeViewModel: ObservableObject {
   @Published var episodes: [Episode]?
+  var cancellables: Set<AnyCancellable> = []
 
   let apiClient: ApiClient
-  var cancellables: Set<AnyCancellable> = []
 
   init(apiClient: ApiClient) {
     self.apiClient = apiClient
@@ -308,15 +314,15 @@ Publishers.Timer(every: .seconds(1), scheduler: DispatchQueue.main)
   .sink { print("Timer", $0) }
 ```
 
-Alternatively you can call the `publisher` method on a scheduler in order to derive a repeating timer on that scheduler:
+Alternatively you can call the `timerPublisher` method on a scheduler in order to derive a repeating timer on that scheduler:
 
 ```swift
-DispachQueue.main.timerPublisher(every: .seconds(1))
+DispatchQueue.main.timerPublisher(every: .seconds(1))
   .autoconnect()
   .sink { print("Timer", $0) }
 ```
 
-But the best part of this timer is that you can use it with `TestScheduler` so that any Combine code you write involving timers because more testable. This shows how we can easily simulate the idea of moving time forward 1,000 seconds in a timer:
+But the best part of this timer is that you can use it with `TestScheduler` so that any Combine code you write involving timers becomes more testable. This shows how we can easily simulate the idea of moving time forward 1,000 seconds in a timer:
 
 ```swift
 let scheduler = DispatchQueue.testScheduler
