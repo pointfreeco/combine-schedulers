@@ -3,7 +3,8 @@ import Dispatch
 
 /// A scheduler that executes its work on the main queue as soon as possible.
 ///
-/// This scheduler is inspired by the [equivalent](https://github.com/ReactiveCocoa/ReactiveSwift/blob/58d92aa01081301549c48a4049e215210f650d07/Sources/Scheduler.swift#L92)
+/// This scheduler is inspired by the
+/// [equivalent](https://github.com/ReactiveCocoa/ReactiveSwift/blob/58d92aa01081301549c48a4049e215210f650d07/Sources/Scheduler.swift#L92)
 /// scheduler in the [ReactiveSwift](https://github.com/ReactiveCocoa/ReactiveSwift) project.
 ///
 /// If `UIScheduler.shared.schedule` is invoked from the main thread then the unit of work will be
