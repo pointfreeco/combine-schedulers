@@ -56,50 +56,47 @@ import Foundation
 /// Alternatively, we can explicitly pass a scheduler into the view model initializer so that it can
 /// be controller from the outside:
 ///
-class HomeViewModel: ObservableObject {
-  @Published var episodes: [Episode]?
-
-  let apiClient: ApiClient
-  let scheduler: AnySchedulerOf<DispatchQueue>
-  var cancellables: Set<AnyCancellable> = []
-
-  init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
-    self.apiClient = apiClient
-    self.scheduler = scheduler
-  }
-
-  func reloadButtonTapped() {
-    Just(())
-      .delay(for: .seconds(10), scheduler: self.scheduler)
-      .flatMap { self.apiClient.fetchEpisodes() }
-      .sink { self.episodes = $0 }
-      .store(in: &self.cancellables)
-  }
-}
-```
-
-And then in tests use an immediate scheduler:
-
-```swift
-func testViewModel() {
-  let viewModel(
-    apiClient: .mock,
-    scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
-  )
-
-  var output: [Episode] = []
-  viewModel.$episodes
-    .sink { output.append($0) }
-    .store(in: &self.cancellables)
-
-  viewModel.reloadButtonTapped()
-
-  // No more waiting...
-
-  XCTAssert(output, [Episode(id: 42)])
-}
-```
-
+///     class HomeViewModel: ObservableObject {
+///       @Published var episodes: [Episode]?
+///
+///       let apiClient: ApiClient
+///       let scheduler: AnySchedulerOf<DispatchQueue>
+///       var cancellables: Set<AnyCancellable> = []
+///
+///       init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
+///         self.apiClient = apiClient
+///         self.scheduler = scheduler
+///       }
+///
+///       func reloadButtonTapped() {
+///         Just(())
+///           .delay(for: .seconds(10), scheduler: self.scheduler)
+///           .flatMap { self.apiClient.fetchEpisodes() }
+///           .sink { self.episodes = $0 }
+///           .store(in: &self.cancellables)
+///       }
+///     }
+///
+/// And then in tests use an immediate scheduler:
+///
+///     func testViewModel() {
+///       let viewModel(
+///         apiClient: .mock,
+///         scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
+///       )
+///
+///       var output: [Episode] = []
+///       viewModel.$episodes
+///         .sink { output.append($0) }
+///         .store(in: &self.cancellables)
+///
+///       viewModel.reloadButtonTapped()
+///
+///       // No more waiting...
+///
+///       XCTAssert(output, [Episode(id: 42)])
+///     }
+///
 public struct ImmediateScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
 where
   SchedulerTimeType: Strideable,
