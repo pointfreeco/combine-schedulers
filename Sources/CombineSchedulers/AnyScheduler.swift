@@ -1,15 +1,17 @@
 import Combine
 import Foundation
 
-/// A type-erasing scheduler that defines when and how to execute a closure.
+/// A type-erasing wrapper for the `Scheduler` protocol, which can be useful for being generic over
+/// many types of schedulers without needing to actually introduce a generic to your code.
 ///
 /// This type is useful for times that you want to be able to customize the scheduler used in some
-/// code from the outside, but you don't want to introduce a generic to make it customizable.
-/// For example, suppose you have a view model `ObservableObject` that performs an API request
-/// when a method is called:
+/// code from the outside, but you don't want to introduce a generic to make it customizable. For
+/// example, suppose you have a view model `ObservableObject` that performs an API request when a
+/// method is called:
 ///
 ///     class EpisodeViewModel: ObservableObject {
 ///       @Published var episode: Episode?
+///       private var cancellables: Set<AnyCancellable> = []
 ///
 ///       let apiClient: ApiClient
 ///
@@ -21,25 +23,27 @@ import Foundation
 ///         self.apiClient.fetchEpisode()
 ///           .receive(on: DispatchQueue.main)
 ///           .sink { self.episode = $0 }
+///           .store(in: &self.cancellables)
 ///       }
 ///     }
 ///
-/// Notice that we are using `DispatchQueue.main` in the `reloadButtonTapped` method because
-/// the `fetchEpisode` endpoint most likely delivers its output on a background thread (as is the
-/// case with `URLSession`).
+/// Notice that we are using `DispatchQueue.main` in the `reloadButtonTapped` method because the
+/// `fetchEpisode` endpoint most likely delivers its output on a background thread (as is the case
+/// with `URLSession`).
 ///
 /// This code seems innocent enough, but the presence of `.receive(on: DispatchQueue.main)` makes
-/// this code harder to test since you have to use `XCTest` expectations to explicitly wait a
-/// small amount of time for the queue to execute. This can lead to flakiness in tests and make
-/// test suites take longer to execute than necessary.
+/// this code harder to test since you have to use `XCTest` expectations to explicitly wait a small
+/// amount of time for the queue to execute. This can lead to flakiness in tests and make test
+/// suites take longer to execute than necessary.
 ///
 /// One way to fix this testing problem is to use an "immediate" scheduler instead of
-/// `DispatchQueue.main`, which will cause `fetchEpisode` to deliver its output as soon as
-/// possible with no thread hops. In order to allow for this we would need to inject a scheduler
-/// into our view model so that we can control it from the outside:
+/// `DispatchQueue.main`, which will cause `fetchEpisode` to deliver its output as soon as possible
+/// with no thread hops. In order to allow for this we would need to inject a scheduler into our
+/// view model so that we can control it from the outside:
 ///
 ///     class EpisodeViewModel<S: Scheduler>: ObservableObject {
 ///       @Published var episode: Episode?
+///       private var cancellables: Set<AnyCancellable> = []
 ///
 ///       let apiClient: ApiClient
 ///       let scheduler: S
@@ -53,6 +57,7 @@ import Foundation
 ///         self.apiClient.fetchEpisode()
 ///           .receive(on: self.scheduler)
 ///           .sink { self.episode = $0 }
+///           .store(in: &self.cancellables)
 ///       }
 ///     }
 ///
@@ -66,11 +71,11 @@ import Foundation
 /// to control the scheduler, which would be useful if we wanted to write snapshot tests.
 ///
 /// Instead of introducing a generic to allow for substituting in different schedulers we can use
-/// the `AnyScheduler`. It allows us to be somewhat generic in the scheduler, but without actually
+/// `AnyScheduler`. It allows us to be somewhat generic in the scheduler, but without actually
 /// introducing a generic.
 ///
-/// Instead of holding a generic scheduler in our view model we can say
-/// that we only want a scheduler whose associated types match that of `DispatchQueue`:
+/// Instead of holding a generic scheduler in our view model we can say that we only want a
+/// scheduler whose associated types match that of `DispatchQueue`:
 ///
 ///     class EpisodeViewModel: ObservableObject {
 ///       @Published var episode: Episode?
