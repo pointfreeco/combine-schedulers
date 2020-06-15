@@ -5,7 +5,7 @@
 [![CI](https://github.com/pointfreeco/combine-schedulers/workflows/CI/badge.svg)](https://github.com/pointfreeco/combine-schedulers/actions?query=workflow%3ACI)
 [![@pointfreeco](https://img.shields.io/badge/contact-@pointfreeco-5AA9E7.svg?style=flat)](https://twitter.com/pointfreeco)
 
-A few schedulers that makes working with Combine more testable and more versatile.
+A few schedulers that make working with Combine more testable and more versatile.
 
 ## Motivation
 
