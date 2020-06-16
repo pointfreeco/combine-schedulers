@@ -1,7 +1,9 @@
+#if canImport(Combine)
 import Combine
 import CombineSchedulers
 import XCTest
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 final class CombineSchedulerTests: XCTestCase {
   var cancellables: Set<AnyCancellable> = []
 
@@ -133,3 +135,4 @@ final class CombineSchedulerTests: XCTestCase {
     XCTAssertEqual(values, [1, 42, 42, 1, 42])
   }
 }
+#endif

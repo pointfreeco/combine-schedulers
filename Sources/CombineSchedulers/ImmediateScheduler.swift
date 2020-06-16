@@ -1,3 +1,4 @@
+#if canImport(Combine)
 import Combine
 import Foundation
 
@@ -97,6 +98,7 @@ import Foundation
 ///       XCTAssert(output, [Episode(id: 42)])
 ///     }
 ///
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public struct ImmediateScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
 where
   SchedulerTimeType: Strideable,
@@ -138,6 +140,7 @@ where
   }
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Scheduler
 where
   SchedulerTimeType == DispatchQueue.SchedulerTimeType,
@@ -149,6 +152,7 @@ where
   }
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Scheduler
 where
   SchedulerTimeType == RunLoop.SchedulerTimeType,
@@ -159,6 +163,7 @@ where
   }
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Scheduler
 where
   SchedulerTimeType == OperationQueue.SchedulerTimeType,
@@ -171,6 +176,8 @@ where
 
 /// A convenience type to specify an `ImmediateTestScheduler` by the scheduler it wraps rather than
 /// by the time type and options type.
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public typealias ImmediateSchedulerOf<Scheduler> = ImmediateScheduler<
   Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
 > where Scheduler: Combine.Scheduler
+#endif

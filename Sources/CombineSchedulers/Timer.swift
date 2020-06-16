@@ -11,12 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 // Only support 64bit
-#if !(os(iOS) && (arch(i386) || arch(arm)))
-
+#if !(os(iOS) && (arch(i386) || arch(arm))) && canImport(Combine)
   @_exported import Foundation  // Clang module
   import Combine
   import Foundation
 
+  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   extension Scheduler {
     /// Returns a publisher that repeatedly emits the scheduler's current time on the given
     /// interval.
