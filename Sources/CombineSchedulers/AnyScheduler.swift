@@ -1,3 +1,4 @@
+#if canImport(Combine)
 import Combine
 import Foundation
 
@@ -114,6 +115,7 @@ import Foundation
 /// in classes, functions, etc. without needing to introduce a generic, which can help simplify
 /// the code and reduce implementation details from leaking out.
 ///
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public struct AnyScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
 where
   SchedulerTimeType: Strideable,
@@ -199,13 +201,16 @@ where
 
 /// A convenience type to specify an `AnyScheduler` by the scheduler it wraps rather than by the
 /// time type and options type.
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public typealias AnySchedulerOf<Scheduler> = AnyScheduler<
   Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
 > where Scheduler: Combine.Scheduler
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Scheduler {
   /// Wraps this scheduler with a type eraser.
   public func eraseToAnyScheduler() -> AnyScheduler<SchedulerTimeType, SchedulerOptions> {
     AnyScheduler(self)
   }
 }
+#endif
