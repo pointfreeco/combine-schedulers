@@ -292,7 +292,7 @@
           self.cancellable = parent.scheduler.schedule(
             after: parent.scheduler.now.advanced(by: parent.interval),
             interval: parent.interval,
-            tolerance: parent.tolerance ?? .seconds(.max),
+            tolerance: parent.tolerance ?? .zero,
             options: parent.options
           ) {
             self.timerFired()
