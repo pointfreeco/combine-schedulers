@@ -345,6 +345,10 @@ scheduler.advance(by: 1_000)
 XCTAssertEqual(output, Array(0...1_001))
 ```
 
+## Compatability
+
+This library is compatible with iOS 13.2 and higher. There are bugs in Combine and iOS 13.1 and lower that cause crashes when trying to compare `DispatchQueue.SchedulerTimeType` values.
+
 ## Installation
 
 You can add CombineSchedulers to an Xcode project by adding it as a package dependency.
@@ -354,8 +358,6 @@ You can add CombineSchedulers to an Xcode project by adding it as a package depe
   3. Depending on how your project is structured:
       - If you have a single application target that needs access to the library, then add **CombineSchedulers** directly to your application.
       - If you want to use this library from multiple targets you must create a shared framework that depends on **CombineSchedulers**, and then depend on that framework from your other targets.
-
-**Note**: This library is only compatible with iOS 13.2 and higher. There are bugs in Combine and iOS 13.1 and lower that cause crashes when trying to compare `DispatchQueue.SchedulerTimeType` values.
 
 ## Other Libraries
 
