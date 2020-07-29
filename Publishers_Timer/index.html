@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CombineSchedulers - Publishers.Timer</title>
+    <link rel="stylesheet" type="text/css" href="/combine-schedulers/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/combine-schedulers/">
+            <strong>
+                CombineSchedulers
+            </strong>
+            <span>Documentation</span>
+        </a>
+        <sup>Beta</sup>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#nested type aliases">Nested Type Aliases</a><ul><li class="typealias"><a href="#publishers.timer.output">Output</a></li><li class="typealias"><a href="#publishers.timer.failure">Failure</a></li></ul></li><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#publishers.timer.init(every:tolerance:scheduler:options:)">init(every:​tolerance:​scheduler:​options:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#publishers.timer.interval">interval</a></li><li class="variable"><a href="#publishers.timer.options">options</a></li><li class="variable"><a href="#publishers.timer.scheduler">scheduler</a></li><li class="variable"><a href="#publishers.timer.tolerance">tolerance</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#publishers.timer.receive(subscriber:)">receive(subscriber:​)</a></li><li class="function"><a href="#publishers.timer.connect()">connect()</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Class</small>
+    <code class="name">Publishers.​Timer</code>
+</h1>
+
+<html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">Timer</span>&lt;<span class="variable">S</span>: <span class="type">Scheduler</span>&gt;: <span class="type">ConnectablePublisher</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>A publisher that emits a scheduler's current time on a repeating interval.</p>
+
+</div>
+<div class="discussion">
+    <p>This publisher is an alternative to Foundation's <code>Timer.publisher</code>, with its primary
+difference being that it allows you to use any scheduler for the timer, not just <code>RunLoop</code>.
+This is useful because the <code>RunLoop</code> scheduler is not testable in the sense that if you want
+to write tests against a publisher that makes use of <code>Timer.publisher</code> you must explicitly
+wait for time to pass in order to get emissions. This is likely to lead to fragile tests and
+greatly bloat the time your tests take to execute.</p>
+
+<p>It can be used much like Foundation's timer, except you specify a scheduler rather than a
+run loop:</p>
+
+<html><body><pre class="highlight"><code><span class="variable">Publishers</span>.<span class="type">Timer</span>(<span class="variable">every</span>: .<span class="variable">seconds</span>(<span class="number literal">1</span>), <span class="variable">scheduler</span>: <span class="type">DispatchQueue</span>.<span class="type">main</span>)
+  .<span class="type">sink</span> { <span class="variable">print</span>(<span class="string literal">"</span><span class="string literal">Timer</span><span class="string literal">"</span>, <span class="variable">$0</span>) }
+</code></pre></body></html>
+<p>But more importantly, you can use it with <code>TestScheduler</code> so that any Combine code you write
+involving timers becomes more testable. This shows how we can easily simulate the idea of
+moving time forward 1,000 seconds in a timer:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="type">testScheduler</span>
+<span class="keyword">var</span> <span class="variable">output</span>: [<span class="type">Int</span>] = []
+
+<span class="variable">Publishers</span>.<span class="type">Timer</span>(<span class="variable">every</span>: <span class="number literal">1</span>, <span class="variable">scheduler</span>: <span class="type">scheduler</span>)
+  .<span class="type">sink</span> { <span class="keyword">_</span> <span class="keyword">in</span> <span class="variable">output</span>.<span class="type">append</span>(<span class="variable">output</span>.<span class="type">count</span>) }
+  .<span class="type">store</span>(<span class="variable">in</span>: &amp;<span class="keyword">self</span>.<span class="type">cancellables</span>)
+
+<span class="variable">XCTAssertEqual</span>(<span class="variable">output</span>, [])
+
+<span class="variable">scheduler</span>.<span class="type">advance</span>(<span class="variable">by</span>: <span class="number literal">1</span>)
+<span class="variable">XCTAssertEqual</span>(<span class="variable">output</span>, [<span class="number literal">0</span>])
+
+<span class="variable">scheduler</span>.<span class="type">advance</span>(<span class="variable">by</span>: <span class="number literal">1</span>)
+<span class="variable">XCTAssertEqual</span>(<span class="variable">output</span>, [<span class="number literal">0</span>, <span class="number literal">1</span>])
+
+<span class="variable">scheduler</span>.<span class="type">advance</span>(<span class="variable">by</span>: <span class="number literal">1_000</span>)
+<span class="variable">XCTAssertEqual</span>(<span class="variable">output</span>, <span class="variable">Array</span>(<span class="number literal">0</span>...<span class="number literal">1_001</span>))
+</code></pre></body></html>
+</div>
+<section id="relationships">
+    <h2 hidden>Relationships</h2>
+        
+        <h3>Conforms To</h3>
+<dl>
+    <dt class="unknown"><code>ConnectablePublisher</code></dt>
+</dl>
+</section>
+    <section id="nested type aliases">
+        <h2>Nested Type Aliases</h2>
+
+        <div role="article" class="typealias" id="publishers.timer.output">
+    <h3>
+        <code>Output</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">Output</span> = <span class="type">S</span>.<span class="type">SchedulerTimeType</span></code></pre></body></html>
+</div>
+<div role="article" class="typealias" id="publishers.timer.failure">
+    <h3>
+        <code>Failure</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">Failure</span> = <span class="type">Never</span></code></pre></body></html>
+</div>
+    </section>
+    <section id="initializers">
+        <h2>Initializers</h2>
+
+        <div role="article" class="initializer" id="publishers.timer.init(every:tolerance:scheduler:options:)">
+    <h3>
+        <code>init(every:​tolerance:​scheduler:​options:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">every</span> <span class="variable">interval</span>: <span class="type">S</span>.<span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">tolerance</span>: <span class="type">S</span>.<span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>? = <span class="keyword">nil</span>, <span class="variable">scheduler</span>: <span class="type">S</span>, <span class="variable">options</span>: <span class="type">S</span>.<span class="type">SchedulerOptions</span>? = <span class="keyword">nil</span>)</code></pre></body></html>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="publishers.timer.interval">
+    <h3>
+        <code>interval</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">interval</span>: <span class="type">S</span>.<span class="type">SchedulerTimeType</span>.<span class="type">Stride</span></code></pre></body></html>
+</div>
+<div role="article" class="variable" id="publishers.timer.options">
+    <h3>
+        <code>options</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">options</span>: <span class="type">S</span>.<span class="type">SchedulerOptions</span>?</code></pre></body></html>
+</div>
+<div role="article" class="variable" id="publishers.timer.scheduler">
+    <h3>
+        <code>scheduler</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span>: <span class="type">S</span></code></pre></body></html>
+</div>
+<div role="article" class="variable" id="publishers.timer.tolerance">
+    <h3>
+        <code>tolerance</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">tolerance</span>: <span class="type">S</span>.<span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>?</code></pre></body></html>
+</div>
+    </section>
+    <section id="methods">
+        <h2>Methods</h2>
+
+        <div role="article" class="function" id="publishers.timer.receive(subscriber:)">
+    <h3>
+        <code>receive(subscriber:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">receive</span>&lt;<span class="variable">S</span>: <span class="type">Subscriber</span>&gt;(<span class="variable">subscriber</span>: <span class="type">S</span>) <span class="keyword">where</span> <span class="type">Failure</span> == <span class="type">S</span>.<span class="type">Failure</span>, <span class="type">Output</span> == <span class="type">S</span>.<span class="type">Input</span></code></pre></body></html>
+</div>
+<div role="article" class="function" id="publishers.timer.connect()">
+    <h3>
+        <code>connect()</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">connect</span>() -&gt; <span class="type">Cancellable</span></code></pre></body></html>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2020-07-29T15:46:51+0000">July 29, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.3</span>.
+</p>
+    </footer>
+</body>
+</html>

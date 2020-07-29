@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CombineSchedulers - AnyScheduler</title>
+    <link rel="stylesheet" type="text/css" href="/combine-schedulers/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/combine-schedulers/">
+            <strong>
+                CombineSchedulers
+            </strong>
+            <span>Documentation</span>
+        </a>
+        <sup>Beta</sup>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#anyscheduler.init(_:)">init(_:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#anyscheduler.minimumtolerance">minimum​Tolerance</a></li><li class="variable"><a href="#anyscheduler.now">now</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#anyscheduler.schedule(after:tolerance:options:_:)">schedule(after:​tolerance:​options:​_:​)</a></li><li class="function"><a href="#anyscheduler.schedule(after:interval:tolerance:options:_:)">schedule(after:​interval:​tolerance:​options:​_:​)</a></li><li class="function"><a href="#anyscheduler.schedule(options:_:)">schedule(options:​_:​)</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Structure</small>
+    <code class="name">Any​Scheduler</code>
+</h1>
+
+<html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">OSX</span> <span class="number literal">10.15</span>, <span class="keyword">iOS</span> <span class="number literal">13.0</span>, <span class="keyword">tvOS</span> <span class="number literal">13.0</span>, <span class="keyword">watchOS</span> <span class="number literal">6.0</span>, *) <span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">AnyScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span> <span class="keyword">where</span> <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>, <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>A type-erasing wrapper for the <code>Scheduler</code> protocol, which can be useful for being generic over
+many types of schedulers without needing to actually introduce a generic to your code.</p>
+
+</div>
+<div class="discussion">
+    <p>This type is useful for times that you want to be able to customize the scheduler used in some
+code from the outside, but you don't want to introduce a generic to make it customizable. For
+example, suppose you have a view model <code>ObservableObject</code> that performs an API request when a
+method is called:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">class</span> <span class="type">EpisodeViewModel</span>: <span class="type">ObservableObject</span> {
+  <span class="attribute">@</span><span class="type">Published</span> <span class="keyword">var</span> <span class="variable">episode</span>: <span class="type">Episode</span>?
+  <span class="keyword">private</span> <span class="keyword">var</span> <span class="variable">cancellables</span>: <span class="type">Set</span>&lt;<span class="type">AnyCancellable</span>&gt; = []
+
+  <span class="keyword">let</span> <span class="variable">apiClient</span>: <span class="type">ApiClient</span>
+
+  <span class="keyword">init</span>(<span class="variable">apiClient</span>: <span class="type">ApiClient</span>) {
+    <span class="keyword">self</span>.<span class="type">apiClient</span> = <span class="variable">apiClient</span>
+  }
+
+  <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
+    <span class="keyword">self</span>.<span class="type">apiClient</span>.<span class="type">fetchEpisode</span>()
+      .<span class="type">receive</span>(<span class="variable">on</span>: <span class="type">DispatchQueue</span>.<span class="type">main</span>)
+      .<span class="type">sink</span> { <span class="keyword">self</span>.<span class="type">episode</span> = <span class="variable">$0</span> }
+      .<span class="type">store</span>(<span class="variable">in</span>: &amp;<span class="keyword">self</span>.<span class="type">cancellables</span>)
+  }
+}
+</code></pre></body></html>
+<p>Notice that we are using <code>DispatchQueue.main</code> in the <code>reloadButtonTapped</code> method because the
+<code>fetchEpisode</code> endpoint most likely delivers its output on a background thread (as is the case
+with <code>URLSession</code>).</p>
+
+<p>This code seems innocent enough, but the presence of <code>.receive(on: DispatchQueue.main)</code> makes
+this code harder to test since you have to use <code>XCTest</code> expectations to explicitly wait a small
+amount of time for the queue to execute. This can lead to flakiness in tests and make test
+suites take longer to execute than necessary.</p>
+
+<p>One way to fix this testing problem is to use an &quot;immediate&quot; scheduler instead of
+<code>DispatchQueue.main</code>, which will cause <code>fetchEpisode</code> to deliver its output as soon as possible
+with no thread hops. In order to allow for this we would need to inject a scheduler into our
+view model so that we can control it from the outside:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">class</span> <span class="type">EpisodeViewModel</span>&lt;<span class="variable">S</span>: <span class="type">Scheduler</span>&gt;: <span class="type">ObservableObject</span> {
+  <span class="attribute">@</span><span class="type">Published</span> <span class="keyword">var</span> <span class="variable">episode</span>: <span class="type">Episode</span>?
+  <span class="keyword">private</span> <span class="keyword">var</span> <span class="variable">cancellables</span>: <span class="type">Set</span>&lt;<span class="type">AnyCancellable</span>&gt; = []
+
+  <span class="keyword">let</span> <span class="variable">apiClient</span>: <span class="type">ApiClient</span>
+  <span class="keyword">let</span> <span class="variable">scheduler</span>: <span class="type">S</span>
+
+  <span class="keyword">init</span>(<span class="variable">apiClient</span>: <span class="type">ApiClient</span>, <span class="variable">scheduler</span>: <span class="type">S</span>) {
+    <span class="keyword">self</span>.<span class="type">apiClient</span> = <span class="variable">apiClient</span>
+    <span class="keyword">self</span>.<span class="type">scheduler</span> = <span class="variable">scheduler</span>
+  }
+
+  <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
+    <span class="keyword">self</span>.<span class="type">apiClient</span>.<span class="type">fetchEpisode</span>()
+      .<span class="type">receive</span>(<span class="variable">on</span>: <span class="keyword">self</span>.<span class="type">scheduler</span>)
+      .<span class="type">sink</span> { <span class="keyword">self</span>.<span class="type">episode</span> = <span class="variable">$0</span> }
+      .<span class="type">store</span>(<span class="variable">in</span>: &amp;<span class="keyword">self</span>.<span class="type">cancellables</span>)
+  }
+}
+</code></pre></body></html>
+<p>Now we can initialize this view model in production by using <code>DispatchQueue.main</code> and we can
+initialize it in tests using <code>DispatchQueue.immediateScheduler</code>. Sounds like a win!</p>
+
+<p>However, introducing this generic to our view model is quite heavyweight as it is loudly
+announcing to the outside world that this type uses a scheduler, and worse it will end up
+infecting any code that touches this view model that also wants to be testable. For example,
+any view that uses this view model will need to introduce a generic if it wants to also be able
+to control the scheduler, which would be useful if we wanted to write snapshot tests.</p>
+
+<p>Instead of introducing a generic to allow for substituting in different schedulers we can use
+<code>AnyScheduler</code>. It allows us to be somewhat generic in the scheduler, but without actually
+introducing a generic.</p>
+
+<p>Instead of holding a generic scheduler in our view model we can say that we only want a
+scheduler whose associated types match that of <code>DispatchQueue</code>:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">class</span> <span class="type">EpisodeViewModel</span>: <span class="type">ObservableObject</span> {
+  <span class="attribute">@</span><span class="type">Published</span> <span class="keyword">var</span> <span class="variable">episode</span>: <span class="type">Episode</span>?
+
+  <span class="keyword">let</span> <span class="variable">apiClient</span>: <span class="type">ApiClient</span>
+  <span class="keyword">let</span> <span class="variable">scheduler</span>: <a href="/combine-schedulers/AnySchedulerOf"><span class="type">AnySchedulerOf</span></a>&lt;<span class="type">DispatchQueue</span>&gt;
+
+  <span class="keyword">init</span>(<span class="variable">apiClient</span>: <span class="type">ApiClient</span>, <span class="variable">scheduler</span>: <a href="/combine-schedulers/AnySchedulerOf"><span class="type">AnySchedulerOf</span></a>&lt;<span class="type">DispatchQueue</span>&gt;) {
+    <span class="keyword">self</span>.<span class="type">apiClient</span> = <span class="variable">apiClient</span>
+    <span class="keyword">self</span>.<span class="type">scheduler</span> = <span class="variable">scheduler</span>
+  }
+
+  <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
+    <span class="keyword">self</span>.<span class="type">apiClient</span>.<span class="type">fetchEpisode</span>()
+      .<span class="type">receive</span>(<span class="variable">on</span>: <span class="keyword">self</span>.<span class="type">scheduler</span>)
+      .<span class="type">sink</span> { <span class="keyword">self</span>.<span class="type">episode</span> = <span class="variable">$0</span> }
+  }
+}
+</code></pre></body></html>
+<p>Then, in production we can create a view model that uses a live <code>DispatchQueue</code>, but we just
+have to first erase its type:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">viewModel</span> = <span class="variable">EpisodeViewModel</span>(
+  <span class="variable">apiClient</span>: ...,
+  <span class="variable">scheduler</span>: <span class="type">DispatchQueue</span>.<span class="type">main</span>.<span class="type">eraseToAnyScheduler</span>()
+)
+</code></pre></body></html>
+<p>And similarly in tests we can use an immediate scheduler as long as we erase its type:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">viewModel</span> = <span class="variable">EpisodeViewModel</span>(
+  <span class="variable">apiClient</span>: ...,
+  <span class="variable">scheduler</span>: <span class="type">DispatchQueue</span>.<span class="type">immediateScheduler</span>.<span class="type">eraseToAnyScheduler</span>()
+)
+</code></pre></body></html>
+<p>So, in general, <code>AnyScheduler</code> is great for allowing one to control what scheduler is used
+in classes, functions, etc. without needing to introduce a generic, which can help simplify
+the code and reduce implementation details from leaking out.</p>
+
+</div>
+<section id="relationships">
+    <h2 hidden>Relationships</h2>
+        
+        <h3>Conforms To</h3>
+<dl>
+    <dt class="unknown"><code>Scheduler</code></dt>
+</dl>
+</section>
+    <section id="initializers">
+        <h2>Initializers</h2>
+
+        <div role="article" class="initializer" id="anyscheduler.init(_:)">
+    <h3>
+        <code>init(_:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>&lt;<span class="variable">S</span>&gt;(<span class="keyword">_</span> <span class="variable">scheduler</span>: <span class="type">S</span>) <span class="keyword">where</span> <span class="type">S</span>: <span class="type">Scheduler</span>, <span class="type">S</span>.<span class="type">SchedulerTimeType</span> == <span class="type">SchedulerTimeType</span>, <span class="type">S</span>.<span class="type">SchedulerOptions</span> == <span class="type">SchedulerOptions</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Creates a type-erasing scheduler to wrap the provided scheduler.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>scheduler</th>
+    <td><code class="type">S</code></td></td>
+    <td><ul>
+<li>scheduler: A scheduler to wrap with a type-eraser.</li>
+</ul>
+</td>
+</tr>
+  </tbody>
+</table>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="anyscheduler.minimumtolerance">
+    <h3>
+        <code>minimum​Tolerance</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">minimumTolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>The minimum tolerance allowed by the scheduler.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="anyscheduler.now">
+    <h3>
+        <code>now</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">now</span>: <span class="type">SchedulerTimeType</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>This scheduler’s definition of the current moment in time.</p>
+
+</div>
+</div>
+    </section>
+    <section id="methods">
+        <h2>Methods</h2>
+
+        <div role="article" class="function" id="anyscheduler.schedule(after:tolerance:options:_:)">
+    <h3>
+        <code>schedule(after:​tolerance:​options:​_:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">after</span> <span class="variable">date</span>: <span class="type">SchedulerTimeType</span>, <span class="variable">tolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">options</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>)</code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Performs the action at some time after the specified date.</p>
+
+</div>
+</div>
+<div role="article" class="function" id="anyscheduler.schedule(after:interval:tolerance:options:_:)">
+    <h3>
+        <code>schedule(after:​interval:​tolerance:​options:​_:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">after</span> <span class="variable">date</span>: <span class="type">SchedulerTimeType</span>, <span class="variable">interval</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">tolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">options</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>) -&gt; <span class="type">Cancellable</span></code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Performs the action at some time after the specified date, at the
+specified frequency, taking into account tolerance if possible.</p>
+
+</div>
+</div>
+<div role="article" class="function" id="anyscheduler.schedule(options:_:)">
+    <h3>
+        <code>schedule(options:​_:​)</code>
+    </h3>
+    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>)</code></pre></body></html>
+<div class="summary" role="doc-abstract">
+    <p>Performs the action at the next possible opportunity.</p>
+
+</div>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2020-07-29T15:46:51+0000">July 29, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.3</span>.
+</p>
+    </footer>
+</body>
+</html>

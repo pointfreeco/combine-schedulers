@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CombineSchedulers - CombineSchedulers</title>
+    <link rel="stylesheet" type="text/css" href="/combine-schedulers/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/combine-schedulers/">
+            <strong>
+                CombineSchedulers
+            </strong>
+            <span>Documentation</span>
+        </a>
+        <sup>Beta</sup>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#classes">Classes</a></li><li><a href="#structures">Structures</a></li><li><a href="#typealiases">Typealiases</a></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+                <section id="classes">
+        <h2>Classes</h2>
+        <dl>
+            <dt class="class">
+    <a href="/combine-schedulers/TestScheduler" title="class - TestScheduler">
+        Test​Scheduler
+    </a>
+</dt>
+<dd>
+    <p>A scheduler whose current time and execution can be controlled in a deterministic manner.</p>
+
+</dd>
+<dt class="class">
+    <a href="/combine-schedulers/Publishers_Timer" title="class - Publishers.Timer">
+        Publishers.​Timer
+    </a>
+</dt>
+<dd>
+    <p>A publisher that emits a scheduler's current time on a repeating interval.</p>
+
+</dd>
+        </dl>
+    </section>
+    <section id="structures">
+        <h2>Structures</h2>
+        <dl>
+            <dt class="structure">
+    <a href="/combine-schedulers/AnyScheduler" title="structure - AnyScheduler">
+        Any​Scheduler
+    </a>
+</dt>
+<dd>
+    <p>A type-erasing wrapper for the <code>Scheduler</code> protocol, which can be useful for being generic over
+many types of schedulers without needing to actually introduce a generic to your code.</p>
+
+</dd>
+<dt class="structure">
+    <a href="/combine-schedulers/ImmediateScheduler" title="structure - ImmediateScheduler">
+        Immediate​Scheduler
+    </a>
+</dt>
+<dd>
+    <p>A scheduler for performing synchronous actions.</p>
+
+</dd>
+<dt class="structure">
+    <a href="/combine-schedulers/UIScheduler" title="structure - UIScheduler">
+        UIScheduler
+    </a>
+</dt>
+<dd>
+    <p>A scheduler that executes its work on the main queue as soon as possible.</p>
+
+</dd>
+        </dl>
+    </section>
+    <section id="typealiases">
+        <h2>Typealiases</h2>
+        <dl>
+            <dt class="typealias">
+    <a href="/combine-schedulers/AnySchedulerOf" title="typealias - AnySchedulerOf">
+        Any​Scheduler​Of
+    </a>
+</dt>
+<dd>
+    <p>A convenience type to specify an <code>AnyScheduler</code> by the scheduler it wraps rather than by the
+time type and options type.</p>
+
+</dd>
+<dt class="typealias">
+    <a href="/combine-schedulers/ImmediateSchedulerOf" title="typealias - ImmediateSchedulerOf">
+        Immediate​Scheduler​Of
+    </a>
+</dt>
+<dd>
+    <p>A convenience type to specify an <code>ImmediateTestScheduler</code> by the scheduler it wraps rather than
+by the time type and options type.</p>
+
+</dd>
+<dt class="typealias">
+    <a href="/combine-schedulers/TestSchedulerOf" title="typealias - TestSchedulerOf">
+        Test​Scheduler​Of
+    </a>
+</dt>
+<dd>
+    <p>A convenience type to specify a <code>TestScheduler</code> by the scheduler it wraps rather than by the
+time type and options type.</p>
+
+</dd>
+        </dl>
+    </section>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2020-07-29T15:46:51+0000">July 29, 2020</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.3</span>.
+</p>
+    </footer>
+</body>
+</html>
