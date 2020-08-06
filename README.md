@@ -7,17 +7,22 @@
 
 A few schedulers that make working with Combine more testable and more versatile.
 
+* [Motivation](#motivation)
+* [Learn more](#learn-more)
+  * [`AnyScheduler`](#anyscheduler)
+  * [`TestScheduler`](#testscheduler)
+  * [`UIScheduler`](#testscheduler)
+  * [`ImmediateScheduler`](#immediatescheduler)
+  * [`Publishers.Timer`](#publisherstimer)
+* [Installation](#installation)
+* [Documentation](#documentation)
+* [Other libraries](#other-libraries)
+
 ## Motivation
 
 The Combine framework provides the `Scheduler` protocol, which is a powerful abstraction for describing how and when units of work are executed. It unifies many disparate ways of executing work, such as `DispatchQueue`, `RunLoop` and `OperationQueue`.
 
 However, the Combine framework is still quite new and missing some fundamental pieces needed to make asynchronous Combine code more testable. This library intends to fill those gaps with some handy schedulers and publishers.
-
-* [`AnyScheduler`](#anyscheduler)
-* [`TestScheduler`](#testscheduler)
-* [`UIScheduler`](#uischeduler)
-* [`ImmediateScheduler`](#immediatescheduler)
-* [`Publishers.Timer`](#publisherstimer)
 
 ## Learn More
 
@@ -354,6 +359,10 @@ You can add CombineSchedulers to an Xcode project by adding it as a package depe
   3. Depending on how your project is structured:
       - If you have a single application target that needs access to the library, then add **CombineSchedulers** directly to your application.
       - If you want to use this library from multiple targets you must create a shared framework that depends on **CombineSchedulers**, and then depend on that framework from your other targets.
+
+## Documentation
+
+The latest documentation for Combine Schedulers' APIs is available [here](https://pointfreeco.github.io/combine-schedulers/).
 
 ## Other Libraries
 
