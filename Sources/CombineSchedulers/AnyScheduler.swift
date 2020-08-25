@@ -139,7 +139,7 @@
         SchedulerOptions?,
         @escaping () -> Void
       ) -> Void
-    private let _scheduleSchedulerOptionsAction: (SchedulerOptions?, @escaping () -> Void) -> Void
+    private let _scheduleOptionsAction: (SchedulerOptions?, @escaping () -> Void) -> Void
 
     /// The minimum tolerance allowed by the scheduler.
     public var minimumTolerance: SchedulerTimeType.Stride { self._minimumTolerance() }
@@ -147,7 +147,27 @@
     /// This scheduler’s definition of the current moment in time.
     public var now: SchedulerTimeType { self._now() }
 
-    let scheduler: Any
+    /// Creates a type-erasing scheduler to wrap the provided endpoints.
+    ///
+    /// - Parameters:
+    ///   - minimumTolerance: A closure that returns the scheduler's minimum tolerance.
+    ///   - now: A closure that returns the scheduler's current time.
+    ///   - scheduleImmediately: A closure that schedules a unit of work to be run as soon as possible.
+    ///   - delayed: A closure that schedules a unit of work to be run after a delay.
+    ///   - interval: A closure that schedules a unit of work to be performed on a repeating interval.
+    public init(
+      minimumTolerance: @escaping () -> SchedulerTimeType.Stride,
+      now: @escaping () -> SchedulerTimeType,
+      scheduleImmediately: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
+      delayed: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Void,
+      interval: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Cancellable
+    ) {
+      self._minimumTolerance = minimumTolerance
+      self._now = now
+      self._scheduleOptionsAction = scheduleImmediately
+      self._scheduleAfterToleranceSchedulerOptionsAction = delayed
+      self._scheduleAfterIntervalToleranceSchedulerOptionsAction = interval
+    }
 
     /// Creates a type-erasing scheduler to wrap the provided scheduler.
     ///
@@ -159,12 +179,11 @@
     where
       S: Scheduler, S.SchedulerTimeType == SchedulerTimeType, S.SchedulerOptions == SchedulerOptions
     {
-      self.scheduler = scheduler
       self._now = { scheduler.now }
       self._minimumTolerance = { scheduler.minimumTolerance }
       self._scheduleAfterToleranceSchedulerOptionsAction = scheduler.schedule
       self._scheduleAfterIntervalToleranceSchedulerOptionsAction = scheduler.schedule
-      self._scheduleSchedulerOptionsAction = scheduler.schedule
+      self._scheduleOptionsAction = scheduler.schedule
     }
 
     /// Performs the action at some time after the specified date.
@@ -195,7 +214,7 @@
       options: SchedulerOptions?,
       _ action: @escaping () -> Void
     ) {
-      self._scheduleSchedulerOptionsAction(options, action)
+      self._scheduleOptionsAction(options, action)
     }
   }
 
