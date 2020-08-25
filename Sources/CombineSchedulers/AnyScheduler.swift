@@ -124,7 +124,7 @@
 
     private let _minimumTolerance: () -> SchedulerTimeType.Stride
     private let _now: () -> SchedulerTimeType
-    private let _scheduleAfterIntervalToleranceSchedulerOptionsAction:
+    private let _scheduleAfterIntervalToleranceOptionsAction:
       (
         SchedulerTimeType,
         SchedulerTimeType.Stride,
@@ -132,7 +132,7 @@
         SchedulerOptions?,
         @escaping () -> Void
       ) -> Cancellable
-    private let _scheduleAfterToleranceSchedulerOptionsAction:
+    private let _scheduleAfterToleranceOptionsAction:
       (
         SchedulerTimeType,
         SchedulerTimeType.Stride,
@@ -165,8 +165,8 @@
       self._minimumTolerance = minimumTolerance
       self._now = now
       self._scheduleOptionsAction = scheduleImmediately
-      self._scheduleAfterToleranceSchedulerOptionsAction = delayed
-      self._scheduleAfterIntervalToleranceSchedulerOptionsAction = interval
+      self._scheduleAfterToleranceOptionsAction = delayed
+      self._scheduleAfterIntervalToleranceOptionsAction = interval
     }
 
     /// Creates a type-erasing scheduler to wrap the provided scheduler.
@@ -181,8 +181,8 @@
     {
       self._now = { scheduler.now }
       self._minimumTolerance = { scheduler.minimumTolerance }
-      self._scheduleAfterToleranceSchedulerOptionsAction = scheduler.schedule
-      self._scheduleAfterIntervalToleranceSchedulerOptionsAction = scheduler.schedule
+      self._scheduleAfterToleranceOptionsAction = scheduler.schedule
+      self._scheduleAfterIntervalToleranceOptionsAction = scheduler.schedule
       self._scheduleOptionsAction = scheduler.schedule
     }
 
@@ -193,7 +193,7 @@
       options: SchedulerOptions?,
       _ action: @escaping () -> Void
     ) {
-      self._scheduleAfterToleranceSchedulerOptionsAction(date, tolerance, options, action)
+      self._scheduleAfterToleranceOptionsAction(date, tolerance, options, action)
     }
 
     /// Performs the action at some time after the specified date, at the
@@ -205,7 +205,7 @@
       options: SchedulerOptions?,
       _ action: @escaping () -> Void
     ) -> Cancellable {
-      self._scheduleAfterIntervalToleranceSchedulerOptionsAction(
+      self._scheduleAfterIntervalToleranceOptionsAction(
         date, interval, tolerance, options, action)
     }
 
