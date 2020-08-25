@@ -152,20 +152,20 @@
     /// - Parameters:
     ///   - minimumTolerance: A closure that returns the scheduler's minimum tolerance.
     ///   - now: A closure that returns the scheduler's current time.
-    ///   - immediately: A closure that schedules a unit of work to be run as soon as possible.
-    ///   - delay: A closure that schedules a unit of work to be run after a delay.
+    ///   - scheduleImmediately: A closure that schedules a unit of work to be run as soon as possible.
+    ///   - delayed: A closure that schedules a unit of work to be run after a delay.
     ///   - interval: A closure that schedules a unit of work to be performed on a repeating interval.
     public init(
       minimumTolerance: @escaping () -> SchedulerTimeType.Stride,
       now: @escaping () -> SchedulerTimeType,
-      immediately: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
-      delay: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Void,
+      scheduleImmediately: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
+      delayed: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Void,
       interval: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Cancellable
     ) {
       self._minimumTolerance = minimumTolerance
       self._now = now
-      self._scheduleOptionsAction = immediately
-      self._scheduleAfterToleranceSchedulerOptionsAction = delay
+      self._scheduleOptionsAction = scheduleImmediately
+      self._scheduleAfterToleranceSchedulerOptionsAction = delayed
       self._scheduleAfterIntervalToleranceSchedulerOptionsAction = interval
     }
 
