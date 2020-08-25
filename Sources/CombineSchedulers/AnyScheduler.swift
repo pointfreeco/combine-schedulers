@@ -139,7 +139,7 @@
         SchedulerOptions?,
         @escaping () -> Void
       ) -> Void
-    private let _scheduleSchedulerOptionsAction: (SchedulerOptions?, @escaping () -> Void) -> Void
+    private let _scheduleOptionsAction: (SchedulerOptions?, @escaping () -> Void) -> Void
 
     /// The minimum tolerance allowed by the scheduler.
     public var minimumTolerance: SchedulerTimeType.Stride { self._minimumTolerance() }
@@ -152,21 +152,21 @@
     /// - Parameters:
     ///   - minimumTolerance: A closure that returns the scheduler's minimum tolerance.
     ///   - now: A closure that returns the scheduler's current time.
-    ///   - scheduleSchedulerOptionsAction: A closure that schedules a unit of work to be run as soon as possible.
-    ///   - scheduleAfterToleranceSchedulerOptionsAction: A closure that schedules a unit of work to be run after a delay.
-    ///   - scheduleAfterIntervalToleranceSchedulerOptionsAction: A closure that schedules a unit of work to be performed on a repeating interval.
+    ///   - immediately: A closure that schedules a unit of work to be run as soon as possible.
+    ///   - delay: A closure that schedules a unit of work to be run after a delay.
+    ///   - interval: A closure that schedules a unit of work to be performed on a repeating interval.
     public init(
       minimumTolerance: @escaping () -> SchedulerTimeType.Stride,
       now: @escaping () -> SchedulerTimeType,
-      scheduleSchedulerOptionsAction: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
-      scheduleAfterToleranceSchedulerOptionsAction: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Void,
-      scheduleAfterIntervalToleranceSchedulerOptionsAction: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Cancellable
+      immediately: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
+      delay: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Void,
+      interval: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Cancellable
     ) {
       self._minimumTolerance = minimumTolerance
       self._now = now
-      self._scheduleSchedulerOptionsAction = scheduleSchedulerOptionsAction
-      self._scheduleAfterToleranceSchedulerOptionsAction = scheduleAfterToleranceSchedulerOptionsAction
-      self._scheduleAfterIntervalToleranceSchedulerOptionsAction = scheduleAfterIntervalToleranceSchedulerOptionsAction
+      self._scheduleOptionsAction = immediately
+      self._scheduleAfterToleranceSchedulerOptionsAction = delay
+      self._scheduleAfterIntervalToleranceSchedulerOptionsAction = interval
     }
 
     /// Creates a type-erasing scheduler to wrap the provided scheduler.
@@ -183,7 +183,7 @@
       self._minimumTolerance = { scheduler.minimumTolerance }
       self._scheduleAfterToleranceSchedulerOptionsAction = scheduler.schedule
       self._scheduleAfterIntervalToleranceSchedulerOptionsAction = scheduler.schedule
-      self._scheduleSchedulerOptionsAction = scheduler.schedule
+      self._scheduleOptionsAction = scheduler.schedule
     }
 
     /// Performs the action at some time after the specified date.
@@ -214,7 +214,7 @@
       options: SchedulerOptions?,
       _ action: @escaping () -> Void
     ) {
-      self._scheduleSchedulerOptionsAction(options, action)
+      self._scheduleOptionsAction(options, action)
     }
   }
 
