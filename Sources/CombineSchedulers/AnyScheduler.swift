@@ -147,7 +147,27 @@
     /// This scheduler’s definition of the current moment in time.
     public var now: SchedulerTimeType { self._now() }
 
-    let scheduler: Any
+    /// Creates a type-erasing scheduler to wrap the provided endpoints.
+    ///
+    /// - Parameters:
+    ///   - minimumTolerance: A closure that returns the scheduler's minimum tolerance.
+    ///   - now: A closure that returns the scheduler's current time.
+    ///   - scheduleSchedulerOptionsAction: A closure that schedules a unit of work to be run as soon as possible.
+    ///   - scheduleAfterToleranceSchedulerOptionsAction: A closure that schedules a unit of work to be run after a delay.
+    ///   - scheduleAfterIntervalToleranceSchedulerOptionsAction: A closure that schedules a unit of work to be performed on a repeating interval.
+    public init(
+      minimumTolerance: @escaping () -> SchedulerTimeType.Stride,
+      now: @escaping () -> SchedulerTimeType,
+      scheduleSchedulerOptionsAction: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
+      scheduleAfterToleranceSchedulerOptionsAction: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Void,
+      scheduleAfterIntervalToleranceSchedulerOptionsAction: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Cancellable
+    ) {
+      self._minimumTolerance = minimumTolerance
+      self._now = now
+      self._scheduleSchedulerOptionsAction = scheduleSchedulerOptionsAction
+      self._scheduleAfterToleranceSchedulerOptionsAction = scheduleAfterToleranceSchedulerOptionsAction
+      self._scheduleAfterIntervalToleranceSchedulerOptionsAction = scheduleAfterIntervalToleranceSchedulerOptionsAction
+    }
 
     /// Creates a type-erasing scheduler to wrap the provided scheduler.
     ///
@@ -159,7 +179,6 @@
     where
       S: Scheduler, S.SchedulerTimeType == SchedulerTimeType, S.SchedulerOptions == SchedulerOptions
     {
-      self.scheduler = scheduler
       self._now = { scheduler.now }
       self._minimumTolerance = { scheduler.minimumTolerance }
       self._scheduleAfterToleranceSchedulerOptionsAction = scheduler.schedule
