@@ -159,8 +159,13 @@
       minimumTolerance: @escaping () -> SchedulerTimeType.Stride,
       now: @escaping () -> SchedulerTimeType,
       scheduleImmediately: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
-      delayed: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Void,
-      interval: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Cancellable
+      delayed: @escaping (
+        SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void
+      ) -> Void,
+      interval: @escaping (
+        SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?,
+        @escaping () -> Void
+      ) -> Cancellable
     ) {
       self._minimumTolerance = minimumTolerance
       self._now = now

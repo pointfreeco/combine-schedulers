@@ -14,7 +14,7 @@ let package = Package(
     .library(
       name: "CombineSchedulers",
       targets: ["CombineSchedulers"]
-    ),
+    )
   ],
   targets: [
     .target(name: "CombineSchedulers"),
