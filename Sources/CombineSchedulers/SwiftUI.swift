@@ -3,7 +3,7 @@ import Combine
 import SwiftUI
 
 extension Scheduler {
-  public func animation(_ animation: Animation) -> AnyScheduler<SchedulerTimeType, SchedulerOptions> {
+  public func animation(_ animation: Animation? = .default) -> AnyScheduler<SchedulerTimeType, SchedulerOptions> {
     AnyScheduler(
       minimumTolerance: { self.minimumTolerance },
       now: { self.now },
