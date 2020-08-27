@@ -5,10 +5,10 @@ import PackageDescription
 let package = Package(
   name: "combine-schedulers",
   platforms: [
-    .iOS(.v10),
+    .iOS(.v13),
     .macOS(.v10_15),
-    .tvOS(.v10),
-    .watchOS(.v3),
+    .tvOS(.v13),
+    .watchOS(.v6),
   ],
   products: [
     .library(
