@@ -98,10 +98,10 @@
   ///       XCTAssert(output, [Episode(id: 42)])
   ///     }
   ///
-  /// - Note: This scheduler can _not_ used to test publishers with more complex timing logic, like
-  ///   those that use `Debounce`, `Throttle`, or `Timer.Publisher`, and in fact `ImmediateScheduler`
-  ///   will not scheduler this work in a well-defined way. Use a `TestScheduler` instead to capture
-  ///   the timing behavior.
+  /// - Note: This scheduler can _not_ be used to test publishers with more complex timing logic,
+  ///   like those that use `Debounce`, `Throttle`, or `Timer.Publisher`, and in fact
+  ///   `ImmediateScheduler` will not schedule this work in a defined way. Use a `TestScheduler`
+  ///   instead to capture your publisher's timing behavior.
   ///
   @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   public struct ImmediateScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
