@@ -4,15 +4,16 @@
 
   /// A scheduler for performing synchronous actions.
   ///
-  /// You can only use this scheduler for immediate actions. If you attempt to schedule actions after
-  /// a specific date, this scheduler ignores the date and performs them immediately.
+  /// You can only use this scheduler for immediate actions. If you attempt to schedule actions
+  /// after a specific date, this scheduler ignores the date and performs them immediately.
   ///
   /// This scheduler is useful for writing tests against publishers that use asynchrony operators,
   /// such as `receive(on:)`, `subscribe(on:)` and others, because it forces the publisher to emit
   /// immediately rather than needing to wait for thread hops or delays using `XCTestExpectation`.
   ///
-  /// This scheduler is different from `TestScheduler` in that you cannot explicitly control how time
-  /// flows through your publisher, but rather you are instantly collapsing time into a single point.
+  /// This scheduler is different from `TestScheduler` in that you cannot explicitly control how
+  /// time flows through your publisher, but rather you are instantly collapsing time into a single
+  /// point.
   ///
   /// As a basic example, suppose you have a view model that loads some data after waiting for 10
   /// seconds from when a button is tapped:
@@ -54,8 +55,8 @@
   ///       XCTAssert(output, [Episode(id: 42)])
   ///     }
   ///
-  /// Alternatively, we can explicitly pass a scheduler into the view model initializer so that it can
-  /// be controller from the outside:
+  /// Alternatively, we can explicitly pass a scheduler into the view model initializer so that it
+  /// can be controller from the outside:
   ///
   ///     class HomeViewModel: ObservableObject {
   ///       @Published var episodes: [Episode]?
@@ -179,8 +180,8 @@
     }
   }
 
-  /// A convenience type to specify an `ImmediateTestScheduler` by the scheduler it wraps rather than
-  /// by the time type and options type.
+  /// A convenience type to specify an `ImmediateTestScheduler` by the scheduler it wraps rather
+  /// than by the time type and options type.
   @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   public typealias ImmediateSchedulerOf<Scheduler> = ImmediateScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
