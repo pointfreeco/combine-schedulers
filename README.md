@@ -350,7 +350,7 @@ scheduler.advance(by: 1_000)
 XCTAssertEqual(output, Array(0...1_001))
 ```
 
-## Compatability
+## Compatibility
 
 This library is compatible with iOS 13.2 and higher. There are bugs in Combine and iOS 13.1 and lower that cause crashes when trying to compare `DispatchQueue.SchedulerTimeType` values.
 
