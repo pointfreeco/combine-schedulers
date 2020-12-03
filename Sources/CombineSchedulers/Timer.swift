@@ -20,7 +20,7 @@
   extension Scheduler {
     /// Returns a publisher that repeatedly emits the scheduler's current time on the given
     /// interval.
-    /// 
+    ///
     /// - Parameters:
     ///   - interval: The time interval on which to publish events. For example, a value of `0.5`
     ///     publishes an event approximately every half-second.
