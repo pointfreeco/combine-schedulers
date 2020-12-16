@@ -20,7 +20,7 @@ A few schedulers that make working with Combine more testable and more versatile
 
 ## Motivation
 
-The Combine framework provides the `Scheduler` protocol, which is a powerful abstraction for describing how and when units of work are executed. It unifies many disparate ways of executing work, such as `DispatchQueue`, `RunLoop` and `OperationQueue`. 
+The Combine framework provides the `Scheduler` protocol, which is a powerful abstraction for describing how and when units of work are executed. It unifies many disparate ways of executing work, such as `DispatchQueue`, `RunLoop` and `OperationQueue`.
 
 However, the moment you use any of these schedulers in your reactive code you instantly make the publisher asynchronous and therefore much harder to test, forcing you to use expectations and waits for time to pass as your publisher executes.
 
