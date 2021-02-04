@@ -108,6 +108,7 @@
     ///
     ///     let scheduler = DispatchQueue.testScheduler
     ///     Publishers.Timer(every: .seconds(1), scheduler: scheduler)
+    ///       .autoconnect()
     ///       .sink { _ in print($0) }
     ///       .store(in: &cancellables)
     ///
@@ -119,6 +120,7 @@
     ///
     ///     let scheduler = DispatchQueue.testScheduler
     ///     Publishers.Timer(every: .seconds(1), scheduler: scheduler)
+    ///       .autoconnect()
     ///       .prefix(3)
     ///       .sink { _ in print($0) }
     ///       .store(in: &cancellables)
