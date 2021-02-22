@@ -44,12 +44,14 @@
     ///       @Published var articles: [Article] = []
     ///
     ///       init() {
-    ///         Publishers.Concatenate(
-    ///           // No animation
-    ///           prefix: cachedArticles().receive(on: DispatchQueue.main.animation(nil)),
-    ///
-    ///           // With animations
-    ///           suffix: apiClient.loadArticles().receive(on: DispatchQueue.main.animation())
+    ///         cachedArticles()
+    ///           // Don't animate cached articles when they load
+    ///           .receive(on: DispatchQueue.main.animation(nil))
+    ///           .append(
+    ///             apiClient.loadArticles()
+    ///               // Animate the fresh articles when they load
+    ///               .receive(on: DispatchQueue.main.animation())
+    ///           )
     ///       }
     ///     }
     ///
