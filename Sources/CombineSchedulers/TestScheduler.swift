@@ -56,7 +56,7 @@
   /// but this technique can be used to test any publisher that involves Combine's asynchronous
   /// operations.
   ///
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   public final class TestScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
   where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
 
@@ -108,6 +108,7 @@
     ///
     ///     let scheduler = DispatchQueue.testScheduler
     ///     Publishers.Timer(every: .seconds(1), scheduler: scheduler)
+    ///       .autoconnect()
     ///       .sink { _ in print($0) }
     ///       .store(in: &cancellables)
     ///
@@ -119,6 +120,7 @@
     ///
     ///     let scheduler = DispatchQueue.testScheduler
     ///     Publishers.Timer(every: .seconds(1), scheduler: scheduler)
+    ///       .autoconnect()
     ///       .prefix(3)
     ///       .sink { _ in print($0) }
     ///       .store(in: &cancellables)
@@ -174,7 +176,7 @@
     }
   }
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler
   where
     SchedulerTimeType == DispatchQueue.SchedulerTimeType,
@@ -187,7 +189,7 @@
     }
   }
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler
   where
     SchedulerTimeType == RunLoop.SchedulerTimeType,
@@ -199,7 +201,7 @@
     }
   }
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler
   where
     SchedulerTimeType == OperationQueue.SchedulerTimeType,
@@ -213,7 +215,7 @@
 
   /// A convenience type to specify a `TestScheduler` by the scheduler it wraps rather than by the
   /// time type and options type.
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   public typealias TestSchedulerOf<Scheduler> = TestScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
   > where Scheduler: Combine.Scheduler

@@ -115,7 +115,7 @@
   /// in classes, functions, etc. without needing to introduce a generic, which can help simplify
   /// the code and reduce implementation details from leaking out.
   ///
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   public struct AnyScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
   where
     SchedulerTimeType: Strideable,
@@ -159,8 +159,13 @@
       minimumTolerance: @escaping () -> SchedulerTimeType.Stride,
       now: @escaping () -> SchedulerTimeType,
       scheduleImmediately: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
-      delayed: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Void,
-      interval: @escaping (SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void) -> Cancellable
+      delayed: @escaping (
+        SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void
+      ) -> Void,
+      interval: @escaping (
+        SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?,
+        @escaping () -> Void
+      ) -> Cancellable
     ) {
       self._minimumTolerance = minimumTolerance
       self._now = now

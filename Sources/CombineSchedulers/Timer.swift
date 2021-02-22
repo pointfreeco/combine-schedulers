@@ -20,7 +20,7 @@
   extension Scheduler {
     /// Returns a publisher that repeatedly emits the scheduler's current time on the given
     /// interval.
-    /// 
+    ///
     /// - Parameters:
     ///   - interval: The time interval on which to publish events. For example, a value of `0.5`
     ///     publishes an event approximately every half-second.
@@ -52,6 +52,7 @@
     /// run loop:
     ///
     ///     Publishers.Timer(every: .seconds(1), scheduler: DispatchQueue.main)
+    ///       .autoconnect()
     ///       .sink { print("Timer", $0) }
     ///
     /// But more importantly, you can use it with `TestScheduler` so that any Combine code you write
@@ -62,6 +63,7 @@
     ///     var output: [Int] = []
     ///
     ///     Publishers.Timer(every: 1, scheduler: scheduler)
+    ///       .autoconnect()
     ///       .sink { _ in output.append(output.count) }
     ///       .store(in: &self.cancellables)
     ///
