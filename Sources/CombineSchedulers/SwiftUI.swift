@@ -4,7 +4,54 @@
 
   @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler {
-    /// Specifies an animation to perform when an action is scheduled.
+    /// Specifies an animation to perform when an action is scheduled. This can be useful for times
+    /// that you cannot easily wrap state mutations in a `withAnimation` block.
+    ///
+    /// For example, if you load some asynchronous data in an `ObservableObject` and then
+    /// pipe its output into a `@Published` field you may be tempted to use the `.assign(to:)`
+    /// operator:
+    ///
+    ///     class ViewModel: ObservableObject {
+    ///       @Published var articles: [Article] = []
+    ///
+    ///       init() {
+    ///         apiClient.loadArticles()
+    ///           .receive(on: DispatchQueue.main)
+    ///           .assign(to: self.$articles)
+    ///       }
+    ///     }
+    ///
+    /// However, this prevents you from wrapping the `articles` mutation in `withAnimation` since
+    /// that is hidden from you in the `.assign(to:)` operator. In this situation you can simply
+    /// use the `.animation` operator on `Scheduler` to transform `DispatchQueue.main` into a
+    /// scheduler that performs its work inside `withAnimation`:
+    ///
+    ///     class ViewModel: ObservableObject {
+    ///       @Published var articles: [Article] = []
+    ///
+    ///       init() {
+    ///         apiClient.loadArticles()
+    ///           .receive(on: DispatchQueue.main.animation())
+    ///           .assign(to: self.$articles)
+    ///       }
+    ///     }
+    ///
+    /// Another common use case is when you have a Combine publisher made up of many publishers
+    /// that have been merged or concatenated. You may want to animate the outputs of each of
+    /// those publishers differently:
+    ///
+    ///     class ViewModel: ObservableObject {
+    ///       @Published var articles: [Article] = []
+    ///
+    ///       init() {
+    ///         Publishers.Concatenate(
+    ///           // No animation
+    ///           prefix: cachedArticles().receive(on: DispatchQueue.main.animation(nil)),
+    ///
+    ///           // With animations
+    ///           suffix: apiClient.loadArticles().receive(on: DispatchQueue.main.animation())
+    ///       }
+    ///     }
     ///
     /// - Parameter animation: An animation to be performed.
     /// - Returns: A scheduler that performs an animation when a scheduled action is run.
