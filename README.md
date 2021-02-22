@@ -350,7 +350,7 @@ XCTAssertEqual(output, Array(0...1_001))
 
 CombineSchedulers comes with helpers that aid in asynchronous SwiftUI animations. You can invoke the `animation` and `transaction` methods to transform an existing scheduler into one that schedules its actions with an animation or in a transaction. 
 
-For example, to animate an API response in your view model, you can specify that the scheduler that receives that state should be animated:
+For example, to animate an API response in your view model, you can specify that the scheduler that receives this state should be animated:
 
 ```swift
 self.apiClient.fetchEpisode()
