@@ -32,7 +32,7 @@
 
     /// Wraps scheduled actions in a transaction.
     ///
-    /// - Parameter transaction: An transaction.
+    /// - Parameter transaction: A transaction.
     /// - Returns: A scheduler that wraps scheduled actions in a transaction.
     public func transaction(_ transaction: Transaction) -> AnySchedulerOf<Self> {
       AnyScheduler(
