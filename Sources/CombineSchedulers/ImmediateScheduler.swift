@@ -104,7 +104,7 @@
   ///   `ImmediateScheduler` will not schedule this work in a defined way. Use a `TestScheduler`
   ///   instead to capture your publisher's timing behavior.
   ///
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   public struct ImmediateScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
   where
     SchedulerTimeType: Strideable,

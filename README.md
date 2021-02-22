@@ -14,6 +14,8 @@ A few schedulers that make working with Combine more testable and more versatile
   * [`UIScheduler`](#testscheduler)
   * [`ImmediateScheduler`](#immediatescheduler)
   * [`Publishers.Timer`](#publisherstimer)
+* [Scheduler transformations](#scheduler-transformations)
+  * [Animation](#animation)
 * [Installation](#installation)
 * [Documentation](#documentation)
 * [Other libraries](#other-libraries)
@@ -49,7 +51,6 @@ This type is useful for times that you want to be able to customize the schedule
 ```swift
 class EpisodeViewModel: ObservableObject {
   @Published var episode: Episode?
-  private var cancellables: Set<AnyCancellable> = []
 
   let apiClient: ApiClient
 
@@ -60,8 +61,7 @@ class EpisodeViewModel: ObservableObject {
   func reloadButtonTapped() {
     self.apiClient.fetchEpisode()
       .receive(on: DispatchQueue.main)
-      .sink { self.episode = $0 }
-      .store(in: &self.cancellables)
+      .assign(to: self.$episode)
   }
 }
 ```
@@ -75,7 +75,6 @@ One way to fix this testing problem is to use an ["immediate" scheduler](#immedi
 ```swift
 class EpisodeViewModel<S: Scheduler>: ObservableObject {
   @Published var episode: Episode?
-  private var cancellables: Set<AnyCancellable> = []
 
   let apiClient: ApiClient
   let scheduler: S
@@ -88,8 +87,7 @@ class EpisodeViewModel<S: Scheduler>: ObservableObject {
   func reloadButtonTapped() {
     self.apiClient.fetchEpisode()
       .receive(on: self.scheduler)
-      .sink { self.episode = $0 }
-      .store(in: &self.cancellables)
+      .assign(to: self.$episode)
   }
 }
 ```
@@ -105,7 +103,6 @@ Instead of holding a generic scheduler in our view model we can say that we only
 ```swift
 class EpisodeViewModel: ObservableObject {
   @Published var episode: Episode?
-  private var cancellables: Set<AnyCancellable> = []
 
   let apiClient: ApiClient
   let scheduler: AnySchedulerOf<DispatchQueue>
@@ -118,8 +115,7 @@ class EpisodeViewModel: ObservableObject {
   func reloadButtonTapped() {
     self.apiClient.fetchEpisode()
       .receive(on: self.scheduler)
-      .sink { self.episode = $0 }
-      .store(in: &self.cancellables)
+      .assign(to: self.$episode)
   }
 }
 ```
@@ -223,7 +219,6 @@ As a basic example, suppose you have a view model that loads some data after wai
 ```swift
 class HomeViewModel: ObservableObject {
   @Published var episodes: [Episode]?
-  var cancellables: Set<AnyCancellable> = []
 
   let apiClient: ApiClient
 
@@ -235,8 +230,7 @@ class HomeViewModel: ObservableObject {
     Just(())
       .delay(for: .seconds(10), scheduler: DispachQueue.main)
       .flatMap { apiClient.fetchEpisodes() }
-      .sink { self.episodes = $0 }
-      .store(in: &self.cancellables)
+      .assign(to: self.$episodes)
   }
 }
 ```
@@ -268,7 +262,6 @@ class HomeViewModel: ObservableObject {
 
   let apiClient: ApiClient
   let scheduler: AnySchedulerOf<DispatchQueue>
-  var cancellables: Set<AnyCancellable> = []
 
   init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
     self.apiClient = apiClient
@@ -279,8 +272,7 @@ class HomeViewModel: ObservableObject {
     Just(())
       .delay(for: .seconds(10), scheduler: self.scheduler)
       .flatMap { self.apiClient.fetchEpisodes() }
-      .sink { self.episodes = $0 }
-      .store(in: &self.cancellables)
+      .assign(to: self.$episodes)
   }
 }
 ```
@@ -352,9 +344,23 @@ scheduler.advance(by: 1_000)
 XCTAssertEqual(output, Array(0...1_001))
 ```
 
+## Scheduler transformations
+
+### Animation
+
+CombineSchedulers comes with helpers that aid in asynchronous SwiftUI animations. You can invoke the `animation` and `transaction` methods to transform an existing scheduler into one that schedules its actions with an animation or in a transaction. 
+
+For example, to animate an API response in your view model, you can specify that the scheduler that receives that state should be animated:
+
+```swift
+self.apiClient.fetchEpisode()
+  .receive(on: self.scheduler.animation())
+  .assign(to: self.$episode)
+```
+
 ## Compatibility
 
-This library is compatible with iOS 13.2 and higher. There are bugs in Combine and iOS 13.1 and lower that cause crashes when trying to compare `DispatchQueue.SchedulerTimeType` values.
+This library is compatible with iOS 13.2 and higher. Please note that there are bugs in the Combine framework and iOS 13.1 and lower that will cause crashes when trying to compare `DispatchQueue.SchedulerTimeType` values, which is an operation that the `TestScheduler` depends on.
 
 ## Installation
 
