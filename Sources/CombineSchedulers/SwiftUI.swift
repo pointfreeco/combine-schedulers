@@ -8,7 +8,7 @@
     /// that you cannot easily wrap state mutations in a `withAnimation` block.
     ///
     /// For example, if you load some asynchronous data in an `ObservableObject` and then
-    /// pipe its output into a `@Published` field you may be tempted to use the `.assign(to:)`
+    /// pipe its output into a `@Published` field, you may be tempted to use the `.assign(to:)`
     /// operator:
     ///
     ///     class ViewModel: ObservableObject {
