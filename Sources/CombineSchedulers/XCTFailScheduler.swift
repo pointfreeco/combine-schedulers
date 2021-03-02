@@ -8,8 +8,14 @@
       now: @escaping () -> SchedulerTimeType
     ) -> AnySchedulerOf<Self> {
       .init(
-        minimumTolerance: minimumTolerance,
-        now: now,
+        minimumTolerance: {
+          _XCTFail("\(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly asked its tolerance")
+          return minimumTolerance()
+        },
+        now: {
+          _XCTFail("\(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly asked its current time")
+          return now()
+        },
         scheduleImmediately: { options, action in
           _XCTFail("\(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly scheduled immediate work")
         },
