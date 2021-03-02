@@ -44,11 +44,11 @@
     SchedulerTimeType == DispatchQueue.SchedulerTimeType,
     SchedulerOptions == DispatchQueue.SchedulerOptions
   {
-    static var failing: AnySchedulerOf<Self> {
+    public static var failing: AnySchedulerOf<Self> {
       .failing("")
     }
 
-    static func failing(_ prefix: String) -> AnySchedulerOf<Self> {
+    public static func failing(_ prefix: String) -> AnySchedulerOf<Self> {
       .failing(
         prefix,
         minimumTolerance: { .zero },
@@ -62,12 +62,13 @@
     SchedulerTimeType == RunLoop.SchedulerTimeType,
     SchedulerOptions == RunLoop.SchedulerOptions
   {
-    static var failing: AnySchedulerOf<Self> {
+    public static var failing: AnySchedulerOf<Self> {
       .failing("")
     }
 
-    static func failing(_ prefix: String) -> AnySchedulerOf<Self> {
+    public static func failing(_ prefix: String) -> AnySchedulerOf<Self> {
       .failing(
+        prefix,
         minimumTolerance: { .zero },
         now: { .init(.init(timeIntervalSinceReferenceDate: 0)) }
       )
