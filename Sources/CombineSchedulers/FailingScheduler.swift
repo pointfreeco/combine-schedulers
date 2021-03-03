@@ -15,7 +15,7 @@
           _XCTFail(
             """
             \(prefix.isEmpty ? "" : "\(prefix) - ")\
-            A failing scheduler unexpectedly scheduled immediate work
+            A failing scheduler scheduled an action to run immediately.
             """
           )
         },
@@ -23,7 +23,7 @@
           _XCTFail(
             """
             \(prefix.isEmpty ? "" : "\(prefix) - ")\
-            A failing scheduler unexpectedly scheduled delayed work
+            A failing scheduler scheduled an action to run later.
             """
           )
         },
@@ -31,7 +31,7 @@
           _XCTFail(
             """
             \(prefix.isEmpty ? "" : "\(prefix) - ")\
-            A failing scheduler unexpectedly scheduled delayed work at an interval
+            A failing scheduler scheduled an action to run on a timer.
             """
           )
           return AnyCancellable {}
