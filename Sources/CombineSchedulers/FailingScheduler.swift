@@ -95,7 +95,7 @@
         .takeUnretainedValue(),
       let _issue = _alloc
         .perform(
-          Selector(("initWithType:compactDescription:")), with: 0, with: "failed - \(message)"
+          Selector(("initWithType:compactDescription:")), with: 0, with: message
         )?
         .takeUnretainedValue()
     else { return }
