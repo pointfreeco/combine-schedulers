@@ -79,27 +79,27 @@
   // NB: Dynamically load XCTest to prevent leaking its symbols into our library code.
   private func _XCTFail(_ message: String) {
     guard
-      let _XCTestObservationCenter = NSClassFromString("XCTestObservationCenter")
+      let XCTestObservationCenter = NSClassFromString("XCTestObservationCenter")
         as Any as? NSObjectProtocol,
-      let _shared = _XCTestObservationCenter.perform(Selector(("sharedTestObservationCenter")))?
+      let shared = XCTestObservationCenter.perform(Selector(("sharedTestObservationCenter")))?
         .takeUnretainedValue(),
-      let _observers = _shared.perform(Selector(("observers")))?
+      let observers = shared.perform(Selector(("observers")))?
         .takeUnretainedValue() as? [AnyObject],
-      let _observer = _observers
+      let observer = observers
         .first(where: { NSStringFromClass(type(of: $0)) == "XCTestMisuseObserver" }),
-      let _currentTestCase = _observer.perform(Selector(("currentTestCase")))?
+      let currentTestCase = observer.perform(Selector(("currentTestCase")))?
         .takeUnretainedValue(),
-      let _XCTIssue = NSClassFromString("XCTIssue")
+      let XCTIssue = NSClassFromString("XCTIssue")
         as Any as? NSObjectProtocol,
-      let _alloc = _XCTIssue.perform(NSSelectorFromString("alloc"))?
+      let alloc = XCTIssue.perform(NSSelectorFromString("alloc"))?
         .takeUnretainedValue(),
-      let _issue = _alloc
+      let issue = alloc
         .perform(
           Selector(("initWithType:compactDescription:")), with: 0, with: message
         )?
         .takeUnretainedValue()
     else { return }
 
-    _ = _currentTestCase.perform(Selector(("recordIssue:")), with: _issue)
+    _ = currentTestCase.perform(Selector(("recordIssue:")), with: issue)
   }
 #endif
