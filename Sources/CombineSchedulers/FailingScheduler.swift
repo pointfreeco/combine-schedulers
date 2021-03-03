@@ -9,29 +9,29 @@
       now: @escaping () -> SchedulerTimeType
     ) -> AnySchedulerOf<Self> {
       .init(
-        minimumTolerance: {
-          _XCTFail("\(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly asked its tolerance")
-          return minimumTolerance()
-        },
-        now: {
-          _XCTFail("\(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly asked its current time")
-          return now()
-        },
+        minimumTolerance: minimumTolerance,
+        now: now,
         scheduleImmediately: { options, action in
-          _XCTFail("\(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly scheduled immediate work")
+          _XCTFail(
+            """
+            \(prefix.isEmpty ? "" : "\(prefix) - ")\
+            \(Self.self) unexpectedly scheduled immediate work
+            """
+          )
         },
         delayed: { delay, tolerance, options, action in
           _XCTFail(
             """
-            \(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly scheduled delayed work
+            \(prefix.isEmpty ? "" : "\(prefix) - ")\
+            \(Self.self) unexpectedly scheduled delayed work
             """
           )
         },
         interval: { delay, interval, tolerance, options, action in
           _XCTFail(
             """
-            \(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly scheduled delayed work at an \
-            interval
+            \(prefix.isEmpty ? "" : "\(prefix) - ")\
+            \(Self.self) unexpectedly scheduled delayed work at an interal
             """
           )
           return AnyCancellable {}
