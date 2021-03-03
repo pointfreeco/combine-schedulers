@@ -10,7 +10,15 @@
     ) -> AnySchedulerOf<Self> {
       .init(
         minimumTolerance: minimumTolerance,
-        now: now,
+        now: {
+          _XCTFail(
+            """
+            \(prefix.isEmpty ? "" : "\(prefix) - ")\
+            A failing scheduler was asked the current time.
+            """
+          )
+          return now()
+        },
         scheduleImmediately: { options, action in
           _XCTFail(
             """
