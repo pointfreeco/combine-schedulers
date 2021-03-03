@@ -1,5 +1,6 @@
 #if DEBUG
   import Combine
+  import Foundation
 
   extension Scheduler {
     public static func failing(
@@ -22,15 +23,15 @@
         delayed: { delay, tolerance, options, action in
           _XCTFail(
             """
-            \(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly scheduled work delayed by \(delay)
+            \(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly scheduled delayed work
             """
           )
         },
         interval: { delay, interval, tolerance, options, action in
           _XCTFail(
             """
-            \(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly scheduled work \
-            \(interval == .zero ? "" : "delayed by \(delay) ")every \(interval)
+            \(prefix.isEmpty ? "" : "\(prefix) - ")Unexpectedly scheduled delayed work at an \
+            interval
             """
           )
           return AnyCancellable {}
@@ -76,40 +77,29 @@
   }
 
   // NB: Dynamically load XCTest to prevent leaking its symbols into our library code.
-  private func _XCTFail(_ message: String = "", file: StaticString = #file, line: UInt = #line) {
+  private func _XCTFail(_ message: String) {
     guard
-      let _XCTFailureHandler = _XCTFailureHandler,
-      let _XCTCurrentTestCase = _XCTCurrentTestCase
-    else {
-      assertionFailure(
-        """
-        Couldn't load XCTest. Are you using a test store in application code?"
-        """,
-        file: file,
-        line: line
-      )
-      return
-    }
-    _XCTFailureHandler(_XCTCurrentTestCase(), true, "\(file)", line, message, nil)
+      let _XCTestObservationCenter = NSClassFromString("XCTestObservationCenter")
+        as Any as? NSObjectProtocol,
+      let _shared = _XCTestObservationCenter.perform(Selector(("sharedTestObservationCenter")))?
+        .takeUnretainedValue(),
+      let _observers = _shared.perform(Selector(("observers")))?
+        .takeUnretainedValue() as? [AnyObject],
+      let _observer = _observers
+        .first(where: { NSStringFromClass(type(of: $0)) == "XCTestMisuseObserver" }),
+      let _currentTestCase = _observer.perform(Selector(("currentTestCase")))?
+        .takeUnretainedValue(),
+      let _XCTIssue = NSClassFromString("XCTIssue")
+        as Any as? NSObjectProtocol,
+      let _alloc = _XCTIssue.perform(NSSelectorFromString("alloc"))?
+        .takeUnretainedValue(),
+      let _issue = _alloc
+        .perform(
+          Selector(("initWithType:compactDescription:")), with: 0, with: "failed - \(message)"
+        )?
+        .takeUnretainedValue()
+    else { return }
+
+    _ = _currentTestCase.perform(Selector(("recordIssue:")), with: _issue)
   }
-
-  private typealias XCTCurrentTestCase = @convention(c) () -> AnyObject
-  private typealias XCTFailureHandler = @convention(c) (
-    AnyObject, Bool, UnsafePointer<CChar>, UInt, String, String?
-  ) -> Void
-
-  private let _XCTest = NSClassFromString("XCTest")
-    .flatMap(Bundle.init(for:))
-    .flatMap { $0.executablePath }
-    .flatMap { dlopen($0, RTLD_NOW) }
-
-  private let _XCTFailureHandler =
-    _XCTest
-    .flatMap { dlsym($0, "_XCTFailureHandler") }
-    .map { unsafeBitCast($0, to: XCTFailureHandler.self) }
-
-  private let _XCTCurrentTestCase =
-    _XCTest
-    .flatMap { dlsym($0, "_XCTCurrentTestCase") }
-    .map { unsafeBitCast($0, to: XCTCurrentTestCase.self) }
 #endif
