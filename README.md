@@ -29,17 +29,11 @@ This library provides new schedulers that allow you to turn any asynchronous pub
 
 ## Learn More
 
-These concepts (and more) are explored thoroughly in [Point-Free](https://www.pointfree.co), a video series exploring functional programming and Swift hosted by [Brandon Williams](https://github.com/mbrandonw) and [Stephen Celis](https://github.com/stephencelis).
+This library was designed over the course of many episodes on [Point-Free](https://www.pointfree.co), a video series exploring functional programming and Swift hosted by [Brandon Williams](https://github.com/mbrandonw) and [Stephen Celis](https://github.com/stephencelis).
 
-The design of this library was explored in the following [Point-Free](https://www.pointfree.co) episodes:
+You can watch all of the episodes [here](https://www.pointfree.co/collections/combine/schedulers).
 
-  - [Episode 104](https://www.pointfree.co/episodes/ep104-combine-schedulers-testing-time): Testing Time
-  - [Episode 105](https://www.pointfree.co/episodes/ep105-combine-schedulers-controlling-time): Controlling Time
-  - [Episode 106](https://www.pointfree.co/episodes/ep106-combine-schedulers-erasing-time): Erasing Time
-  - [Episode 136](https://www.pointfree.co/episodes/ep136-swiftui-animation-the-basics): SwiftUI Animation: Composable Architecture
-  - [Episode 137](https://www.pointfree.co/episodes/ep137-swiftui-animation-the-point): SwiftUI Animation: The Point
-
-<a href="https://www.pointfree.co/episodes/ep104-combine-schedulers-testing-time">
+<a href="https://www.pointfree.co/collections/combine/schedulers">
   <img alt="video poster image" src="https://i.vimeocdn.com/video/905440786.jpg" width="480">
 </a>
 
