@@ -15,7 +15,7 @@
           _XCTFail(
             """
             \(prefix.isEmpty ? "" : "\(prefix) - ")\
-            \(Self.self) unexpectedly scheduled immediate work
+            Unexpectedly scheduled immediate work
             """
           )
         },
@@ -23,7 +23,7 @@
           _XCTFail(
             """
             \(prefix.isEmpty ? "" : "\(prefix) - ")\
-            \(Self.self) unexpectedly scheduled delayed work
+            Unexpectedly scheduled delayed work
             """
           )
         },
@@ -31,7 +31,7 @@
           _XCTFail(
             """
             \(prefix.isEmpty ? "" : "\(prefix) - ")\
-            \(Self.self) unexpectedly scheduled delayed work at an interal
+            Unexpectedly scheduled delayed work at an interal
             """
           )
           return AnyCancellable {}
