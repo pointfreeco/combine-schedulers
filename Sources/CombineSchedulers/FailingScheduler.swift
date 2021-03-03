@@ -98,7 +98,11 @@
           Selector(("initWithType:compactDescription:")), with: 0, with: message
         )?
         .takeUnretainedValue()
-    else { return }
+    else {
+      // - assertionFailure?
+      // - fall back to TCA-based XCTFail?
+      return
+    }
 
     _ = currentTestCase.perform(Selector(("recordIssue:")), with: issue)
   }
