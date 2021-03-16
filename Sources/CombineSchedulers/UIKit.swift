@@ -4,6 +4,12 @@
 
   @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler {
+    /// Wraps scheduled actions in `UIView.animate`.
+    ///
+    /// - Parameter duration: The `duration` parameter passed to `UIView.animate`.
+    /// - Parameter delay: The `delay` parameter passed to `UIView.animate`.
+    /// - Parameter animationOptions: The `options` parameter passed to `UIView.animate`
+    /// - Returns: A scheduler that wraps scheduled actions in `UIView.animate`.
     public func animate(
       withDuration duration: TimeInterval,
       delay: TimeInterval = 0,
@@ -45,6 +51,14 @@
       )
     }
 
+    /// Wraps scheduled actions in `UIView.animate`.
+    ///
+    /// - Parameter duration: The `duration` parameter passed to `UIView.animate`.
+    /// - Parameter delay: The `delay` parameter passed to `UIView.animate`.
+    /// - Parameter dampingRatio: The `dampingRatio` parameter passed to `UIView.animate`
+    /// - Parameter velocity: The `velocity` parameter passed to `UIView.animate`
+    /// - Parameter animationOptions: The `options` parameter passed to `UIView.animate`
+    /// - Returns: A scheduler that wraps scheduled actions in `UIView.animate`.
     public func animate(
       withDuration duration: TimeInterval,
       delay: TimeInterval = 0,
