@@ -1,7 +1,8 @@
-#if DEBUG
+#if DEBUG && canImport(Combine)
   import Combine
   import Foundation
 
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler {
     public static func failing(
       _ prefix: String = "",
