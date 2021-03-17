@@ -96,7 +96,8 @@
         .takeUnretainedValue(),
       let observers = shared.perform(Selector(("observers")))?
         .takeUnretainedValue() as? [AnyObject],
-      let observer = observers
+      let observer =
+        observers
         .first(where: { NSStringFromClass(type(of: $0)) == "XCTestMisuseObserver" }),
       let currentTestCase = observer.perform(Selector(("currentTestCase")))?
         .takeUnretainedValue(),
@@ -104,7 +105,8 @@
         as Any as? NSObjectProtocol,
       let alloc = XCTIssue.perform(NSSelectorFromString("alloc"))?
         .takeUnretainedValue(),
-      let issue = alloc
+      let issue =
+        alloc
         .perform(
           Selector(("initWithType:compactDescription:")), with: 0, with: message
         )?
