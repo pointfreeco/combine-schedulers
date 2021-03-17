@@ -49,6 +49,7 @@
     }
   }
 
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler
   where
     SchedulerTimeType == DispatchQueue.SchedulerTimeType,
@@ -67,6 +68,7 @@
     }
   }
 
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler
   where
     SchedulerTimeType == RunLoop.SchedulerTimeType,
