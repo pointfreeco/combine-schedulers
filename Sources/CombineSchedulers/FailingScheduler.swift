@@ -88,8 +88,8 @@
   }
 
   // NB: Dynamically load XCTest to prevent leaking its symbols into our library code.
-  private func _XCTFail(_ message: String) {
-    guard
+  private func _XCTFail(_ message: String, file: StaticString = #file, line: UInt = #line) {
+    if
       let XCTestObservationCenter = NSClassFromString("XCTestObservationCenter")
         as Any as? NSObjectProtocol,
       let shared = XCTestObservationCenter.perform(Selector(("sharedTestObservationCenter")))?
@@ -111,12 +111,30 @@
           Selector(("initWithType:compactDescription:")), with: 0, with: message
         )?
         .takeUnretainedValue()
-    else {
-      // - assertionFailure?
-      // - fall back to TCA-based XCTFail?
+    {
+      _ = currentTestCase.perform(Selector(("recordIssue:")), with: issue)
+      return
+    } else if let _XCTFailureHandler = _XCTFailureHandler {
+      _XCTFailureHandler(nil, true, "\(file)", line, message, nil)
+    } else {
+      assertionFailure(
+        "Couldn't load 'XCTest'. Are you running code that calls 'XCTFail' from application code?",
+        file: file,
+        line: line
+      )
       return
     }
-
-    _ = currentTestCase.perform(Selector(("recordIssue:")), with: issue)
   }
+
+  private typealias XCTFailureHandler = @convention(c) (
+    AnyObject?, Bool, UnsafePointer<CChar>, UInt, String, String?
+  ) -> Void
+  private let _XCTest = NSClassFromString("XCTest")
+    .flatMap(Bundle.init(for:))
+    .flatMap({ $0.executablePath })
+    .flatMap({ dlopen($0, RTLD_NOW) })
+  private let _XCTFailureHandler =
+    _XCTest
+    .flatMap { dlsym($0, "_XCTFailureHandler") }
+    .map({ unsafeBitCast($0, to: XCTFailureHandler.self) })
 #endif
