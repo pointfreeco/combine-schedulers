@@ -205,6 +205,7 @@
   @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension DispatchQueue {
     public static func failing(_ prefix: String = "") -> FailingSchedulerOf<DispatchQueue> {
+      // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(prefix, now: .init(.init(uptimeNanoseconds: 1)))
     }
   }
