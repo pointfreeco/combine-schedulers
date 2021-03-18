@@ -10,11 +10,11 @@ A few schedulers that make working with Combine more testable and more versatile
 * [Learn more](#learn-more)
   * [`AnyScheduler`](#anyscheduler)
   * [`TestScheduler`](#testscheduler)
-  * [`UIScheduler`](#testscheduler)
   * [`ImmediateScheduler`](#immediatescheduler)
+  * [`FailingScheduler`](#failingscheduler)
+  * [Animated schedulers](#animated-schedulers)
+  * [`UIScheduler`](#testscheduler)
   * [`Publishers.Timer`](#publisherstimer)
-* [Scheduler transformations](#scheduler-transformations)
-  * [Animation](#animation)
 * [Installation](#installation)
 * [Documentation](#documentation)
 * [Other libraries](#other-libraries)
@@ -56,7 +56,7 @@ class EpisodeViewModel: ObservableObject {
   func reloadButtonTapped() {
     self.apiClient.fetchEpisode()
       .receive(on: DispatchQueue.main)
-      .assign(to: self.$episode)
+      .assign(to: &self.$episode)
   }
 }
 ```
@@ -82,7 +82,7 @@ class EpisodeViewModel<S: Scheduler>: ObservableObject {
   func reloadButtonTapped() {
     self.apiClient.fetchEpisode()
       .receive(on: self.scheduler)
-      .assign(to: self.$episode)
+      .assign(to: &self.$episode)
   }
 }
 ```
@@ -110,7 +110,7 @@ class EpisodeViewModel: ObservableObject {
   func reloadButtonTapped() {
     self.apiClient.fetchEpisode()
       .receive(on: self.scheduler)
-      .assign(to: self.$episode)
+      .assign(to: &self.$episode)
   }
 }
 ```
@@ -191,14 +191,6 @@ XCTAssertEqual(output, [1])
 
 This is a very simple example of how to control the flow of time with the test scheduler, but this technique can be used to test any publisher that involves Combine's asynchronous operations.
 
-### `UIScheduler`
-
-A scheduler that executes its work on the main queue as soon as possible. This scheduler is inspired by the [equivalent](https://github.com/ReactiveCocoa/ReactiveSwift/blob/58d92aa01081301549c48a4049e215210f650d07/Sources/Scheduler.swift#L92) scheduler in the [ReactiveSwift](https://github.com/ReactiveCocoa/ReactiveSwift) project.
-
-If `UIScheduler.shared.schedule` is invoked from the main thread then the unit of work will be performed immediately. This is in contrast to `DispatchQueue.main.schedule`, which will incur a thread hop before executing since it uses `DispatchQueue.main.async` under the hood.
-
-This scheduler can be useful for situations where you need work executed as quickly as possible on the main thread, and for which a thread hop would be problematic, such as when performing animations.
-
 ### `ImmediateScheduler`
 
 The Combine framework comes with an `ImmediateScheduler` type of its own, but it defines all new types for the associated types of `SchedulerTimeType` and `SchedulerOptions`. This means you cannot easily swap between a live `DispatchQueue` and an "immediate" `DispatchQueue` that executes work synchronously. The only way to do that would be to introduce generics to any code making use of that scheduler, which can become unwieldly.
@@ -225,7 +217,7 @@ class HomeViewModel: ObservableObject {
     Just(())
       .delay(for: .seconds(10), scheduler: DispachQueue.main)
       .flatMap { apiClient.fetchEpisodes() }
-      .assign(to: self.$episodes)
+      .assign(to: &self.$episodes)
   }
 }
 ```
@@ -234,18 +226,13 @@ In order to test this code you would literally need to wait 10 seconds for the p
 
 ```swift
 func testViewModel() {
-  let viewModel(apiClient: .mock)
-
-  var output: [Episode] = []
-  viewModel.$episodes
-    .sink { output.append($0) }
-    .store(in: &self.cancellables)
+  let viewModel = HomeViewModel(apiClient: .mock)
 
   viewModel.reloadButtonTapped()
 
   _ = XCTWaiter.wait(for: [XCTestExpectation()], timeout: 10)
 
-  XCTAssert(output, [Episode(id: 42)])
+  XCTAssert(viewModel.episodes, [Episode(id: 42)])
 }
 ```
 
@@ -267,7 +254,7 @@ class HomeViewModel: ObservableObject {
     Just(())
       .delay(for: .seconds(10), scheduler: self.scheduler)
       .flatMap { self.apiClient.fetchEpisodes() }
-      .assign(to: self.$episodes)
+      .assign(to: &self.$episodes)
   }
 }
 ```
@@ -276,23 +263,103 @@ And then in tests use an immediate scheduler:
 
 ```swift
 func testViewModel() {
-  let viewModel(
+  let viewModel = HomeViewModel(
     apiClient: .mock,
     scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
   )
-
-  var output: [Episode] = []
-  viewModel.$episodes
-    .sink { output.append($0) }
-    .store(in: &self.cancellables)
 
   viewModel.reloadButtonTapped()
 
   // No more waiting...
 
-  XCTAssert(output, [Episode(id: 42)])
+  XCTAssert(viewModel.episodes, [Episode(id: 42)])
 }
 ```
+
+### `FailingScheduler`
+
+A scheduler that causes a test to fail if it is used.
+
+This scheduler can provide an additional layer of certainty that a tested code path does not require the use of a scheduler.
+
+As a view model becomes more complex, only some of its logic may require a scheduler. When writing unit tests for any logic that does _not_ require a scheduler, one should provide a failing scheduler, instead. This documents, directly in the test, that the feature does not use a scheduler. If it did, or ever does in the future, the test will fail.
+
+For example, the following view model has a couple responsibilities:
+
+```swift
+class EpisodeViewModel: ObservableObject {
+  @Published var episode: Episode?
+
+  let apiClient: ApiClient
+  let mainQueue: AnySchedulerOf<DispatchQueue>
+
+  init(apiClient: ApiClient, mainQueue: AnySchedulerOf<DispatchQueue>) {
+    self.apiClient = apiClient
+    self.mainQueue = mainQueue
+  }
+
+  func reloadButtonTapped() {
+    self.apiClient.fetchEpisode()
+      .receive(on: self.mainQueue)
+      .assign(to: &self.$episode)
+  }
+
+  func favoriteButtonTapped() {
+    self.episode?.isFavorite.toggle()
+  }
+}
+```
+
+  * It lets the user tap a button to refresh some episode data
+  * It lets the user toggle if the episode is one of their favorites
+
+The API client delivers the episode on a background queue, so the view model must receive it on its main queue before mutating its state.
+
+Tapping the reload button, however, involves no scheduling. This means that a test can be written with a failing scheduler:
+
+```swift
+func testFavoriteButton() {
+  let viewModel = EpisodeViewModel(
+    apiClient: .mock,
+    mainQueue: .failing
+  )
+  viewModel.episode = .mock
+
+  viewModel.favoriteButtonTapped()
+  XCTAssert(viewModel.episode?.isFavorite == true)
+
+  viewModel.favoriteButtonTapped()
+  XCTAssert(viewModel.episode?.isFavorite == false)
+}
+```
+
+With `.failing`, this test pretty strongly declares that favoriting an episode does not need a scheduler to do the job, which means it is reasonable to assume that the feature is simple and does not involve any asynchrony.
+
+In the future, should favoriting an episode fire off an API request that involves a scheduler, this test will begin to fail, which is a good thing! This will force us to address the complexity that was introduced. Had we used any other scheduler, it would quietly receive this additional work and the test would continue to pass.
+
+### Animated schedulers
+
+CombineSchedulers comes with helpers that aid in asynchronous animations in both SwiftUI and UIKit.
+
+If a SwiftUI state mutation should be animated, you can invoke the `animation` and `transaction` methods to transform an existing scheduler into one that schedules its actions with an animation or in a transaction. These APIs mirror SwiftUI's `withAnimation` and `withTransaction` functions, which are invoked by the animated scheduler.
+
+For example, to animate an API response in your view model, you can specify that the scheduler that receives this state should be animated:
+
+```swift
+self.apiClient.fetchEpisode()
+  .receive(on: self.scheduler.animation())
+  .assign(to: &self.$episode)
+```
+
+If you are powering a UIKit feature with Combine, you can use the `animate` method, which mirrors `UIView.animate`.
+
+### `UIScheduler`
+
+A scheduler that executes its work on the main queue as soon as possible. This scheduler is inspired by the [equivalent](https://github.com/ReactiveCocoa/ReactiveSwift/blob/58d92aa01081301549c48a4049e215210f650d07/Sources/Scheduler.swift#L92) scheduler in the [ReactiveSwift](https://github.com/ReactiveCocoa/ReactiveSwift) project.
+
+If `UIScheduler.shared.schedule` is invoked from the main thread then the unit of work will be performed immediately. This is in contrast to `DispatchQueue.main.schedule`, which will incur a thread hop before executing since it uses `DispatchQueue.main.async` under the hood.
+
+This scheduler can be useful for situations where you need work executed as quickly as possible on the main thread, and for which a thread hop would be problematic, such as when performing animations.
 
 ### `Publishers.Timer`
 
@@ -337,20 +404,6 @@ XCTAssertEqual(output, [0, 1])
 
 scheduler.advance(by: 1_000)
 XCTAssertEqual(output, Array(0...1_001))
-```
-
-## Scheduler transformations
-
-### Animation
-
-CombineSchedulers comes with helpers that aid in asynchronous SwiftUI animations. You can invoke the `animation` and `transaction` methods to transform an existing scheduler into one that schedules its actions with an animation or in a transaction. 
-
-For example, to animate an API response in your view model, you can specify that the scheduler that receives this state should be animated:
-
-```swift
-self.apiClient.fetchEpisode()
-  .receive(on: self.scheduler.animation())
-  .assign(to: self.$episode)
 ```
 
 ## Compatibility

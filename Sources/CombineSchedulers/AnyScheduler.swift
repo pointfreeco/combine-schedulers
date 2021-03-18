@@ -12,7 +12,6 @@
   ///
   ///     class EpisodeViewModel: ObservableObject {
   ///       @Published var episode: Episode?
-  ///       private var cancellables: Set<AnyCancellable> = []
   ///
   ///       let apiClient: ApiClient
   ///
@@ -23,8 +22,7 @@
   ///       func reloadButtonTapped() {
   ///         self.apiClient.fetchEpisode()
   ///           .receive(on: DispatchQueue.main)
-  ///           .sink { self.episode = $0 }
-  ///           .store(in: &self.cancellables)
+  ///           .assign(to: &self.$episode)
   ///       }
   ///     }
   ///
@@ -44,7 +42,6 @@
   ///
   ///     class EpisodeViewModel<S: Scheduler>: ObservableObject {
   ///       @Published var episode: Episode?
-  ///       private var cancellables: Set<AnyCancellable> = []
   ///
   ///       let apiClient: ApiClient
   ///       let scheduler: S
@@ -57,8 +54,7 @@
   ///       func reloadButtonTapped() {
   ///         self.apiClient.fetchEpisode()
   ///           .receive(on: self.scheduler)
-  ///           .sink { self.episode = $0 }
-  ///           .store(in: &self.cancellables)
+  ///           .assign(to: &self.$episode)
   ///       }
   ///     }
   ///
@@ -92,7 +88,7 @@
   ///       func reloadButtonTapped() {
   ///         self.apiClient.fetchEpisode()
   ///           .receive(on: self.scheduler)
-  ///           .sink { self.episode = $0 }
+  ///           .assign(to: &self.$episode)
   ///       }
   ///     }
   ///
@@ -225,12 +221,12 @@
 
   /// A convenience type to specify an `AnyScheduler` by the scheduler it wraps rather than by the
   /// time type and options type.
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   public typealias AnySchedulerOf<Scheduler> = AnyScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
   > where Scheduler: Combine.Scheduler
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension Scheduler {
     /// Wraps this scheduler with a type eraser.
     public func eraseToAnyScheduler() -> AnyScheduler<SchedulerTimeType, SchedulerOptions> {
