@@ -1,6 +1,7 @@
 #if DEBUG && canImport(Combine)
   import Combine
   import Foundation
+  import XCTestDynamicOverlay
 
   /// A scheduler that causes the current XCTest test case to fail if it is used.
   ///
@@ -75,7 +76,7 @@
   {
 
     public var minimumTolerance: SchedulerTimeType.Stride {
-      _XCTFail(
+      XCTFail(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         A failing scheduler was asked its minimum tolerance.
@@ -85,7 +86,7 @@
     }
 
     public var now: SchedulerTimeType {
-      _XCTFail(
+      XCTFail(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         A failing scheduler was asked the current time.
@@ -109,7 +110,7 @@
     }
 
     public func schedule(options _: SchedulerOptions?, _ action: () -> Void) {
-      _XCTFail(
+      XCTFail(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         A failing scheduler scheduled an action to run immediately.
@@ -123,7 +124,7 @@
       options _: SchedulerOptions?,
       _ action: () -> Void
     ) {
-      _XCTFail(
+      XCTFail(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         A failing scheduler scheduled an action to run later.
@@ -138,7 +139,7 @@
       options _: SchedulerOptions?,
       _ action: () -> Void
     ) -> Cancellable {
-      _XCTFail(
+      XCTFail(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         A failing scheduler scheduled an action to run on a timer.
@@ -194,17 +195,12 @@
   }
 
   @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-  extension Scheduler {
-    public static func failing(
-      _ prefix: String = "", now: SchedulerTimeType
-    ) -> FailingSchedulerOf<Self> {
-      .init(prefix, now: now)
-    }
-  }
-
-  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension DispatchQueue {
-    public static func failing(_ prefix: String = "") -> FailingSchedulerOf<DispatchQueue> {
+    public static var failing: FailingSchedulerOf<DispatchQueue> {
+      Self.failing("")
+    }
+
+    public static func failing(_ prefix: String) -> FailingSchedulerOf<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(prefix, now: .init(.init(uptimeNanoseconds: 1)))
     }
@@ -212,6 +208,10 @@
 
   @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension OperationQueue {
+    public static var failing: FailingSchedulerOf<OperationQueue> {
+      Self.failing("")
+    }
+
     public static func failing(_ prefix: String = "") -> FailingSchedulerOf<OperationQueue> {
       .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
     }
@@ -219,6 +219,10 @@
 
   @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension RunLoop {
+    public static var failing: FailingSchedulerOf<RunLoop> {
+      Self.failing("")
+    }
+
     public static func failing(_ prefix: String = "") -> FailingSchedulerOf<RunLoop> {
       .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
     }
@@ -230,60 +234,4 @@
   public typealias FailingSchedulerOf<Scheduler> = FailingScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
   > where Scheduler: Combine.Scheduler
-
-  // NB: Dynamically load XCTest to prevent leaking its symbols into our library code.
-  private func _XCTFail(_ message: String, file: StaticString = #file, line: UInt = #line) {
-    // Xcode 12: Record XCTIssue
-    if
-      let XCTestObservationCenter = NSClassFromString("XCTestObservationCenter")
-        as Any as? NSObjectProtocol,
-      let shared = XCTestObservationCenter.perform(Selector(("sharedTestObservationCenter")))?
-        .takeUnretainedValue(),
-      let observers = shared.perform(Selector(("observers")))?
-        .takeUnretainedValue() as? [AnyObject],
-      let observer =
-        observers
-        .first(where: { NSStringFromClass(type(of: $0)) == "XCTestMisuseObserver" }),
-      let currentTestCase = observer.perform(Selector(("currentTestCase")))?
-        .takeUnretainedValue(),
-      let XCTIssue = NSClassFromString("XCTIssue")
-        as Any as? NSObjectProtocol,
-      let alloc = XCTIssue.perform(NSSelectorFromString("alloc"))?
-        .takeUnretainedValue(),
-      let issue =
-        alloc
-        .perform(
-          Selector(("initWithType:compactDescription:")), with: 0, with: message
-        )?
-        .takeUnretainedValue()
-    {
-      _ = currentTestCase.perform(Selector(("recordIssue:")), with: issue)
-      return
-    }
-
-    // Xcode <12: Call XCTFail
-    if let _XCTFailureHandler = _XCTFailureHandler {
-      _XCTFailureHandler(nil, true, "\(file)", line, message, nil)
-      return
-    }
-
-    assertionFailure(
-      "Couldn't load 'XCTest'. Are you running code that calls 'XCTFail' from application code?",
-      file: file,
-      line: line
-    )
-    return
-  }
-
-  private typealias XCTFailureHandler = @convention(c) (
-    AnyObject?, Bool, UnsafePointer<CChar>, UInt, String, String?
-  ) -> Void
-  private let _XCTest = NSClassFromString("XCTest")
-    .flatMap(Bundle.init(for:))
-    .flatMap({ $0.executablePath })
-    .flatMap({ dlopen($0, RTLD_NOW) })
-  private let _XCTFailureHandler =
-    _XCTest
-    .flatMap { dlsym($0, "_XCTFailureHandler") }
-    .map({ unsafeBitCast($0, to: XCTFailureHandler.self) })
 #endif
