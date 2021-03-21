@@ -11,8 +11,8 @@ A few schedulers that make working with Combine more testable and more versatile
   * [`AnyScheduler`](#anyscheduler)
   * [`TestScheduler`](#testscheduler)
   * [`ImmediateScheduler`](#immediatescheduler)
-  * [`FailingScheduler`](#failingscheduler)
   * [Animated schedulers](#animated-schedulers)
+  * [`FailingScheduler`](#failingscheduler)
   * [`UIScheduler`](#testscheduler)
   * [`Publishers.Timer`](#publisherstimer)
 * [Installation](#installation)
@@ -276,6 +276,22 @@ func testViewModel() {
 }
 ```
 
+### Animated schedulers
+
+CombineSchedulers comes with helpers that aid in asynchronous animations in both SwiftUI and UIKit.
+
+If a SwiftUI state mutation should be animated, you can invoke the `animation` and `transaction` methods to transform an existing scheduler into one that schedules its actions with an animation or in a transaction. These APIs mirror SwiftUI's `withAnimation` and `withTransaction` functions, which are invoked by the animated scheduler.
+
+For example, to animate an API response in your view model, you can specify that the scheduler that receives this state should be animated:
+
+```swift
+self.apiClient.fetchEpisode()
+  .receive(on: self.scheduler.animation())
+  .assign(to: &self.$episode)
+```
+
+If you are powering a UIKit feature with Combine, you can use the `animate` method, which mirrors `UIView.animate`.
+
 ### `FailingScheduler`
 
 A scheduler that causes a test to fail if it is used.
@@ -333,25 +349,9 @@ func testFavoriteButton() {
 }
 ```
 
-With `.failing`, this test pretty strongly declares that favoriting an episode does not need a scheduler to do the job, which means it is reasonable to assume that the feature is simple and does not involve any asynchrony.
+With `.failing`, this test strongly declares that favoriting an episode does not need a scheduler to do the job, which means it is reasonable to assume that the feature is simple and does not involve any asynchrony.
 
 In the future, should favoriting an episode fire off an API request that involves a scheduler, this test will begin to fail, which is a good thing! This will force us to address the complexity that was introduced. Had we used any other scheduler, it would quietly receive this additional work and the test would continue to pass.
-
-### Animated schedulers
-
-CombineSchedulers comes with helpers that aid in asynchronous animations in both SwiftUI and UIKit.
-
-If a SwiftUI state mutation should be animated, you can invoke the `animation` and `transaction` methods to transform an existing scheduler into one that schedules its actions with an animation or in a transaction. These APIs mirror SwiftUI's `withAnimation` and `withTransaction` functions, which are invoked by the animated scheduler.
-
-For example, to animate an API response in your view model, you can specify that the scheduler that receives this state should be animated:
-
-```swift
-self.apiClient.fetchEpisode()
-  .receive(on: self.scheduler.animation())
-  .assign(to: &self.$episode)
-```
-
-If you are powering a UIKit feature with Combine, you can use the `animate` method, which mirrors `UIView.animate`.
 
 ### `UIScheduler`
 
