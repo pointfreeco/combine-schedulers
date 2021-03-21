@@ -290,7 +290,13 @@ self.apiClient.fetchEpisode()
   .assign(to: &self.$episode)
 ```
 
-If you are powering a UIKit feature with Combine, you can use the `animate` method, which mirrors `UIView.animate`.
+If you are powering a UIKit feature with Combine, you can use the `.animate` method, which mirrors `UIView.animate`:
+
+```swift
+self.apiClient.fetchEpisode()
+  .receive(on: self.scheduler.animate(withDuration: 0.3))
+  .assign(to: &self.$episode)
+```
 
 ### `FailingScheduler`
 
