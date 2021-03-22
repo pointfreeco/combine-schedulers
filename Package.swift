@@ -17,19 +17,19 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.1.0"),
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.1.0")
   ],
   targets: [
     .target(
       name: "CombineSchedulers",
       dependencies: [
-        "XCTestDynamicOverlay",
+        "XCTestDynamicOverlay"
       ]
     ),
     .testTarget(
       name: "CombineSchedulersTests",
       dependencies: [
-        "CombineSchedulers",
+        "CombineSchedulers"
       ]
     ),
   ]
