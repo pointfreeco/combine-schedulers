@@ -3,7 +3,7 @@
   import CombineSchedulers
   import XCTest
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   final class UISchedulerTests: XCTestCase {
     func testVoidsThreadHop() {
       var worked = false
