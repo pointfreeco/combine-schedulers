@@ -25,7 +25,7 @@ let package = Package(
       name: "CombineSchedulersTests",
       dependencies: [
         "CombineSchedulers",
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+        "XCTestDynamicOverlay"
       ]
     ),
   ]
