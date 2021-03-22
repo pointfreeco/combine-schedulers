@@ -51,7 +51,6 @@ method is called:</p>
 
 <html><body><pre class="highlight"><code><span class="keyword">class</span> <span class="type">EpisodeViewModel</span>: <span class="type">ObservableObject</span> {
   <span class="attribute">@</span><span class="type">Published</span> <span class="keyword">var</span> <span class="variable">episode</span>: <span class="type">Episode</span>?
-  <span class="keyword">private</span> <span class="keyword">var</span> <span class="variable">cancellables</span>: <span class="type">Set</span>&lt;<span class="type">AnyCancellable</span>&gt; = []
 
   <span class="keyword">let</span> <span class="variable">apiClient</span>: <span class="type">ApiClient</span>
 
@@ -62,8 +61,7 @@ method is called:</p>
   <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
     <span class="keyword">self</span>.<span class="type">apiClient</span>.<span class="type">fetchEpisode</span>()
       .<span class="type">receive</span>(<span class="variable">on</span>: <span class="type">DispatchQueue</span>.<span class="type">main</span>)
-      .<span class="type">sink</span> { <span class="keyword">self</span>.<span class="type">episode</span> = <span class="variable">$0</span> }
-      .<span class="type">store</span>(<span class="variable">in</span>: &amp;<span class="keyword">self</span>.<span class="type">cancellables</span>)
+      .<span class="type">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="type">$episode</span>)
   }
 }
 </code></pre></body></html>
@@ -83,7 +81,6 @@ view model so that we can control it from the outside:</p>
 
 <html><body><pre class="highlight"><code><span class="keyword">class</span> <span class="type">EpisodeViewModel</span>&lt;<span class="variable">S</span>: <span class="type">Scheduler</span>&gt;: <span class="type">ObservableObject</span> {
   <span class="attribute">@</span><span class="type">Published</span> <span class="keyword">var</span> <span class="variable">episode</span>: <span class="type">Episode</span>?
-  <span class="keyword">private</span> <span class="keyword">var</span> <span class="variable">cancellables</span>: <span class="type">Set</span>&lt;<span class="type">AnyCancellable</span>&gt; = []
 
   <span class="keyword">let</span> <span class="variable">apiClient</span>: <span class="type">ApiClient</span>
   <span class="keyword">let</span> <span class="variable">scheduler</span>: <span class="type">S</span>
@@ -96,8 +93,7 @@ view model so that we can control it from the outside:</p>
   <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
     <span class="keyword">self</span>.<span class="type">apiClient</span>.<span class="type">fetchEpisode</span>()
       .<span class="type">receive</span>(<span class="variable">on</span>: <span class="keyword">self</span>.<span class="type">scheduler</span>)
-      .<span class="type">sink</span> { <span class="keyword">self</span>.<span class="type">episode</span> = <span class="variable">$0</span> }
-      .<span class="type">store</span>(<span class="variable">in</span>: &amp;<span class="keyword">self</span>.<span class="type">cancellables</span>)
+      .<span class="type">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="type">$episode</span>)
   }
 }
 </code></pre></body></html>
@@ -131,7 +127,7 @@ scheduler whose associated types match that of <code>DispatchQueue</code>:</p>
   <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
     <span class="keyword">self</span>.<span class="type">apiClient</span>.<span class="type">fetchEpisode</span>()
       .<span class="type">receive</span>(<span class="variable">on</span>: <span class="keyword">self</span>.<span class="type">scheduler</span>)
-      .<span class="type">sink</span> { <span class="keyword">self</span>.<span class="type">episode</span> = <span class="variable">$0</span> }
+      .<span class="type">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="type">$episode</span>)
   }
 }
 </code></pre></body></html>
@@ -364,7 +360,7 @@ specified frequency, taking into account tolerance if possible.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-02-22T19:47:58+0000">February 22, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-03-22T14:26:05+0000">March 22, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>

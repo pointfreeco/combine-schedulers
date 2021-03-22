@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CombineSchedulers - ImmediateSchedulerOf</title>
+    <title>CombineSchedulers - FailingSchedulerOf</title>
     <link rel="stylesheet" type="text/css" href="/combine-schedulers/all.css" media="all" />
 </head>
 <body>
@@ -34,14 +34,14 @@
         <article>
             <h1>
     <small>Typealias</small>
-    <span class="name">Immediate​Scheduler​Of</span>
+    <span class="name">Failing​Scheduler​Of</span>
 </h1>
 
-<html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *) <span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">ImmediateSchedulerOf</span>&lt;<span class="variable">Scheduler</span>&gt; = <a href="/combine-schedulers/ImmediateScheduler"><span class="type">ImmediateScheduler</span></a>&lt;
+<html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *) <span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">FailingSchedulerOf</span>&lt;<span class="variable">Scheduler</span>&gt; = <a href="/combine-schedulers/FailingScheduler"><span class="type">FailingScheduler</span></a>&lt;
     <span class="type">Scheduler</span>.<span class="type">SchedulerTimeType</span>, <span class="type">Scheduler</span>.<span class="type">SchedulerOptions</span>
   &gt; <span class="keyword">where</span> <span class="type">Scheduler</span>: <span class="type">Combine</span>.<span class="type">Scheduler</span></code></pre></body></html>
 <div class="summary" role="doc-abstract">
-    <p>A convenience type to specify an <code>ImmediateScheduler</code> by the scheduler it wraps rather than by
+    <p>A convenience type to specify a <code>FailingScheduler</code> by the scheduler it wraps rather than by
 the time type and options type.</p>
 
 </div>
