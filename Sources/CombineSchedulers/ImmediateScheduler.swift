@@ -20,7 +20,6 @@
   ///
   ///     class HomeViewModel: ObservableObject {
   ///       @Published var episodes: [Episode]?
-  ///       var cancellables: Set<AnyCancellable> = []
   ///
   ///       let apiClient: ApiClient
   ///
@@ -32,8 +31,7 @@
   ///         Just(())
   ///           .delay(for: .seconds(10), scheduler: DispachQueue.main)
   ///           .flatMap { apiClient.fetchEpisodes() }
-  ///           .sink { self.episodes = $0 }
-  ///           .store(in: &self.cancellables)
+  ///           .assign(to: &self.episodes)
   ///       }
   ///     }
   ///
@@ -41,18 +39,13 @@
   /// emit:
   ///
   ///     func testViewModel() {
-  ///       let viewModel(apiClient: .mock)
-  ///
-  ///       var output: [Episode] = []
-  ///       viewModel.$episodes
-  ///         .sink { output.append($0) }
-  ///         .store(in: &self.cancellables)
+  ///       let viewModel = HomeViewModel(apiClient: .mock)
   ///
   ///       viewModel.reloadButtonTapped()
   ///
   ///       _ = XCTWaiter.wait(for: [XCTestExpectation()], timeout: 10)
   ///
-  ///       XCTAssert(output, [Episode(id: 42)])
+  ///       XCTAssert(viewModel.episodes, [Episode(id: 42)])
   ///     }
   ///
   /// Alternatively, we can explicitly pass a scheduler into the view model initializer so that it
@@ -63,7 +56,6 @@
   ///
   ///       let apiClient: ApiClient
   ///       let scheduler: AnySchedulerOf<DispatchQueue>
-  ///       var cancellables: Set<AnyCancellable> = []
   ///
   ///       init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
   ///         self.apiClient = apiClient
@@ -74,29 +66,23 @@
   ///         Just(())
   ///           .delay(for: .seconds(10), scheduler: self.scheduler)
   ///           .flatMap { self.apiClient.fetchEpisodes() }
-  ///           .sink { self.episodes = $0 }
-  ///           .store(in: &self.cancellables)
+  ///           .assign(to: &self.$episodes)
   ///       }
   ///     }
   ///
   /// And then in tests use an immediate scheduler:
   ///
   ///     func testViewModel() {
-  ///       let viewModel(
+  ///       let viewModel = HomeViewModel(
   ///         apiClient: .mock,
   ///         scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
   ///       )
-  ///
-  ///       var output: [Episode] = []
-  ///       viewModel.$episodes
-  ///         .sink { output.append($0) }
-  ///         .store(in: &self.cancellables)
   ///
   ///       viewModel.reloadButtonTapped()
   ///
   ///       // No more waiting...
   ///
-  ///       XCTAssert(output, [Episode(id: 42)])
+  ///       XCTAssert(viewModel.episodes, [Episode(id: 42)])
   ///     }
   ///
   /// - Note: This scheduler can _not_ be used to test publishers with more complex timing logic,
@@ -127,6 +113,15 @@
 
     public func schedule(
       after _: SchedulerTimeType,
+      tolerance _: SchedulerTimeType.Stride,
+      options _: SchedulerOptions?,
+      _ action: () -> Void
+    ) {
+      action()
+    }
+
+    public func schedule(
+      after _: SchedulerTimeType,
       interval _: SchedulerTimeType.Stride,
       tolerance _: SchedulerTimeType.Stride,
       options _: SchedulerOptions?,
@@ -135,18 +130,9 @@
       action()
       return AnyCancellable {}
     }
-
-    public func schedule(
-      after _: SchedulerTimeType,
-      tolerance _: SchedulerTimeType.Stride,
-      options _: SchedulerOptions?,
-      _ action: () -> Void
-    ) {
-      action()
-    }
   }
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension Scheduler
   where
     SchedulerTimeType == DispatchQueue.SchedulerTimeType,
@@ -158,7 +144,7 @@
     }
   }
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension Scheduler
   where
     SchedulerTimeType == RunLoop.SchedulerTimeType,
@@ -169,7 +155,7 @@
     }
   }
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension Scheduler
   where
     SchedulerTimeType == OperationQueue.SchedulerTimeType,
@@ -180,9 +166,9 @@
     }
   }
 
-  /// A convenience type to specify an `ImmediateTestScheduler` by the scheduler it wraps rather
-  /// than by the time type and options type.
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+  /// A convenience type to specify an `ImmediateScheduler` by the scheduler it wraps rather than by
+  /// the time type and options type.
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   public typealias ImmediateSchedulerOf<Scheduler> = ImmediateScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
   > where Scheduler: Combine.Scheduler

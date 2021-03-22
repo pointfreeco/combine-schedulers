@@ -17,7 +17,7 @@
     ///       init() {
     ///         apiClient.loadArticles()
     ///           .receive(on: DispatchQueue.main)
-    ///           .assign(to: self.$articles)
+    ///           .assign(to: &self.$articles)
     ///       }
     ///     }
     ///
@@ -32,7 +32,7 @@
     ///       init() {
     ///         apiClient.loadArticles()
     ///           .receive(on: DispatchQueue.main.animation())
-    ///           .assign(to: self.$articles)
+    ///           .assign(to: &self.$articles)
     ///       }
     ///     }
     ///
