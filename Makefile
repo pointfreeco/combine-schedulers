@@ -14,7 +14,7 @@ test:
 	xcodebuild test \
 		-scheme combine-schedulers \
 		-destination platform="$(PLATFORM_TVOS)"
-	xcodebuild test \
+	xcodebuild build \
 		-scheme CombineSchedulers_watchOS \
 		-destination platform="$(PLATFORM_WATCHOS)"
 
