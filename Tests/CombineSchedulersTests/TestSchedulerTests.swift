@@ -8,7 +8,7 @@
     var cancellables: Set<AnyCancellable> = []
 
     func testAdvance() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
@@ -56,7 +56,7 @@
     }
 
     func testDelay0Advance() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
@@ -72,7 +72,7 @@
     }
 
     func testSubscribeOnAdvance() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
@@ -88,7 +88,7 @@
     }
 
     func testReceiveOnAdvance() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
@@ -104,7 +104,7 @@
     }
 
     func testDispatchQueueDefaults() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
       scheduler.advance(by: .nanoseconds(0))
 
       XCTAssertEqual(
@@ -118,7 +118,7 @@
     }
 
     func testTwoIntervalOrdering() {
-      let testScheduler = DispatchQueue.testScheduler
+      let testScheduler = DispatchQueue.test
 
       var values: [Int] = []
 
