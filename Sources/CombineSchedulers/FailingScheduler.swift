@@ -149,6 +149,58 @@
     }
   }
 
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension DispatchQueue {
+    /// A failing scheduler that can substitute itself for a dispatch queue.
+    public static var failing: FailingSchedulerOf<DispatchQueue> {
+      Self.failing("DispatchQueue")
+    }
+
+    /// A failing scheduler that can substitute itself for a dispatch queue.
+    ///
+    /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
+    ///   messages.
+    /// - Returns: A failing scheduler.
+    public static func failing(_ prefix: String) -> FailingSchedulerOf<DispatchQueue> {
+      // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
+      .init(prefix, now: .init(.init(uptimeNanoseconds: 1)))
+    }
+  }
+
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension OperationQueue {
+    /// A failing scheduler that can substitute itself for an operation queue.
+    public static var failing: FailingSchedulerOf<OperationQueue> {
+      Self.failing("OperationQueue")
+    }
+
+    /// A failing scheduler that can substitute itself for an operation queue.
+    ///
+    /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
+    ///   messages.
+    /// - Returns: A failing scheduler.
+    public static func failing(_ prefix: String) -> FailingSchedulerOf<OperationQueue> {
+      .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
+    }
+  }
+
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension RunLoop {
+    /// A failing scheduler that can substitute itself for a run loop.
+    public static var failing: FailingSchedulerOf<RunLoop> {
+      Self.failing("RunLoop")
+    }
+
+    /// A failing scheduler that can substitute itself for a run loop.
+    ///
+    /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
+    ///   messages.
+    /// - Returns: A failing scheduler.
+    public static func failing(_ prefix: String) -> FailingSchedulerOf<RunLoop> {
+      .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
+    }
+  }
+
   @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension AnyScheduler
   where
@@ -156,26 +208,16 @@
     SchedulerOptions == DispatchQueue.SchedulerOptions
   {
     public static var failing: Self {
-      .failing("")
+      DispatchQueue.failing.eraseToAnyScheduler()
     }
 
+    /// A failing scheduler that can substitute itself for a dispatch queue.
+    ///
+    /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
+    ///   messages.
+    /// - Returns: A failing scheduler.
     public static func failing(_ prefix: String) -> Self {
       DispatchQueue.failing(prefix).eraseToAnyScheduler()
-    }
-  }
-
-  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
-  extension AnyScheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
-    public static var failing: Self {
-      .failing("")
-    }
-
-    public static func failing(_ prefix: String) -> Self {
-      RunLoop.failing(prefix).eraseToAnyScheduler()
     }
   }
 
@@ -185,46 +227,39 @@
     SchedulerTimeType == OperationQueue.SchedulerTimeType,
     SchedulerOptions == OperationQueue.SchedulerOptions
   {
+    /// A failing scheduler that can substitute itself for an operation queue.
     public static var failing: Self {
-      .failing("")
+      OperationQueue.failing.eraseToAnyScheduler()
     }
 
+    /// A failing scheduler that can substitute itself for an operation queue.
+    ///
+    /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
+    ///   messages.
+    /// - Returns: A failing scheduler.
     public static func failing(_ prefix: String) -> Self {
       OperationQueue.failing(prefix).eraseToAnyScheduler()
     }
   }
 
-  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-  extension DispatchQueue {
-    public static var failing: FailingSchedulerOf<DispatchQueue> {
-      Self.failing("")
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+  extension AnyScheduler
+  where
+    SchedulerTimeType == RunLoop.SchedulerTimeType,
+    SchedulerOptions == RunLoop.SchedulerOptions
+  {
+    /// A failing scheduler that can substitute itself for a run loop.
+    public static var failing: Self {
+      RunLoop.failing.eraseToAnyScheduler()
     }
 
-    public static func failing(_ prefix: String) -> FailingSchedulerOf<DispatchQueue> {
-      // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
-      .init(prefix, now: .init(.init(uptimeNanoseconds: 1)))
-    }
-  }
-
-  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-  extension OperationQueue {
-    public static var failing: FailingSchedulerOf<OperationQueue> {
-      Self.failing("")
-    }
-
-    public static func failing(_ prefix: String = "") -> FailingSchedulerOf<OperationQueue> {
-      .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
-    }
-  }
-
-  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-  extension RunLoop {
-    public static var failing: FailingSchedulerOf<RunLoop> {
-      Self.failing("")
-    }
-
-    public static func failing(_ prefix: String = "") -> FailingSchedulerOf<RunLoop> {
-      .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
+    /// A failing scheduler that can substitute itself for a run loop.
+    ///
+    /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
+    ///   messages.
+    /// - Returns: A failing scheduler.
+    public static func failing(_ prefix: String) -> Self {
+      RunLoop.failing(prefix).eraseToAnyScheduler()
     }
   }
 

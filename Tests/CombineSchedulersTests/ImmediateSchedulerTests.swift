@@ -6,7 +6,7 @@
   @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   final class ImmediateSchedulerTests: XCTestCase {
     func testSchedulesImmediately() {
-      let scheduler = DispatchQueue.immediateScheduler
+      let scheduler = DispatchQueue.immediate
       var worked = 0
 
       scheduler.schedule { worked += 1 }

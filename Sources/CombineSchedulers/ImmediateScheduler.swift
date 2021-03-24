@@ -133,36 +133,63 @@
   }
 
   @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-  extension Scheduler
+  extension DispatchQueue {
+    /// An immediate scheduler that can substitute itself for a dispatch queue.
+    public static var immediate: ImmediateSchedulerOf<DispatchQueue> {
+      // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
+      .init(now: .init(.init(uptimeNanoseconds: 1)))
+    }
+  }
+
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension OperationQueue {
+    /// An immediate scheduler that can substitute itself for an operation queue.
+    public static var immediate: ImmediateSchedulerOf<OperationQueue> {
+      .init(now: .init(.init(timeIntervalSince1970: 0)))
+    }
+  }
+
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension RunLoop {
+    /// An immediate scheduler that can substitute itself for a run loop.
+    public static var immediate: ImmediateSchedulerOf<RunLoop> {
+      .init(now: .init(.init(timeIntervalSince1970: 0)))
+    }
+  }
+
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+  extension AnyScheduler
   where
     SchedulerTimeType == DispatchQueue.SchedulerTimeType,
     SchedulerOptions == DispatchQueue.SchedulerOptions
   {
-    public static var immediateScheduler: ImmediateSchedulerOf<Self> {
-      // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
-      ImmediateScheduler(now: SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
+    /// An immediate scheduler that can substitute itself for a dispatch queue.
+    public static var immediate: Self {
+      DispatchQueue.immediate.eraseToAnyScheduler()
     }
   }
 
-  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-  extension Scheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
-    public static var immediateScheduler: ImmediateSchedulerOf<Self> {
-      ImmediateScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
-    }
-  }
-
-  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-  extension Scheduler
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+  extension AnyScheduler
   where
     SchedulerTimeType == OperationQueue.SchedulerTimeType,
     SchedulerOptions == OperationQueue.SchedulerOptions
   {
-    public static var immediateScheduler: ImmediateSchedulerOf<Self> {
-      ImmediateScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
+    /// An immediate scheduler that can substitute itself for an operation queue.
+    public static var immediate: Self {
+      OperationQueue.immediate.eraseToAnyScheduler()
+    }
+  }
+
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+  extension AnyScheduler
+  where
+    SchedulerTimeType == RunLoop.SchedulerTimeType,
+    SchedulerOptions == RunLoop.SchedulerOptions
+  {
+    /// An immediate scheduler that can substitute itself for a run loop.
+    public static var immediate: Self {
+      RunLoop.immediate.eraseToAnyScheduler()
     }
   }
 

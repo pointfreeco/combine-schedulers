@@ -176,40 +176,28 @@
     }
   }
 
-  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
-  extension Scheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension DispatchQueue {
     /// A test scheduler of dispatch queues.
-    public static var testScheduler: TestSchedulerOf<Self> {
+    public static var test: TestSchedulerOf<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
-      TestScheduler(now: SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
+      .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
   }
 
-  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
-  extension Scheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
-    /// A test scheduler of run loops.
-    public static var testScheduler: TestSchedulerOf<Self> {
-      TestScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
-    }
-  }
-
-  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
-  extension Scheduler
-  where
-    SchedulerTimeType == OperationQueue.SchedulerTimeType,
-    SchedulerOptions == OperationQueue.SchedulerOptions
-  {
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension OperationQueue {
     /// A test scheduler of operation queues.
-    public static var testScheduler: TestSchedulerOf<Self> {
-      TestScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
+    public static var test: TestSchedulerOf<OperationQueue> {
+      .init(now: .init(.init(timeIntervalSince1970: 0)))
+    }
+  }
+
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension RunLoop {
+    /// A test scheduler of run loops.
+    public static var test: TestSchedulerOf<RunLoop> {
+      .init(now: .init(.init(timeIntervalSince1970: 0)))
     }
   }
 
