@@ -98,7 +98,7 @@ view model so that we can control it from the outside:</p>
 }
 </code></pre></body></html>
 <p>Now we can initialize this view model in production by using <code>DispatchQueue.main</code> and we can
-initialize it in tests using <code>DispatchQueue.immediateScheduler</code>. Sounds like a win!</p>
+initialize it in tests using <code>DispatchQueue.immediate</code>. Sounds like a win!</p>
 
 <p>However, introducing this generic to our view model is quite heavyweight as it is loudly
 announcing to the outside world that this type uses a scheduler, and worse it will end up
@@ -139,11 +139,19 @@ have to first erase its type:</p>
   <span class="variable">scheduler</span>: <span class="type">DispatchQueue</span>.<span class="type">main</span>.<span class="type">eraseToAnyScheduler</span>()
 )
 </code></pre></body></html>
-<p>And similarly in tests we can use an immediate scheduler as long as we erase its type:</p>
+<p>For common schedulers, like <code>DispatchQueue</code>, <code>OperationQueue</code>, and <code>RunLoop</code>, there is even a
+static helper on <code>AnyScheduler</code> that further simplifies this:</p>
 
 <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">viewModel</span> = <span class="variable">EpisodeViewModel</span>(
   <span class="variable">apiClient</span>: ...,
-  <span class="variable">scheduler</span>: <span class="type">DispatchQueue</span>.<span class="type">immediateScheduler</span>.<span class="type">eraseToAnyScheduler</span>()
+  <span class="variable">scheduler</span>: .<span class="variable">main</span>
+)
+</code></pre></body></html>
+<p>And in tests we can use an immediate scheduler:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">viewModel</span> = <span class="variable">EpisodeViewModel</span>(
+  <span class="variable">apiClient</span>: ...,
+  <span class="variable">scheduler</span>: .<span class="variable">immediate</span>
 )
 </code></pre></body></html>
 <p>So, in general, <code>AnyScheduler</code> is great for allowing one to control what scheduler is used
@@ -360,7 +368,7 @@ specified frequency, taking into account tolerance if possible.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-03-29T20:19:44+0000">March 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-03-29T20:32:13+0000">March 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>

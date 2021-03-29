@@ -61,7 +61,7 @@ run loop:</p>
 involving timers becomes more testable. This shows how we can easily simulate the idea of
 moving time forward 1,000 seconds in a timer:</p>
 
-<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="type">testScheduler</span>
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="type">test</span>
 <span class="keyword">var</span> <span class="variable">output</span>: [<span class="type">Int</span>] = []
 
 <span class="variable">Publishers</span>.<span class="type">Timer</span>(<span class="variable">every</span>: <span class="number literal">1</span>, <span class="variable">scheduler</span>: <span class="type">scheduler</span>)
@@ -205,7 +205,7 @@ moving time forward 1,000 seconds in a timer:</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-03-29T20:19:44+0000">March 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-03-29T20:32:13+0000">March 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
 </p>
     </footer>
 </body>
