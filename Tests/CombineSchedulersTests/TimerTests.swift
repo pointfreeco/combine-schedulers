@@ -49,7 +49,7 @@
     }
 
     func testWithTestScheduler() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
       var output: [UInt64] = []
 
       Publishers.Timer(every: 1, scheduler: scheduler)
@@ -76,7 +76,7 @@
     }
 
     func testInterleavingTimers() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
 
       var output: [Int] = []
 
@@ -106,7 +106,7 @@
     }
 
     func testTimerCancellation() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
 
       var count = 0
 
@@ -124,7 +124,7 @@
     }
 
     func testTimerCompletion() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
 
       var count = 0
 

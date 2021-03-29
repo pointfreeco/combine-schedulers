@@ -87,7 +87,7 @@ class EpisodeViewModel<S: Scheduler>: ObservableObject {
 }
 ```
 
-Now we can initialize this view model in production by using `DispatchQueue.main` and we can initialize it in tests using `DispatchQueue.immediateScheduler`. Sounds like a win!
+Now we can initialize this view model in production by using `DispatchQueue.main` and we can initialize it in tests using `DispatchQueue.immediate`. Sounds like a win!
 
 However, introducing this generic to our view model is quite heavyweight as it is loudly announcing to the outside world that this type uses a scheduler, and worse it will end up infecting any code that touches this view model that also wants to be testable. For example, any view that uses this view model will need to introduce a generic if it wants to also be able to control the scheduler, which would be useful if we wanted to write [snapshot tests](https://github.com/pointfreeco/swift-snapshot-testing).
 
@@ -124,12 +124,21 @@ let viewModel = EpisodeViewModel(
 )
 ```
 
-And similarly in tests we can use an immediate scheduler as long as we erase its type:
+For common schedulers, like `DispatchQueue`, `OperationQueue`, and `RunLoop`, there is even a static helper on `AnyScheduler` that further simplifys this:
 
 ```swift
 let viewModel = EpisodeViewModel(
   apiClient: ...,
-  scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
+  scheduler: .main
+)
+```
+
+Then in tests we can use an immediate scheduler:
+
+```swift
+let viewModel = EpisodeViewModel(
+  apiClient: ...,
+  scheduler: .immediate
 )
 ```
 
@@ -158,7 +167,7 @@ Although this publisher is quite simple we may still want to write some tests fo
 To do this we can create a test scheduler and create two futures, one that emits after a second and one that emits after two seconds:
 
 ```swift
-let scheduler = DispatchQueue.testScheduler
+let scheduler = DispatchQueue.test
 
 let first = Future<Int, Never> { callback in
   scheduler.schedule(after: scheduler.now.advanced(by: 1)) { callback(.success(1)) }
@@ -193,9 +202,9 @@ This is a very simple example of how to control the flow of time with the test s
 
 ### `ImmediateScheduler`
 
-The Combine framework comes with an `ImmediateScheduler` type of its own, but it defines all new types for the associated types of `SchedulerTimeType` and `SchedulerOptions`. This means you cannot easily swap between a live `DispatchQueue` and an "immediate" `DispatchQueue` that executes work synchronously. The only way to do that would be to introduce generics to any code making use of that scheduler, which can become unwieldly.
+The Combine framework comes with an `ImmediateScheduler` type of its own, but it defines all new types for the associated types of `SchedulerTimeType` and `SchedulerOptions`. This means you cannot easily swap between a live `DispatchQueue` and an "immediate" `DispatchQueue` that executes work synchronously. The only way to do that would be to introduce generics to any code making use of that scheduler, which can become unwieldy.
 
-So, instead, this library's `ImmediateScheduler` uses the same associated types as an existing scheduler, which means you can use `DispatchQueue.immediateScheduler` to have a scheduler that looks like a dispatch queue but executes its work immediately. Similarly you can construct `RunLoop.immediateScheduler` and `OperationQueue.immediateScheduler`.
+So, instead, this library's `ImmediateScheduler` uses the same associated types as an existing scheduler, which means you can use `DispatchQueue.immediate` to have a scheduler that looks like a dispatch queue but executes its work immediately. Similarly you can construct `RunLoop.immediate` and `OperationQueue.immediate`.
 
 This scheduler is useful for writing tests against publishers that use asynchrony operators, such as `receive(on:)`, `subscribe(on:)` and others, because it forces the publisher to emit immediately rather than needing to wait for thread hops or delays using `XCTestExpectation`.
 
@@ -265,7 +274,7 @@ And then in tests use an immediate scheduler:
 func testViewModel() {
   let viewModel = HomeViewModel(
     apiClient: .mock,
-    scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
+    scheduler: .immediate
   )
 
   viewModel.reloadButtonTapped()
@@ -392,7 +401,7 @@ DispatchQueue.main.timerPublisher(every: .seconds(1))
 But the best part of this timer is that you can use it with `TestScheduler` so that any Combine code you write involving timers becomes more testable. This shows how we can easily simulate the idea of moving time forward 1,000 seconds in a timer:
 
 ```swift
-let scheduler = DispatchQueue.testScheduler
+let scheduler = DispatchQueue.test
 var output: [Int] = []
 
 Publishers.Timer(every: 1, scheduler: scheduler)

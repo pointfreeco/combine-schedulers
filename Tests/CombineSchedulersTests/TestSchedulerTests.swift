@@ -36,7 +36,7 @@
     }
 
     func testRunScheduler() {
-      let scheduler = DispatchQueue.testScheduler
+      let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)

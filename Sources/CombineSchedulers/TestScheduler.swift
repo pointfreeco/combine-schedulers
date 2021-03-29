@@ -26,7 +26,7 @@
   /// To do this we can create a test scheduler and create two futures, one that emits after a
   /// second and one that emits after two seconds:
   ///
-  ///     let scheduler = DispatchQueue.testScheduler
+  ///     let scheduler = DispatchQueue.test
   ///     let first = Future<Int, Never> { callback in
   ///       scheduler.schedule(after: scheduler.now.advanced(by: 1)) { callback(.success(1)) }
   ///     }
@@ -106,7 +106,7 @@
     /// and does not run forever. For example, the following code will run an infinite loop forever
     /// because the timer never finishes:
     ///
-    ///     let scheduler = DispatchQueue.testScheduler
+    ///     let scheduler = DispatchQueue.test
     ///     Publishers.Timer(every: .seconds(1), scheduler: scheduler)
     ///       .autoconnect()
     ///       .sink { _ in print($0) }
@@ -118,7 +118,7 @@
     /// chain on another operator that completes it when a certain condition is met. This can be
     /// done in many ways, such as using `prefix`:
     ///
-    ///     let scheduler = DispatchQueue.testScheduler
+    ///     let scheduler = DispatchQueue.test
     ///     Publishers.Timer(every: .seconds(1), scheduler: scheduler)
     ///       .autoconnect()
     ///       .prefix(3)

@@ -59,7 +59,7 @@
     /// involving timers becomes more testable. This shows how we can easily simulate the idea of
     /// moving time forward 1,000 seconds in a timer:
     ///
-    ///     let scheduler = DispatchQueue.testScheduler
+    ///     let scheduler = DispatchQueue.test
     ///     var output: [Int] = []
     ///
     ///     Publishers.Timer(every: 1, scheduler: scheduler)
