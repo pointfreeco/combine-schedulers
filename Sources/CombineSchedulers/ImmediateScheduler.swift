@@ -75,7 +75,7 @@
   ///     func testViewModel() {
   ///       let viewModel = HomeViewModel(
   ///         apiClient: .mock,
-  ///         scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
+  ///         scheduler: .immediate
   ///       )
   ///
   ///       viewModel.reloadButtonTapped()

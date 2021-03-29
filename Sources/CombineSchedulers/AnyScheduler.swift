@@ -59,7 +59,7 @@
   ///     }
   ///
   /// Now we can initialize this view model in production by using `DispatchQueue.main` and we can
-  /// initialize it in tests using `DispatchQueue.immediateScheduler`. Sounds like a win!
+  /// initialize it in tests using `DispatchQueue.immediate`. Sounds like a win!
   ///
   /// However, introducing this generic to our view model is quite heavyweight as it is loudly
   /// announcing to the outside world that this type uses a scheduler, and worse it will end up
@@ -100,11 +100,19 @@
   ///       scheduler: DispatchQueue.main.eraseToAnyScheduler()
   ///     )
   ///
-  /// And similarly in tests we can use an immediate scheduler as long as we erase its type:
+  /// For common schedulers, like `DispatchQueue`, `OperationQueue`, and `RunLoop`, there is even a
+  /// static helper on `AnyScheduler` that further simplifies this:
   ///
   ///     let viewModel = EpisodeViewModel(
   ///       apiClient: ...,
-  ///       scheduler: DispatchQueue.immediateScheduler.eraseToAnyScheduler()
+  ///       scheduler: .main
+  ///     )
+  ///
+  /// And in tests we can use an immediate scheduler:
+  ///
+  ///     let viewModel = EpisodeViewModel(
+  ///       apiClient: ...,
+  ///       scheduler: .immediate
   ///     )
   ///
   /// So, in general, `AnyScheduler` is great for allowing one to control what scheduler is used
