@@ -233,4 +233,40 @@
       AnyScheduler(self)
     }
   }
+
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+  extension AnyScheduler
+  where
+    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
+    SchedulerOptions == DispatchQueue.SchedulerOptions
+  {
+    /// A type-erased main dispatch queue.
+    public static var main: Self {
+      DispatchQueue.main.eraseToAnyScheduler()
+    }
+  }
+
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+  extension AnyScheduler
+  where
+    SchedulerTimeType == OperationQueue.SchedulerTimeType,
+    SchedulerOptions == OperationQueue.SchedulerOptions
+  {
+    /// A type-erased main operation queue.
+    public static var main: Self {
+      OperationQueue.main.eraseToAnyScheduler()
+    }
+  }
+
+  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+  extension AnyScheduler
+  where
+    SchedulerTimeType == RunLoop.SchedulerTimeType,
+    SchedulerOptions == RunLoop.SchedulerOptions
+  {
+    /// A type-erased main run loop.
+    public static var main: Self {
+      RunLoop.main.eraseToAnyScheduler()
+    }
+  }
 #endif
