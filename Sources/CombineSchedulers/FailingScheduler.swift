@@ -207,6 +207,7 @@
     SchedulerTimeType == DispatchQueue.SchedulerTimeType,
     SchedulerOptions == DispatchQueue.SchedulerOptions
   {
+    /// A failing scheduler that can substitute itself for a dispatch queue.
     public static var failing: Self {
       DispatchQueue.failing.eraseToAnyScheduler()
     }
