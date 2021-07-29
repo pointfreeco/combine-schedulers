@@ -14,7 +14,6 @@
             </strong>
             <span>Documentation</span>
         </a>
-        <sup>Beta</sup>
     </header>
 
     <!--
@@ -37,7 +36,13 @@
     <code class="name">Failing​Scheduler</code>
 </h1>
 
-<html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *) <span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">FailingScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span> <span class="keyword">where</span> <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>, <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></code></pre></body></html>
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *)
+  <span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">FailingScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span>
+  <span class="keyword">where</span>
+    <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>,
+    <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></body></html></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>A scheduler that causes the current XCTest test case to fail if it is used.</p>
 
@@ -60,18 +65,18 @@ use a scheduler. If it did, or ever does in the future, the test will fail.</p>
   <span class="keyword">let</span> <span class="variable">mainQueue</span>: <a href="/combine-schedulers/AnySchedulerOf"><span class="type">AnySchedulerOf</span></a>&lt;<span class="type">DispatchQueue</span>&gt;
 
   <span class="keyword">init</span>(<span class="variable">apiClient</span>: <span class="type">ApiClient</span>, <span class="variable">mainQueue</span>: <a href="/combine-schedulers/AnySchedulerOf"><span class="type">AnySchedulerOf</span></a>&lt;<span class="type">DispatchQueue</span>&gt;) {
-    <span class="keyword">self</span>.<span class="type">apiClient</span> = <span class="variable">apiClient</span>
-    <span class="keyword">self</span>.<span class="type">mainQueue</span> = <span class="variable">mainQueue</span>
+    <span class="keyword">self</span>.<span class="variable">apiClient</span> = <span class="variable">apiClient</span>
+    <span class="keyword">self</span>.<span class="variable">mainQueue</span> = <span class="variable">mainQueue</span>
   }
 
   <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
-    <span class="keyword">self</span>.<span class="type">apiClient</span>.<span class="type">fetchEpisode</span>()
-      .<span class="type">receive</span>(<span class="variable">on</span>: <span class="keyword">self</span>.<span class="type">mainQueue</span>)
-      .<span class="type">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="type">$episode</span>)
+    <span class="keyword">self</span>.<span class="variable">apiClient</span>.<span class="variable">fetchEpisode</span>()
+      .<span class="variable">receive</span>(<span class="variable">on</span>: <span class="keyword">self</span>.<span class="variable">mainQueue</span>)
+      .<span class="variable">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="variable">$episode</span>)
   }
 
   <span class="keyword">func</span> <span class="function">favoriteButtonTapped</span>() {
-    <span class="keyword">self</span>.<span class="type">episode</span>?.<span class="type">isFavorite</span>.<span class="type">toggle</span>()
+    <span class="keyword">self</span>.<span class="variable">episode</span>?.<span class="variable">isFavorite</span>.<span class="variable">toggle</span>()
   }
 }
 </code></pre></body></html>
@@ -95,13 +100,13 @@ written with a failing scheduler:</p>
     <span class="variable">apiClient</span>: .<span class="variable">mock</span>,
     <span class="variable">mainQueue</span>: .<span class="variable">failing</span>
   )
-  <span class="variable">viewModel</span>.<span class="type">episode</span> = .<span class="variable">mock</span>
+  <span class="variable">viewModel</span>.<span class="variable">episode</span> = .<span class="variable">mock</span>
 
-  <span class="variable">viewModel</span>.<span class="type">favoriteButtonTapped</span>()
-  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="type">episode</span>?.<span class="type">isFavorite</span> == <span class="keyword">true</span>)
+  <span class="variable">viewModel</span>.<span class="variable">favoriteButtonTapped</span>()
+  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="variable">episode</span>?.<span class="variable">isFavorite</span> == <span class="keyword">true</span>)
 
-  <span class="variable">viewModel</span>.<span class="type">favoriteButtonTapped</span>()
-  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="type">episode</span>?.<span class="type">isFavorite</span> == <span class="keyword">false</span>)
+  <span class="variable">viewModel</span>.<span class="variable">favoriteButtonTapped</span>()
+  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="variable">episode</span>?.<span class="variable">isFavorite</span> == <span class="keyword">false</span>)
 }
 </code></pre></body></html>
 <p>With <code>.failing</code>, this test pretty strongly declares that favoriting an episode does not need
@@ -165,9 +170,11 @@ additional work and the test would continue to pass.</p>
 
         <div role="article" class="initializer" id="failingscheduler.init(_:now:)">
     <h3>
-        <code>init(_:​now:​)</code>
+        <code><a href="#failingscheduler.init(_:now:)">init(_:​now:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="keyword">_</span> <span class="variable">prefix</span>: <span class="type">String</span> = <span class="string literal">"</span><span class="string literal"/><span class="string literal">"</span>, <span class="variable">now</span>: <span class="type">SchedulerTimeType</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">init</span>(<span class="keyword">_</span> <span class="variable">prefix</span>: <span class="type">String</span> = <span class="string literal">"</span><span class="string literal"/><span class="string literal">"</span>, <span class="variable">now</span>: <span class="type">SchedulerTimeType</span>)  </body></html></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Creates a failing test scheduler with the given date.</p>
 
@@ -204,21 +211,27 @@ additional work and the test would continue to pass.</p>
 
         <div role="article" class="variable" id="failingscheduler.minimumtolerance">
     <h3>
-        <code>minimum​Tolerance</code>
+        <code><a href="#failingscheduler.minimumtolerance">minimum​Tolerance</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">minimumTolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">minimumTolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>  </body></html></code></pre>
+</div>
 </div>
 <div role="article" class="variable" id="failingscheduler.now">
     <h3>
-        <code>now</code>
+        <code><a href="#failingscheduler.now">now</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">now</span>: <span class="type">SchedulerTimeType</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">now</span>: <span class="type">SchedulerTimeType</span>  </body></html></code></pre>
+</div>
 </div>
 <div role="article" class="variable" id="failingscheduler.prefix">
     <h3>
-        <code>prefix</code>
+        <code><a href="#failingscheduler.prefix">prefix</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">prefix</span>: <span class="type">String</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">prefix</span>: <span class="type">String</span></body></html></code></pre>
+</div>
 </div>
     </section>
     <section id="methods">
@@ -226,21 +239,38 @@ additional work and the test would continue to pass.</p>
 
         <div role="article" class="function" id="failingscheduler.schedule(options:_:)">
     <h3>
-        <code>schedule(options:​_:​)</code>
+        <code><a href="#failingscheduler.schedule(options:_:)">schedule(options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>)  </body></html></code></pre>
+</div>
 </div>
 <div role="article" class="function" id="failingscheduler.schedule(after:tolerance:options:_:)">
     <h3>
-        <code>schedule(after:​tolerance:​options:​_:​)</code>
+        <code><a href="#failingscheduler.schedule(after:tolerance:options:_:)">schedule(after:​tolerance:​options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>, <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
+      <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
+      <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+      <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
+    )  </body></html></code></pre>
+</div>
 </div>
 <div role="article" class="function" id="failingscheduler.schedule(after:interval:tolerance:options:_:)">
     <h3>
-        <code>schedule(after:​interval:​tolerance:​options:​_:​)</code>
+        <code><a href="#failingscheduler.schedule(after:interval:tolerance:options:_:)">schedule(after:​interval:​tolerance:​options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>, <span class="variable">interval</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>) -&gt; <span class="type">Cancellable</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
+      <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
+      <span class="variable">interval</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+      <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
+    ) -&gt; <span class="type">Cancellable</span>  </body></html></code></pre>
+</div>
 </div>
     </section>
 
@@ -251,7 +281,7 @@ additional work and the test would continue to pass.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-03-29T20:32:13+0000">March 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-07-29T14:57:12+0000">July 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>

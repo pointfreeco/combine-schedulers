@@ -14,7 +14,6 @@
             </strong>
             <span>Documentation</span>
         </a>
-        <sup>Beta</sup>
     </header>
 
     <!--
@@ -37,7 +36,13 @@
     <code class="name">Immediate​Scheduler</code>
 </h1>
 
-<html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *) <span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">ImmediateScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span> <span class="keyword">where</span> <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>, <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></code></pre></body></html>
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *)
+  <span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">ImmediateScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span>
+  <span class="keyword">where</span>
+    <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>,
+    <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></body></html></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>A scheduler for performing synchronous actions.</p>
 
@@ -63,14 +68,14 @@ seconds from when a button is tapped:</p>
   <span class="keyword">let</span> <span class="variable">apiClient</span>: <span class="type">ApiClient</span>
 
   <span class="keyword">init</span>(<span class="variable">apiClient</span>: <span class="type">ApiClient</span>) {
-    <span class="keyword">self</span>.<span class="type">apiClient</span> = <span class="variable">apiClient</span>
+    <span class="keyword">self</span>.<span class="variable">apiClient</span> = <span class="variable">apiClient</span>
   }
 
   <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
     <span class="variable">Just</span>(())
-      .<span class="type">delay</span>(<span class="variable">for</span>: .<span class="variable">seconds</span>(<span class="number literal">10</span>), <span class="variable">scheduler</span>: <span class="type">DispachQueue</span>.<span class="type">main</span>)
-      .<span class="type">flatMap</span> { <span class="variable">apiClient</span>.<span class="type">fetchEpisodes</span>() }
-      .<span class="type">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="type">episodes</span>)
+      .<span class="variable">delay</span>(<span class="variable">for</span>: .<span class="variable">seconds</span>(<span class="number literal">10</span>), <span class="variable">scheduler</span>: <span class="type">DispachQueue</span>.<span class="variable">main</span>)
+      .<span class="variable">flatMap</span> { <span class="variable">apiClient</span>.<span class="variable">fetchEpisodes</span>() }
+      .<span class="variable">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="variable">episodes</span>)
   }
 }
 </code></pre></body></html>
@@ -80,11 +85,11 @@ emit:</p>
 <html><body><pre class="highlight"><code><span class="keyword">func</span> <span class="function">testViewModel</span>() {
   <span class="keyword">let</span> <span class="variable">viewModel</span> = <span class="variable">HomeViewModel</span>(<span class="variable">apiClient</span>: .<span class="variable">mock</span>)
 
-  <span class="variable">viewModel</span>.<span class="type">reloadButtonTapped</span>()
+  <span class="variable">viewModel</span>.<span class="variable">reloadButtonTapped</span>()
 
-  <span class="keyword">_</span> = <span class="variable">XCTWaiter</span>.<span class="type">wait</span>(<span class="variable">for</span>: [<span class="variable">XCTestExpectation</span>()], <span class="variable">timeout</span>: <span class="number literal">10</span>)
+  <span class="keyword">_</span> = <span class="variable">XCTWaiter</span>.<span class="variable">wait</span>(<span class="variable">for</span>: [<span class="type">XCTestExpectation</span>()], <span class="variable">timeout</span>: <span class="number literal">10</span>)
 
-  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="type">episodes</span>, [<span class="type">Episode</span>(<span class="variable">id</span>: <span class="number literal">42</span>)])
+  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="variable">episodes</span>, [<span class="type">Episode</span>(<span class="variable">id</span>: <span class="number literal">42</span>)])
 }
 </code></pre></body></html>
 <p>Alternatively, we can explicitly pass a scheduler into the view model initializer so that it
@@ -97,15 +102,15 @@ can be controller from the outside:</p>
   <span class="keyword">let</span> <span class="variable">scheduler</span>: <a href="/combine-schedulers/AnySchedulerOf"><span class="type">AnySchedulerOf</span></a>&lt;<span class="type">DispatchQueue</span>&gt;
 
   <span class="keyword">init</span>(<span class="variable">apiClient</span>: <span class="type">ApiClient</span>, <span class="variable">scheduler</span>: <a href="/combine-schedulers/AnySchedulerOf"><span class="type">AnySchedulerOf</span></a>&lt;<span class="type">DispatchQueue</span>&gt;) {
-    <span class="keyword">self</span>.<span class="type">apiClient</span> = <span class="variable">apiClient</span>
-    <span class="keyword">self</span>.<span class="type">scheduler</span> = <span class="variable">scheduler</span>
+    <span class="keyword">self</span>.<span class="variable">apiClient</span> = <span class="variable">apiClient</span>
+    <span class="keyword">self</span>.<span class="variable">scheduler</span> = <span class="variable">scheduler</span>
   }
 
   <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
     <span class="variable">Just</span>(())
-      .<span class="type">delay</span>(<span class="variable">for</span>: .<span class="variable">seconds</span>(<span class="number literal">10</span>), <span class="variable">scheduler</span>: <span class="keyword">self</span>.<span class="type">scheduler</span>)
-      .<span class="type">flatMap</span> { <span class="keyword">self</span>.<span class="type">apiClient</span>.<span class="type">fetchEpisodes</span>() }
-      .<span class="type">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="type">$episodes</span>)
+      .<span class="variable">delay</span>(<span class="variable">for</span>: .<span class="variable">seconds</span>(<span class="number literal">10</span>), <span class="variable">scheduler</span>: <span class="keyword">self</span>.<span class="variable">scheduler</span>)
+      .<span class="variable">flatMap</span> { <span class="keyword">self</span>.<span class="variable">apiClient</span>.<span class="variable">fetchEpisodes</span>() }
+      .<span class="variable">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="variable">$episodes</span>)
   }
 }
 </code></pre></body></html>
@@ -117,14 +122,14 @@ can be controller from the outside:</p>
     <span class="variable">scheduler</span>: .<span class="variable">immediate</span>
   )
 
-  <span class="variable">viewModel</span>.<span class="type">reloadButtonTapped</span>()
+  <span class="variable">viewModel</span>.<span class="variable">reloadButtonTapped</span>()
 
   <span class="comment">// No more waiting...</span>
 
-  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="type">episodes</span>, [<span class="type">Episode</span>(<span class="variable">id</span>: <span class="number literal">42</span>)])
+  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="variable">episodes</span>, [<span class="type">Episode</span>(<span class="variable">id</span>: <span class="number literal">42</span>)])
 }
 </code></pre></body></html>
-<aside class="note">
+<aside class="note" title="Note">
     <p>This scheduler can <em>not</em> be used to test publishers with more complex timing logic, like those that use <code>Debounce</code>, <code>Throttle</code>, or <code>Timer.Publisher</code>, and in fact <code>ImmediateScheduler</code> will not schedule this work in a defined way. Use a <code>TestScheduler</code> instead to capture your publisher's timing behavior.</p>
 
 </aside>
@@ -137,11 +142,11 @@ can be controller from the outside:</p>
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.40.1 (20161225.0304)
  -->
-<!-- Title: %3 Pages: 1 -->
+<!-- Title: %7 Pages: 1 -->
 <svg width="872pt" height="116pt"
  viewBox="0.00 0.00 872.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
-<title>%3</title>
+<title>%7</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-112 868,-112 868,4 -4,4"/>
 <!-- ImmediateScheduler -->
 <g id="node1" class="node structure current">
@@ -180,9 +185,11 @@ can be controller from the outside:</p>
 
         <div role="article" class="initializer" id="immediatescheduler.init(now:)">
     <h3>
-        <code>init(now:​)</code>
+        <code><a href="#immediatescheduler.init(now:)">init(now:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">now</span>: <span class="type">SchedulerTimeType</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">now</span>: <span class="type">SchedulerTimeType</span>)  </body></html></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Creates an immediate test scheduler with the given date.</p>
 
@@ -213,15 +220,19 @@ can be controller from the outside:</p>
 
         <div role="article" class="variable" id="immediatescheduler.minimumtolerance">
     <h3>
-        <code>minimum​Tolerance</code>
+        <code><a href="#immediatescheduler.minimumtolerance">minimum​Tolerance</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">minimumTolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span> = .<span class="variable">zero</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">minimumTolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span> = .<span class="variable">zero</span></body></html></code></pre>
+</div>
 </div>
 <div role="article" class="variable" id="immediatescheduler.now">
     <h3>
-        <code>now</code>
+        <code><a href="#immediatescheduler.now">now</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">now</span>: <span class="type">SchedulerTimeType</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">now</span>: <span class="type">SchedulerTimeType</span></body></html></code></pre>
+</div>
 </div>
     </section>
     <section id="methods">
@@ -229,21 +240,38 @@ can be controller from the outside:</p>
 
         <div role="article" class="function" id="immediatescheduler.schedule(options:_:)">
     <h3>
-        <code>schedule(options:​_:​)</code>
+        <code><a href="#immediatescheduler.schedule(options:_:)">schedule(options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>)  </body></html></code></pre>
+</div>
 </div>
 <div role="article" class="function" id="immediatescheduler.schedule(after:tolerance:options:_:)">
     <h3>
-        <code>schedule(after:​tolerance:​options:​_:​)</code>
+        <code><a href="#immediatescheduler.schedule(after:tolerance:options:_:)">schedule(after:​tolerance:​options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>, <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
+      <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
+      <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+      <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
+    )  </body></html></code></pre>
+</div>
 </div>
 <div role="article" class="function" id="immediatescheduler.schedule(after:interval:tolerance:options:_:)">
     <h3>
-        <code>schedule(after:​interval:​tolerance:​options:​_:​)</code>
+        <code><a href="#immediatescheduler.schedule(after:interval:tolerance:options:_:)">schedule(after:​interval:​tolerance:​options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>, <span class="variable">interval</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>) -&gt; <span class="type">Cancellable</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
+      <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
+      <span class="variable">interval</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+      <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
+    ) -&gt; <span class="type">Cancellable</span>  </body></html></code></pre>
+</div>
 </div>
     </section>
 
@@ -254,7 +282,7 @@ can be controller from the outside:</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-03-29T20:32:13+0000">March 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-07-29T14:57:12+0000">July 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>

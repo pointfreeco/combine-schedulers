@@ -14,7 +14,6 @@
             </strong>
             <span>Documentation</span>
         </a>
-        <sup>Beta</sup>
     </header>
 
     <!--
@@ -37,7 +36,11 @@
     <code class="name">Test​Scheduler</code>
 </h1>
 
-<html><body><pre class="highlight"><code><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *) <span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">TestScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span> <span class="keyword">where</span> <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>, <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></code></pre></body></html>
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *)
+  <span class="keyword">public</span> <span class="attribute">final</span> <span class="keyword">class</span> <span class="type">TestScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span>
+  <span class="keyword">where</span> <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>, <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span>  </body></html></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>A scheduler whose current time and execution can be controlled in a deterministic manner.</p>
 
@@ -55,9 +58,9 @@ only emits the first one that completes:</p>
   <span class="keyword">_</span> <span class="variable">second</span>: <span class="type">Future</span>&lt;<span class="type">Output</span>, <span class="type">Failure</span>&gt;
 ) -&gt; <span class="type">AnyPublisher</span>&lt;<span class="type">Output</span>, <span class="type">Failure</span>&gt; {
   <span class="variable">first</span>
-    .<span class="type">merge</span>(<span class="variable">with</span>: <span class="type">second</span>)
-    .<span class="type">prefix</span>(<span class="number literal">1</span>)
-    .<span class="type">eraseToAnyPublisher</span>()
+    .<span class="variable">merge</span>(<span class="variable">with</span>: <span class="type">second</span>)
+    .<span class="variable">prefix</span>(<span class="number literal">1</span>)
+    .<span class="variable">eraseToAnyPublisher</span>()
 }
 </code></pre></body></html>
 <p>Although this publisher is quite simple we may still want to write some tests for it.</p>
@@ -65,30 +68,30 @@ only emits the first one that completes:</p>
 <p>To do this we can create a test scheduler and create two futures, one that emits after a
 second and one that emits after two seconds:</p>
 
-<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="type">test</span>
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="variable">test</span>
 <span class="keyword">let</span> <span class="variable">first</span> = <span class="variable">Future</span>&lt;<span class="type">Int</span>, <span class="type">Never</span>&gt; { <span class="variable">callback</span> <span class="keyword">in</span>
-  <span class="variable">scheduler</span>.<span class="type">schedule</span>(<span class="variable">after</span>: <span class="type">scheduler</span>.<span class="type">now</span>.<span class="type">advanced</span>(<span class="variable">by</span>: <span class="number literal">1</span>)) { <span class="variable">callback</span>(.<span class="variable">success</span>(<span class="number literal">1</span>)) }
+  <span class="variable">scheduler</span>.<span class="variable">schedule</span>(<span class="variable">after</span>: <span class="type">scheduler</span>.<span class="variable">now</span>.<span class="variable">advanced</span>(<span class="variable">by</span>: <span class="number literal">1</span>)) { <span class="variable">callback</span>(.<span class="variable">success</span>(<span class="number literal">1</span>)) }
 }
 <span class="keyword">let</span> <span class="variable">second</span> = <span class="variable">Future</span>&lt;<span class="type">Int</span>, <span class="type">Never</span>&gt; { <span class="variable">callback</span> <span class="keyword">in</span>
-  <span class="variable">scheduler</span>.<span class="type">schedule</span>(<span class="variable">after</span>: <span class="type">scheduler</span>.<span class="type">now</span>.<span class="type">advanced</span>(<span class="variable">by</span>: <span class="number literal">2</span>)) { <span class="variable">callback</span>(.<span class="variable">success</span>(<span class="number literal">2</span>)) }
+  <span class="variable">scheduler</span>.<span class="variable">schedule</span>(<span class="variable">after</span>: <span class="type">scheduler</span>.<span class="variable">now</span>.<span class="variable">advanced</span>(<span class="variable">by</span>: <span class="number literal">2</span>)) { <span class="variable">callback</span>(.<span class="variable">success</span>(<span class="number literal">2</span>)) }
 }
 </code></pre></body></html>
 <p>And then we can race these futures and collect their emissions into an array:</p>
 
 <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">output</span>: [<span class="type">Int</span>] = []
-<span class="keyword">let</span> <span class="variable">cancellable</span> = <span class="variable">race</span>(<span class="variable">first</span>, <span class="variable">second</span>).<span class="type">sink</span> { <span class="variable">output</span>.<span class="type">append</span>(<span class="variable">$0</span>) }
+<span class="keyword">let</span> <span class="variable">cancellable</span> = <span class="variable">race</span>(<span class="variable">first</span>, <span class="variable">second</span>).<span class="variable">sink</span> { <span class="variable">output</span>.<span class="variable">append</span>(<span class="variable">$0</span>) }
 </code></pre></body></html>
 <p>And then we can deterministically move time forward in the scheduler to see how the publisher
 emits. We can start by moving time forward by one second:</p>
 
-<html><body><pre class="highlight"><code><span class="variable">scheduler</span>.<span class="type">advance</span>(<span class="variable">by</span>: <span class="number literal">1</span>)
+<html><body><pre class="highlight"><code><span class="variable">scheduler</span>.<span class="variable">advance</span>(<span class="variable">by</span>: <span class="number literal">1</span>)
 <span class="variable">XCTAssertEqual</span>(<span class="variable">output</span>, [<span class="number literal">1</span>])
 </code></pre></body></html>
 <p>This proves that we get the first emission from the publisher since one second of time has
 passed. If we further advance by one more second we can prove that we do not get anymore
 emissions:</p>
 
-<html><body><pre class="highlight"><code><span class="variable">scheduler</span>.<span class="type">advance</span>(<span class="variable">by</span>: <span class="number literal">1</span>)
+<html><body><pre class="highlight"><code><span class="variable">scheduler</span>.<span class="variable">advance</span>(<span class="variable">by</span>: <span class="number literal">1</span>)
 <span class="variable">XCTAssertEqual</span>(<span class="variable">output</span>, [<span class="number literal">1</span>])
 </code></pre></body></html>
 <p>This is a very simple example of how to control the flow of time with the test scheduler,
@@ -104,11 +107,11 @@ operations.</p>
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.40.1 (20161225.0304)
  -->
-<!-- Title: %3 Pages: 1 -->
+<!-- Title: %19 Pages: 1 -->
 <svg width="872pt" height="116pt"
  viewBox="0.00 0.00 872.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
-<title>%3</title>
+<title>%19</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-112 868,-112 868,4 -4,4"/>
 <!-- TestScheduler -->
 <g id="node1" class="node class current">
@@ -147,9 +150,11 @@ operations.</p>
 
         <div role="article" class="initializer" id="testscheduler.init(now:)">
     <h3>
-        <code>init(now:​)</code>
+        <code><a href="#testscheduler.init(now:)">init(now:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">now</span>: <span class="type">SchedulerTimeType</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">init</span>(<span class="variable">now</span>: <span class="type">SchedulerTimeType</span>)  </body></html></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Creates a test scheduler with the given date.</p>
 
@@ -180,15 +185,19 @@ operations.</p>
 
         <div role="article" class="variable" id="testscheduler.minimumtolerance">
     <h3>
-        <code>minimum​Tolerance</code>
+        <code><a href="#testscheduler.minimumtolerance">minimum​Tolerance</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">minimumTolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span> = .<span class="variable">zero</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">minimumTolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span> = .<span class="variable">zero</span></body></html></code></pre>
+</div>
 </div>
 <div role="article" class="variable" id="testscheduler.now">
     <h3>
-        <code>now</code>
+        <code><a href="#testscheduler.now">now</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">var</span> <span class="variable">now</span>: <span class="type">SchedulerTimeType</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">private</span>(<span class="variable">set</span>) <span class="keyword">var</span> <span class="variable">now</span>: <span class="type">SchedulerTimeType</span></body></html></code></pre>
+</div>
 </div>
     </section>
     <section id="methods">
@@ -196,9 +205,11 @@ operations.</p>
 
         <div role="article" class="function" id="testscheduler.advance(by:)">
     <h3>
-        <code>advance(by:​)</code>
+        <code><a href="#testscheduler.advance(by:)">advance(by:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">advance</span>(<span class="variable">by</span> <span class="variable">stride</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span> = .<span class="variable">zero</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">advance</span>(<span class="variable">by</span> <span class="variable">stride</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span> = .<span class="variable">zero</span>)  </body></html></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Advances the scheduler by the given stride.</p>
 
@@ -225,9 +236,11 @@ operations.</p>
 </div>
 <div role="article" class="function" id="testscheduler.run()">
     <h3>
-        <code>run()</code>
+        <code><a href="#testscheduler.run()">run()</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">run</span>()</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">run</span>()  </body></html></code></pre>
+</div>
 <div class="summary" role="doc-abstract">
     <p>Runs the scheduler until it has no scheduled items left.</p>
 
@@ -237,46 +250,63 @@ operations.</p>
 and does not run forever. For example, the following code will run an infinite loop forever
 because the timer never finishes:</p>
 
-<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="type">test</span>
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="variable">test</span>
 <span class="variable">Publishers</span>.<span class="type">Timer</span>(<span class="variable">every</span>: .<span class="variable">seconds</span>(<span class="number literal">1</span>), <span class="variable">scheduler</span>: <span class="type">scheduler</span>)
-  .<span class="type">autoconnect</span>()
-  .<span class="type">sink</span> { <span class="keyword">_</span> <span class="keyword">in</span> <span class="variable">print</span>(<span class="variable">$0</span>) }
-  .<span class="type">store</span>(<span class="variable">in</span>: &amp;<span class="variable">cancellables</span>)
+  .<span class="variable">autoconnect</span>()
+  .<span class="variable">sink</span> { <span class="keyword">_</span> <span class="keyword">in</span> <span class="variable">print</span>(<span class="variable">$0</span>) }
+  .<span class="variable">store</span>(<span class="variable">in</span>: &amp;<span class="variable">cancellables</span>)
 
-<span class="variable">scheduler</span>.<span class="type">run</span>() <span class="comment">// Will never complete</span>
+<span class="variable">scheduler</span>.<span class="variable">run</span>() <span class="comment">// Will never complete</span>
 </code></pre></body></html>
 <p>If you wanted to make sure that this publisher eventually completes you would need to
 chain on another operator that completes it when a certain condition is met. This can be
 done in many ways, such as using <code>prefix</code>:</p>
 
-<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="type">test</span>
+<html><body><pre class="highlight"><code><span class="keyword">let</span> <span class="variable">scheduler</span> = <span class="variable">DispatchQueue</span>.<span class="variable">test</span>
 <span class="variable">Publishers</span>.<span class="type">Timer</span>(<span class="variable">every</span>: .<span class="variable">seconds</span>(<span class="number literal">1</span>), <span class="variable">scheduler</span>: <span class="type">scheduler</span>)
-  .<span class="type">autoconnect</span>()
-  .<span class="type">prefix</span>(<span class="number literal">3</span>)
-  .<span class="type">sink</span> { <span class="keyword">_</span> <span class="keyword">in</span> <span class="variable">print</span>(<span class="variable">$0</span>) }
-  .<span class="type">store</span>(<span class="variable">in</span>: &amp;<span class="variable">cancellables</span>)
+  .<span class="variable">autoconnect</span>()
+  .<span class="variable">prefix</span>(<span class="number literal">3</span>)
+  .<span class="variable">sink</span> { <span class="keyword">_</span> <span class="keyword">in</span> <span class="variable">print</span>(<span class="variable">$0</span>) }
+  .<span class="variable">store</span>(<span class="variable">in</span>: &amp;<span class="variable">cancellables</span>)
 
-<span class="variable">scheduler</span>.<span class="type">run</span>() <span class="comment">// Prints 3 times and completes.</span>
+<span class="variable">scheduler</span>.<span class="variable">run</span>() <span class="comment">// Prints 3 times and completes.</span>
 </code></pre></body></html>
 </div>
 </div>
 <div role="article" class="function" id="testscheduler.schedule(after:interval:tolerance:options:_:)">
     <h3>
-        <code>schedule(after:​interval:​tolerance:​options:​_:​)</code>
+        <code><a href="#testscheduler.schedule(after:interval:tolerance:options:_:)">schedule(after:​interval:​tolerance:​options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">after</span> <span class="variable">date</span>: <span class="type">SchedulerTimeType</span>, <span class="variable">interval</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>) -&gt; <span class="type">Cancellable</span></code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
+      <span class="variable">after</span> <span class="variable">date</span>: <span class="type">SchedulerTimeType</span>,
+      <span class="variable">interval</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+      <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>
+    ) -&gt; <span class="type">Cancellable</span>  </body></html></code></pre>
+</div>
 </div>
 <div role="article" class="function" id="testscheduler.schedule(after:tolerance:options:_:)">
     <h3>
-        <code>schedule(after:​tolerance:​options:​_:​)</code>
+        <code><a href="#testscheduler.schedule(after:tolerance:options:_:)">schedule(after:​tolerance:​options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">after</span> <span class="variable">date</span>: <span class="type">SchedulerTimeType</span>, <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>, <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
+      <span class="variable">after</span> <span class="variable">date</span>: <span class="type">SchedulerTimeType</span>,
+      <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+      <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>
+    )  </body></html></code></pre>
+</div>
 </div>
 <div role="article" class="function" id="testscheduler.schedule(options:_:)">
     <h3>
-        <code>schedule(options:​_:​)</code>
+        <code><a href="#testscheduler.schedule(options:_:)">schedule(options:​_:​)</a></code>
     </h3>
-    <html><body><pre class="highlight"><code><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>)</code></pre></body></html>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>)  </body></html></code></pre>
+</div>
 </div>
     </section>
 
@@ -287,7 +317,7 @@ done in many ways, such as using <code>prefix</code>:</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-03-29T20:32:13+0000">March 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-beta.5</span>.
+    Generated on <time datetime="2021-07-29T14:57:12+0000">July 29, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>
