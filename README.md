@@ -346,7 +346,7 @@ class EpisodeViewModel: ObservableObject {
 
 The API client delivers the episode on a background queue, so the view model must receive it on its main queue before mutating its state.
 
-Tapping the reload button, however, involves no scheduling. This means that a test can be written with a failing scheduler:
+Tapping the favorite button, however, involves no scheduling. This means that a test can be written with a failing scheduler:
 
 ```swift
 func testFavoriteButton() {
