@@ -13,10 +13,10 @@
 
   import Darwin
 
-  @available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
+  @available(macOS 10.12, iOS 10, tvOS 10, watchOS 3, *)
   typealias Lock = os_unfair_lock_t
 
-  @available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
+  @available(macOS 10.12, iOS 10, tvOS 10, watchOS 3, *)
   extension UnsafeMutablePointer where Pointee == os_unfair_lock_s {
     internal init() {
       let l = UnsafeMutablePointer.allocate(capacity: 1)
