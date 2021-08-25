@@ -1,5 +1,6 @@
 import Combine
 import SwiftUI
+import UIKit
 
 extension Scheduler {
   /// Wraps scheduled actions in `UIView.animate`.
