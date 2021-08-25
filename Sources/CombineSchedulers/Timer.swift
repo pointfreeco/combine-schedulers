@@ -2,7 +2,7 @@
 //
 // This source file is part of the Swift.org open source project
 //
-// Copyright (c) 2014 - 2019 Apple Inc. and the Swift project authors
+// Copyright (c) 2014 - 2020 Apple Inc. and the Swift project authors
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
 // See https://swift.org/LICENSE.txt for license information
@@ -11,351 +11,318 @@
 //===----------------------------------------------------------------------===//
 
 // Only support 64bit
-#if !(os(iOS) && (arch(i386) || arch(arm))) && canImport(Combine)
-  @_exported import Foundation  // Clang module
-  import Combine
-  import Foundation
+#if !(os(iOS) && (arch(i386) || arch(arm)))
 
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-  extension Scheduler {
-    /// Returns a publisher that repeatedly emits the scheduler's current time on the given
-    /// interval.
+@_exported import Foundation // Clang module
+import Combine
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Timer {
+    /// Returns a publisher that repeatedly emits the current date on the given interval.
     ///
     /// - Parameters:
-    ///   - interval: The time interval on which to publish events. For example, a value of `0.5`
-    ///     publishes an event approximately every half-second.
-    ///   - tolerance: The allowed timing variance when emitting events. Defaults to `nil`, which
-    ///     allows any variance.
+    ///   - interval: The time interval on which to publish events. For example, a value of `0.5` publishes an event approximately every half-second.
+    ///   - tolerance: The allowed timing variance when emitting events. Defaults to `nil`, which allows any variance.
+    ///   - runLoop: The run loop on which the timer runs.
+    ///   - mode: The run loop mode in which to run the timer.
     ///   - options: Scheduler options passed to the timer. Defaults to `nil`.
     /// - Returns: A publisher that repeatedly emits the current date on the given interval.
-    public func timerPublisher(
-      every interval: SchedulerTimeType.Stride,
-      tolerance: SchedulerTimeType.Stride? = nil,
-      options: SchedulerOptions? = nil
-    ) -> Publishers.Timer<Self> {
-      Publishers.Timer(every: interval, tolerance: tolerance, scheduler: self, options: options)
+    public static func publish(
+        every interval: TimeInterval,
+        tolerance: TimeInterval? = nil,
+        on runLoop: RunLoop,
+        in mode: RunLoop.Mode,
+        options: RunLoop.SchedulerOptions? = nil)
+        -> TimerPublisher
+    {
+        return TimerPublisher(interval: interval, runLoop: runLoop, mode: mode, options: options)
     }
-  }
 
-  @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-  extension Publishers {
-    /// A publisher that emits a scheduler's current time on a repeating interval.
-    ///
-    /// This publisher is an alternative to Foundation's `Timer.publisher`, with its primary
-    /// difference being that it allows you to use any scheduler for the timer, not just `RunLoop`.
-    /// This is useful because the `RunLoop` scheduler is not testable in the sense that if you want
-    /// to write tests against a publisher that makes use of `Timer.publisher` you must explicitly
-    /// wait for time to pass in order to get emissions. This is likely to lead to fragile tests and
-    /// greatly bloat the time your tests take to execute.
-    ///
-    /// It can be used much like Foundation's timer, except you specify a scheduler rather than a
-    /// run loop:
-    ///
-    ///     Publishers.Timer(every: .seconds(1), scheduler: DispatchQueue.main)
-    ///       .autoconnect()
-    ///       .sink { print("Timer", $0) }
-    ///
-    /// But more importantly, you can use it with `TestScheduler` so that any Combine code you write
-    /// involving timers becomes more testable. This shows how we can easily simulate the idea of
-    /// moving time forward 1,000 seconds in a timer:
-    ///
-    ///     let scheduler = DispatchQueue.test
-    ///     var output: [Int] = []
-    ///
-    ///     Publishers.Timer(every: 1, scheduler: scheduler)
-    ///       .autoconnect()
-    ///       .sink { _ in output.append(output.count) }
-    ///       .store(in: &self.cancellables)
-    ///
-    ///     XCTAssertEqual(output, [])
-    ///
-    ///     scheduler.advance(by: 1)
-    ///     XCTAssertEqual(output, [0])
-    ///
-    ///     scheduler.advance(by: 1)
-    ///     XCTAssertEqual(output, [0, 1])
-    ///
-    ///     scheduler.advance(by: 1_000)
-    ///     XCTAssertEqual(output, Array(0...1_001))
-    ///
-    public final class Timer<S: Scheduler>: ConnectablePublisher {
-      public typealias Output = S.SchedulerTimeType
-      public typealias Failure = Never
+    /// A publisher that repeatedly emits the current date on a given interval.
+    public final class TimerPublisher: ConnectablePublisher {
+        public typealias Output = Date
+        public typealias Failure = Never
 
-      public let interval: S.SchedulerTimeType.Stride
-      public let options: S.SchedulerOptions?
-      public let scheduler: S
-      public let tolerance: S.SchedulerTimeType.Stride?
+        public let interval: TimeInterval
+        public let tolerance: TimeInterval?
+        public let runLoop: RunLoop
+        public let mode: RunLoop.Mode
+        public let options: RunLoop.SchedulerOptions?
 
-      private lazy var routingSubscription: RoutingSubscription = {
-        return RoutingSubscription(parent: self)
-      }()
+        private lazy var routingSubscription: RoutingSubscription = {
+            return RoutingSubscription(parent: self)
+        }()
 
-      // Stores if a `.connect()` happened before subscription, internally readable for tests
-      internal var isConnected: Bool {
-        return routingSubscription.isConnected
-      }
+        // Stores if a `.connect()` happened before subscription, internally readable for tests
+        internal var isConnected: Bool {
+            return routingSubscription.isConnected
+        }
 
-      public init(
-        every interval: S.SchedulerTimeType.Stride,
-        tolerance: S.SchedulerTimeType.Stride? = nil,
-        scheduler: S,
-        options: S.SchedulerOptions? = nil
-      ) {
-        self.interval = interval
-        self.options = options
-        self.scheduler = scheduler
-        self.tolerance = tolerance
-      }
+        /// Creates a publisher that repeatedly emits the current date on the given interval.
+        ///
+        /// - Parameters:
+        ///   - interval: The interval on which to publish events.
+        ///   - tolerance: The allowed timing variance when emitting events. Defaults to `nil`, which allows any variance.
+        ///   - runLoop: The run loop on which the timer runs.
+        ///   - mode: The run loop mode in which to run the timer.
+        ///   - options: Scheduler options passed to the timer. Defaults to `nil`.
+        public init(interval: TimeInterval, tolerance: TimeInterval? = nil, runLoop: RunLoop, mode: RunLoop.Mode, options: RunLoop.SchedulerOptions? = nil) {
+            self.interval = interval
+            self.tolerance = tolerance
+            self.runLoop = runLoop
+            self.mode = mode
+            self.options = options
+        }
 
-      /// Adapter subscription to allow `Timer` to multiplex to multiple subscribers
-      /// the values produced by a single `TimerPublisher.Inner`
-      private class RoutingSubscription: Subscription, Subscriber, CustomStringConvertible,
-        CustomReflectable, CustomPlaygroundDisplayConvertible
-      {
-        typealias Input = S.SchedulerTimeType
-        typealias Failure = Never
+        /// Adapter subscription to allow `Timer` to multiplex to multiple subscribers
+        /// the values produced by a single `TimerPublisher.Inner`
+        private class RoutingSubscription: Subscription, Subscriber, CustomStringConvertible, CustomReflectable, CustomPlaygroundDisplayConvertible {
+            typealias Input = Date
+            typealias Failure = Never
 
-        private typealias ErasedSubscriber = AnySubscriber<Output, Failure>
+            private typealias ErasedSubscriber = AnySubscriber<Output, Failure>
 
-        private let lock: Lock
+            private let lock: Lock
 
-        // Inner is IUP due to init requirements
-        private var inner: Inner<RoutingSubscription>!
-        private var subscribers: [ErasedSubscriber] = []
+            // Inner is IUP due to init requirements
+            private var inner: Inner<RoutingSubscription>!
+            private var subscribers: [ErasedSubscriber] = []
 
-        private var _lockedIsConnected = false
-        var isConnected: Bool {
-          get {
-            lock.lock()
-            defer { lock.unlock() }
-            return _lockedIsConnected
-          }
+            private var _lockedIsConnected = false
+            var isConnected: Bool {
+                get {
+                    lock.lock()
+                    defer { lock.unlock() }
+                    return _lockedIsConnected
+                }
 
-          set {
-            lock.lock()
-            let oldValue = _lockedIsConnected
-            _lockedIsConnected = newValue
+                set {
+                    lock.lock()
+                    let oldValue = _lockedIsConnected
+                    _lockedIsConnected = newValue
 
-            // Inner will always be non-nil
-            let inner = self.inner!
-            lock.unlock()
+                    // Inner will always be non-nil
+                    let inner = self.inner!
+                    lock.unlock()
 
-            guard newValue, !oldValue else {
-              return
+                    guard newValue, !oldValue else {
+                        return
+                    }
+                    inner.enqueue()
+                }
             }
-            inner.enqueue()
-          }
+
+            var description: String { return "Timer" }
+            var customMirror: Mirror { return inner.customMirror }
+            var playgroundDescription: Any { return description }
+            var combineIdentifier: CombineIdentifier { return inner.combineIdentifier }
+
+            init(parent: TimerPublisher) {
+                self.lock = Lock()
+                self.inner = Inner(parent, self)
+            }
+
+            deinit {
+                lock.cleanupLock()
+            }
+
+            func addSubscriber<S: Subscriber>(_ sub: S)
+                where
+                    S.Failure == Failure,
+                    S.Input == Output
+            {
+                lock.lock()
+                subscribers.append(AnySubscriber(sub))
+                lock.unlock()
+
+                sub.receive(subscription: self)
+            }
+
+            func receive(subscription: Subscription) {
+                lock.lock()
+                let subscribers = self.subscribers
+                lock.unlock()
+
+                for sub in subscribers {
+                    sub.receive(subscription: subscription)
+                }
+            }
+
+            func receive(_ value: Input) -> Subscribers.Demand {
+                var resultingDemand: Subscribers.Demand = .max(0)
+                lock.lock()
+                let subscribers = self.subscribers
+                let isConnected = _lockedIsConnected
+                lock.unlock()
+
+                guard isConnected else { return .none }
+
+                for sub in subscribers {
+                    resultingDemand += sub.receive(value)
+                }
+                return resultingDemand
+            }
+
+            func receive(completion: Subscribers.Completion<Failure>) {
+                lock.lock()
+                let subscribers = self.subscribers
+                lock.unlock()
+
+                for sub in subscribers {
+                    sub.receive(completion: completion)
+                }
+            }
+
+            func request(_ demand: Subscribers.Demand) {
+                lock.lock()
+                // Inner will always be non-nil
+                let inner = self.inner!
+                lock.unlock()
+
+                inner.request(demand)
+            }
+
+            func cancel() {
+                lock.lock()
+                // Inner will always be non-nil
+                let inner = self.inner!
+                _lockedIsConnected = false
+                self.subscribers = []
+                lock.unlock()
+
+                inner.cancel()
+            }
         }
 
-        var description: String { return "Timer" }
-        var customMirror: Mirror { return inner.customMirror }
-        var playgroundDescription: Any { return description }
-        var combineIdentifier: CombineIdentifier { return inner.combineIdentifier }
-
-        init(parent: Publishers.Timer<S>) {
-          self.lock = Lock()
-          self.inner = .init(parent, self)
+        public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
+            routingSubscription.addSubscriber(subscriber)
         }
 
-        deinit {
-          lock.cleanupLock()
+        public func connect() -> Cancellable {
+            routingSubscription.isConnected = true
+            return routingSubscription
         }
 
-        func addSubscriber<S: Subscriber>(_ sub: S)
-        where
-          S.Failure == Failure,
-          S.Input == Output
+        private typealias Parent = TimerPublisher
+        private final class Inner<Downstream: Subscriber>: NSObject, Subscription, CustomReflectable, CustomPlaygroundDisplayConvertible
+            where
+                Downstream.Input == Date,
+                Downstream.Failure == Never
         {
-          lock.lock()
-          subscribers.append(AnySubscriber(sub))
-          lock.unlock()
+            private lazy var timer: Timer? = {
+                let t = Timer(
+                    timeInterval: parent?.interval ?? 0,
+                    target: self,
+                    selector: #selector(timerFired),
+                    userInfo: nil,
+                    repeats: true
+                )
 
-          sub.receive(subscription: self)
+                t.tolerance = parent?.tolerance ?? 0
+
+                return t
+            }()
+
+            private let lock: Lock
+            private var downstream: Downstream?
+            private var parent: Parent?
+            private var started: Bool
+            private var demand: Subscribers.Demand
+
+            override var description: String { return "Timer" }
+            var customMirror: Mirror {
+                lock.lock()
+                defer { lock.unlock() }
+                return Mirror(self, children: [
+                    "downstream": downstream as Any,
+                    "interval": parent?.interval as Any,
+                    "tolerance": parent?.tolerance as Any
+                ])
+            }
+            var playgroundDescription: Any { return description }
+
+            init(_ parent: Parent, _ downstream: Downstream) {
+                self.lock = Lock()
+                self.parent = parent
+                self.downstream = downstream
+                self.started = false
+                self.demand = .max(0)
+                super.init()
+            }
+
+            deinit {
+                lock.cleanupLock()
+            }
+
+            func enqueue() {
+                lock.lock()
+                guard let t = timer, let parent = self.parent, !started else {
+                    lock.unlock()
+                    return
+                }
+
+                started = true
+                lock.unlock()
+
+                parent.runLoop.add(t, forMode: parent.mode)
+            }
+
+            func cancel() {
+                lock.lock()
+                guard let t = timer else {
+                    lock.unlock()
+                    return
+                }
+
+                // clear out all optionals
+                downstream = nil
+                parent = nil
+                started = false
+                demand = .max(0)
+                timer = nil
+                lock.unlock()
+
+                // cancel the timer
+                t.invalidate()
+            }
+
+            func request(_ n: Subscribers.Demand) {
+                lock.lock()
+                defer { lock.unlock() }
+                guard parent != nil else {
+                    return
+                }
+                demand += n
+            }
+
+            @objc
+            func timerFired(arg: Any) {
+                lock.lock()
+                guard let ds = downstream, parent != nil else {
+                    lock.unlock()
+                    return
+                }
+
+                // This publisher drops events on the floor when there is no space in the subscriber
+                guard demand > 0 else {
+                    lock.unlock()
+                    return
+                }
+
+                demand -= 1
+                lock.unlock()
+
+                let extra = ds.receive(Date())
+                guard extra > 0 else {
+                    return
+                }
+
+                lock.lock()
+                demand += extra
+                lock.unlock()
+            }
         }
-
-        func receive(subscription: Subscription) {
-          lock.lock()
-          let subscribers = self.subscribers
-          lock.unlock()
-
-          for sub in subscribers {
-            sub.receive(subscription: subscription)
-          }
-        }
-
-        func receive(_ value: Input) -> Subscribers.Demand {
-          var resultingDemand: Subscribers.Demand = .max(0)
-          lock.lock()
-          let subscribers = self.subscribers
-          let isConnected = _lockedIsConnected
-          lock.unlock()
-
-          guard isConnected else { return .none }
-
-          for sub in subscribers {
-            resultingDemand += sub.receive(value)
-          }
-          return resultingDemand
-        }
-
-        func receive(completion: Subscribers.Completion<Failure>) {
-          lock.lock()
-          let subscribers = self.subscribers
-          lock.unlock()
-
-          for sub in subscribers {
-            sub.receive(completion: completion)
-          }
-        }
-
-        func request(_ demand: Subscribers.Demand) {
-          lock.lock()
-          // Inner will always be non-nil
-          let inner = self.inner!
-          lock.unlock()
-
-          inner.request(demand)
-        }
-
-        func cancel() {
-          lock.lock()
-          // Inner will always be non-nil
-          let inner = self.inner!
-          _lockedIsConnected = false
-          self.subscribers = []
-          lock.unlock()
-
-          inner.cancel()
-        }
-      }
-
-      public func receive<S: Subscriber>(subscriber: S)
-      where Failure == S.Failure, Output == S.Input {
-        routingSubscription.addSubscriber(subscriber)
-      }
-
-      public func connect() -> Cancellable {
-        routingSubscription.isConnected = true
-        return routingSubscription
-      }
-
-      private typealias Parent = Publishers.Timer
-      private final class Inner<Downstream: Subscriber>: NSObject, Subscription, CustomReflectable,
-        CustomPlaygroundDisplayConvertible
-      where
-        Downstream.Input == S.SchedulerTimeType,
-        Downstream.Failure == Never
-      {
-        private var cancellable: Cancellable?
-        private let lock: Lock
-        private var downstream: Downstream?
-        private var parent: Parent<S>?
-        private var started: Bool
-        private var demand: Subscribers.Demand
-
-        override var description: String { return "Timer" }
-        var customMirror: Mirror {
-          lock.lock()
-          defer { lock.unlock() }
-          return Mirror(
-            self,
-            children: [
-              "downstream": downstream as Any,
-              "interval": parent?.interval as Any,
-              "tolerance": parent?.tolerance as Any,
-            ])
-        }
-        var playgroundDescription: Any { return description }
-
-        init(_ parent: Parent<S>, _ downstream: Downstream) {
-          self.lock = Lock()
-          self.parent = parent
-          self.downstream = downstream
-          self.started = false
-          self.demand = .max(0)
-          super.init()
-        }
-
-        deinit {
-          lock.cleanupLock()
-        }
-
-        func enqueue() {
-          lock.lock()
-          guard let parent = self.parent, !started else {
-            lock.unlock()
-            return
-          }
-
-          started = true
-          lock.unlock()
-
-          self.cancellable = parent.scheduler.schedule(
-            after: parent.scheduler.now.advanced(by: parent.interval),
-            interval: parent.interval,
-            tolerance: parent.tolerance ?? .zero,
-            options: parent.options
-          ) {
-            self.timerFired()
-          }
-        }
-
-        func cancel() {
-          lock.lock()
-          guard let t = self.cancellable else {
-            lock.unlock()
-            return
-          }
-
-          // clear out all optionals
-          downstream = nil
-          parent = nil
-          started = false
-          demand = .max(0)
-          lock.unlock()
-
-          // cancel the timer
-          t.cancel()
-        }
-
-        func request(_ n: Subscribers.Demand) {
-          lock.lock()
-          defer { lock.unlock() }
-          guard parent != nil else {
-            return
-          }
-          demand += n
-        }
-
-        @objc
-        func timerFired() {
-          lock.lock()
-          guard let ds = downstream, let parent = self.parent else {
-            lock.unlock()
-            return
-          }
-
-          // This publisher drops events on the floor when there is no space in the subscriber
-          guard demand > 0 else {
-            lock.unlock()
-            return
-          }
-
-          demand -= 1
-          lock.unlock()
-
-          let extra = ds.receive(parent.scheduler.now)
-          guard extra > 0 else {
-            return
-          }
-
-          lock.lock()
-          demand += extra
-          lock.unlock()
-        }
-      }
     }
-  }
+}
 
 #endif /* !(os(iOS) && (arch(i386) || arch(arm))) */
