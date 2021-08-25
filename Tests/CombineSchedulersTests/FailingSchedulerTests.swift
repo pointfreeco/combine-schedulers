@@ -1,9 +1,8 @@
-#if canImport(Combine) && compiler(>=5.4)
+#if compiler(>=5.4)
   import Combine
   import CombineSchedulers
   import XCTest
 
-  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   final class FailingSchedulerTests: XCTestCase {
     func testFailure() {
       let scheduler = RunLoop.failing

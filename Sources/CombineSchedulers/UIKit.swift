@@ -1,8 +1,7 @@
-#if canImport(Combine) && canImport(UIKit) && !os(watchOS)
+#if canImport(UIKit) && !os(watchOS)
   import Combine
-  import SwiftUI
+  import UIKit
 
-  @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
   extension Scheduler {
     /// Wraps scheduled actions in `UIView.animate`.
     ///
