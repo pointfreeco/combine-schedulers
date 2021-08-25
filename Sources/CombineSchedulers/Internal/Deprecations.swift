@@ -37,7 +37,7 @@ where
   }
 }
 
-  extension Scheduler
+extension Scheduler
 where
   SchedulerTimeType == DispatchQueue.SchedulerTimeType,
   SchedulerOptions == DispatchQueue.SchedulerOptions
@@ -50,7 +50,7 @@ where
   }
 }
 
-  extension Scheduler
+extension Scheduler
 where
   SchedulerTimeType == OperationQueue.SchedulerTimeType,
   SchedulerOptions == OperationQueue.SchedulerOptions
@@ -62,7 +62,7 @@ where
   }
 }
 
-  extension Scheduler
+extension Scheduler
 where
   SchedulerTimeType == RunLoop.SchedulerTimeType,
   SchedulerOptions == RunLoop.SchedulerOptions
