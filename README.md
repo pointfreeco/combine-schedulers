@@ -34,7 +34,7 @@ This library was designed over the course of many episodes on [Point-Free](https
 You can watch all of the episodes [here](https://www.pointfree.co/collections/combine/schedulers).
 
 <a href="https://www.pointfree.co/collections/combine/schedulers">
-  <img alt="video poster image" src="https://i.vimeocdn.com/video/905440786.jpg" width="480">
+  <img alt="video poster image" src="https://d3rccdn33rt8ze.cloudfront.net/episodes/0106.jpeg" width="480">
 </a>
 
 ### `AnyScheduler`
