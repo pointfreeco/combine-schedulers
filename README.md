@@ -13,7 +13,7 @@ A few schedulers that make working with Combine more testable and more versatile
   * [`ImmediateScheduler`](#immediatescheduler)
   * [Animated schedulers](#animated-schedulers)
   * [`FailingScheduler`](#failingscheduler)
-  * [`UIScheduler`](#testscheduler)
+  * [`UIScheduler`](#uischeduler)
   * [`Publishers.Timer`](#publisherstimer)
 * [Installation](#installation)
 * [Documentation](#documentation)
