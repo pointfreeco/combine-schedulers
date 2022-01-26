@@ -247,9 +247,9 @@ where
   public static var main: Self {
     DispatchQueue.main.eraseToAnyScheduler()
   }
-  
+
   /// A type-erased global dispatch queue with the specified quality-of-service class
-  public static func global(qos:  DispatchQoS.QoSClass = .default) -> Self {
+  public static func global(qos: DispatchQoS.QoSClass = .default) -> Self {
     DispatchQueue.global(qos: qos).eraseToAnyScheduler()
   }
 }
