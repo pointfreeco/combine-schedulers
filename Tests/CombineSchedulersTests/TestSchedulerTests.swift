@@ -69,6 +69,22 @@ final class CombineSchedulerTests: XCTestCase {
     XCTAssertEqual(value, 1)
   }
 
+  func testDelay0Advance_Async() async {
+    let scheduler = DispatchQueue.test
+
+    var value: Int?
+    Just(1)
+      .delay(for: 0, scheduler: scheduler)
+      .sink { value = $0 }
+      .store(in: &self.cancellables)
+
+    XCTAssertEqual(value, nil)
+
+    await scheduler.advance()
+
+    XCTAssertEqual(value, 1)
+  }
+
   func testSubscribeOnAdvance() {
     let scheduler = DispatchQueue.test
 
@@ -131,5 +147,23 @@ final class CombineSchedulerTests: XCTestCase {
     XCTAssertEqual(values, [1, 42])
     testScheduler.advance(by: 2)
     XCTAssertEqual(values, [1, 42, 42, 1, 42])
+  }
+
+  func testAdvanceToFarFuture() async {
+    let testScheduler = DispatchQueue.test
+
+    var tickCount = 0
+    Publishers.Timer(every: .seconds(1), scheduler: testScheduler)
+      .autoconnect()
+      .sink { _ in tickCount += 1 }
+      .store(in: &self.cancellables)
+
+    XCTAssertEqual(tickCount, 0)
+    await testScheduler.advance(by: .seconds(1))
+    XCTAssertEqual(tickCount, 1)
+    await testScheduler.advance(by: .seconds(1))
+    XCTAssertEqual(tickCount, 2)
+    await testScheduler.advance(by: .seconds(1_000))
+    XCTAssertEqual(tickCount, 1_002)
   }
 }

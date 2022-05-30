@@ -98,6 +98,31 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
     }
   }
 
+  public func advance(by stride: SchedulerTimeType.Stride = .zero) async {
+    let finalDate = self.now.advanced(by: stride)
+
+    while self.now <= finalDate {
+      self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
+
+      guard
+        let nextDate = self.scheduled.first?.date,
+        finalDate >= nextDate
+      else {
+        self.now = finalDate
+        return
+      }
+
+      self.now = nextDate
+
+      while let (_, date, action) = self.scheduled.first, date == nextDate {
+        self.scheduled.removeFirst()
+        await Task.megaYield()
+        action()
+        await Task.megaYield()
+      }
+    }
+  }
+
   /// Runs the scheduler until it has no scheduled items left.
   ///
   /// This method is useful for proving exhaustively that your publisher eventually completes
@@ -201,3 +226,11 @@ extension RunLoop {
 public typealias TestSchedulerOf<Scheduler> = TestScheduler<
   Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
 > where Scheduler: Combine.Scheduler
+
+extension Task where Success == Failure, Failure == Never {
+  static func megaYield(count: Int = 3) async {
+    for _ in 1...count {
+      await Task<Void, _>(priority: .background) { await Task.yield() }.value
+    }
+  }
+}
