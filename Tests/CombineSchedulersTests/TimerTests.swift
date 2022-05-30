@@ -72,7 +72,7 @@ final class TimerTests: XCTestCase {
         1_000_000_000, 2_000_000_000, 3_000_000_000, 4_000_000_000, 5_000_000_000, 6_000_000_000,
         7_000_000_000,
       ]
-        .map { $0 + startUptime }
+      .map { $0 + startUptime }
     )
   }
 
