@@ -48,6 +48,8 @@ final class TimerTests: XCTestCase {
 
   func testWithTestScheduler() {
     let scheduler = DispatchQueue.test
+    let startUptime = scheduler.now.dispatchTime.uptimeNanoseconds
+
     var output: [UInt64] = []
 
     Publishers.Timer(every: 1, scheduler: scheduler)
@@ -58,18 +60,19 @@ final class TimerTests: XCTestCase {
     XCTAssertEqual(output, [])
 
     scheduler.advance(by: 1)
-    XCTAssertEqual(output, [1_000_000_001])
+    XCTAssertEqual(output, [1_000_000_000].map { $0 + startUptime })
 
     scheduler.advance(by: 1)
-    XCTAssertEqual(output, [1_000_000_001, 2_000_000_001])
+    XCTAssertEqual(output, [1_000_000_000, 2_000_000_000].map { $0 + startUptime })
 
     scheduler.advance(by: 5)
     XCTAssertEqual(
       output,
       [
-        1_000_000_001, 2_000_000_001, 3_000_000_001, 4_000_000_001, 5_000_000_001, 6_000_000_001,
-        7_000_000_001,
+        1_000_000_000, 2_000_000_000, 3_000_000_000, 4_000_000_000, 5_000_000_000, 6_000_000_000,
+        7_000_000_000,
       ]
+        .map { $0 + startUptime }
     )
   }
 
