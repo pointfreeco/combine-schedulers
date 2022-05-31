@@ -156,6 +156,12 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
     }
   }
 
+  public func run() async {
+    while let date = self.scheduled.first?.date {
+      await self.advance(by: self.now.distance(to: date))
+    }
+  }
+
   public func schedule(
     after date: SchedulerTimeType,
     interval: SchedulerTimeType.Stride,
