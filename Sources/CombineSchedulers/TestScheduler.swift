@@ -102,6 +102,7 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
     let finalDate = self.now.advanced(by: stride)
 
     while self.now <= finalDate {
+      await Task.megaYield()
       self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
 
       guard
