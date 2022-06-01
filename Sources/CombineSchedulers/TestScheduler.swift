@@ -55,7 +55,8 @@ import Foundation
 /// but this technique can be used to test any publisher that involves Combine's asynchronous
 /// operations.
 ///
-public final class TestScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
+public final class TestScheduler<SchedulerTimeType, SchedulerOptions>:
+  Scheduler, @unchecked Sendable
 where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
 
   private var lastSequence: UInt = 0

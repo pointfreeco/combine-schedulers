@@ -118,7 +118,7 @@ import Foundation
 /// in classes, functions, etc. without needing to introduce a generic, which can help simplify
 /// the code and reduce implementation details from leaking out.
 ///
-public struct AnyScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
+public struct AnyScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler, @unchecked Sendable
 where
   SchedulerTimeType: Strideable,
   SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible

@@ -1,4 +1,4 @@
-import Combine
+@preconcurrency import Combine
 
 extension Scheduler {
   public func sleep(

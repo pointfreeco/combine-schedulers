@@ -72,7 +72,6 @@ where
   SchedulerTimeType: Strideable,
   SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
 {
-
   public var minimumTolerance: SchedulerTimeType.Stride {
     XCTFail(
       """
@@ -146,6 +145,9 @@ where
     return AnyCancellable {}
   }
 }
+
+extension FailingScheduler: Sendable
+where SchedulerTimeType: Sendable, SchedulerTimeType.Stride: Sendable {}
 
 extension DispatchQueue {
   /// A failing scheduler that can substitute itself for a dispatch queue.

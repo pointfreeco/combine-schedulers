@@ -24,6 +24,9 @@ let package = Package(
       name: "CombineSchedulers",
       dependencies: [
         "XCTestDynamicOverlay"
+      ],
+      swiftSettings: [
+        .unsafeFlags(["-Xfrontend", "-warn-concurrency"])
       ]
     ),
     .testTarget(
