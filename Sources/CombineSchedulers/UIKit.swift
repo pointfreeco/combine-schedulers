@@ -9,6 +9,7 @@
     /// - Parameter delay: The `delay` parameter passed to `UIView.animate`.
     /// - Parameter animationOptions: The `options` parameter passed to `UIView.animate`
     /// - Returns: A scheduler that wraps scheduled actions in `UIView.animate`.
+    @MainActor
     public func animate(
       withDuration duration: TimeInterval,
       delay: TimeInterval = 0,
@@ -58,6 +59,7 @@
     /// - Parameter velocity: The `velocity` parameter passed to `UIView.animate`
     /// - Parameter animationOptions: The `options` parameter passed to `UIView.animate`
     /// - Returns: A scheduler that wraps scheduled actions in `UIView.animate`.
+    @MainActor
     public func animate(
       withDuration duration: TimeInterval,
       delay: TimeInterval = 0,
