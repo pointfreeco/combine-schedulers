@@ -28,7 +28,7 @@ import Foundation
 ///
 ///       func reloadButtonTapped() {
 ///         Just(())
-///           .delay(for: .seconds(10), scheduler: DispachQueue.main)
+///           .delay(for: .seconds(10), scheduler: DispatchQueue.main)
 ///           .flatMap { apiClient.fetchEpisodes() }
 ///           .assign(to: &self.episodes)
 ///       }
