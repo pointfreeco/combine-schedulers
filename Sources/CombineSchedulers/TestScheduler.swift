@@ -99,6 +99,7 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
     }
   }
 
+  @MainActor
   public func advance(by stride: SchedulerTimeType.Stride = .zero) async {
     let finalDate = self.now.advanced(by: stride)
 
@@ -158,6 +159,7 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
     }
   }
 
+  @MainActor
   public func run() async {
     while let date = self.scheduled.first?.date {
       await self.advance(by: self.now.distance(to: date))
