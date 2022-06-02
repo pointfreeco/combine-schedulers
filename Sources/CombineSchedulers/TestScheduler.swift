@@ -238,7 +238,7 @@ public typealias TestSchedulerOf<Scheduler> = TestScheduler<
 > where Scheduler: Combine.Scheduler
 
 extension Task where Success == Failure, Failure == Never {
-  static func megaYield(count: Int = 2) async {
+  static func megaYield(count: Int = 3) async {
     for _ in 1...count {
       await Task<Void, _>(priority: .background) { await Task.yield() }.value
     }
