@@ -3,3 +3,6 @@
 /Packages
 /*.xcodeproj
 xcuserdata/
+
+# Prevent committing Package.resolved to ensure library isn't accidentally pinned to specific dependency version
+Package.resolved
