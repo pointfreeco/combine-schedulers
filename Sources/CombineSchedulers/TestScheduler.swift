@@ -240,7 +240,7 @@ public typealias TestSchedulerOf<Scheduler> = TestScheduler<
 extension Task where Success == Failure, Failure == Never {
   static func megaYield(count: Int = 3) async {
     for _ in 1...count {
-      await Task<Void, _>(priority: .background) { await Task.yield() }.value
+      await Task<Void, _>.detached(priority: .background) { await Task.yield() }.value
     }
   }
 }
