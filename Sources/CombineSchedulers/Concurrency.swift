@@ -8,7 +8,7 @@ extension Scheduler {
   /// This function doesn't block the scheduler.
   ///
   /// ```
-  /// try await in DispatchQueue.main.sleep(for: .seconds(1))
+  /// try await in scheduler.sleep(for: .seconds(1))
   /// ```
   ///
   /// - Parameters:
@@ -32,6 +32,15 @@ extension Scheduler {
   /// If the task is cancelled before the time ends, this function throws `CancellationError`.
   ///
   /// This function doesn't block the scheduler.
+  ///
+  /// ```
+  /// try await in scheduler.sleep(until: scheduler.now + .seconds(1))
+  /// ```
+
+  /// - Parameters:
+  ///   - deadline: An instant of time to suspend until.
+  ///   - tolerance: The allowed timing variance when emitting events. Defaults to `zero`.
+  ///   - options: Scheduler options passed to the timer. Defaults to `nil`.
   public func sleep(
     until deadline: SchedulerTimeType,
     tolerance: SchedulerTimeType.Stride = .zero,
@@ -47,7 +56,7 @@ extension Scheduler {
   /// Returns a stream that repeatedly yields the current time of the scheduler on a given interval.
   ///
   /// ```
-  /// for await instant in DispatchQueue.main.timer(interval: .seconds(1)) {
+  /// for await instant in scheduler.timer(interval: .seconds(1)) {
   ///   print("now:", instant)
   /// }
   /// ```
@@ -57,6 +66,7 @@ extension Scheduler {
   ///     time. For example, a value of `0.5` yields an instant approximately every half-second.
   ///   - tolerance: The allowed timing variance when emitting events. Defaults to `zero`.
   ///   - options: Scheduler options passed to the timer. Defaults to `nil`.
+  /// - Returns: A stream that repeatedly yields the current time.
   public func timer(
     interval: SchedulerTimeType.Stride,
     tolerance: SchedulerTimeType.Stride = .zero,
@@ -80,12 +90,13 @@ extension Scheduler {
   /// Measure the elapsed time to execute a closure.
   ///
   /// ```
-  /// let elapsed = DispatchQueue.main.measure {
+  /// let elapsed = scheduler.measure {
   ///   someWork()
   /// }
   /// ```
   ///
-  /// - Parameter work: A closure to 
+  /// - Parameter work: A closure to execute.
+  /// - Returns: The amount of time it took to execute the closure.
   public func measure(_ work: () throws -> Void) rethrows -> SchedulerTimeType.Stride {
     let start = self.now
     try work()
