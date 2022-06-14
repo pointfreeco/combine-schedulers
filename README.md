@@ -14,6 +14,7 @@ A few schedulers that make working with Combine more testable and more versatile
   * [Animated schedulers](#animated-schedulers)
   * [`FailingScheduler`](#failingscheduler)
   * [`UIScheduler`](#uischeduler)
+  * [Concurrency APIs](#concurrency-apis)
   * [`Publishers.Timer`](#publisherstimer)
 * [Installation](#installation)
 * [Documentation](#documentation)
@@ -375,6 +376,20 @@ A scheduler that executes its work on the main queue as soon as possible. This s
 If `UIScheduler.shared.schedule` is invoked from the main thread then the unit of work will be performed immediately. This is in contrast to `DispatchQueue.main.schedule`, which will incur a thread hop before executing since it uses `DispatchQueue.main.async` under the hood.
 
 This scheduler can be useful for situations where you need work executed as quickly as possible on the main thread, and for which a thread hop would be problematic, such as when performing animations.
+
+### Concurrency APIs
+
+This library provides `async`-friendly APIs for interacting with Combine schedulers.
+
+```swift
+// Suspend the current task for 1 second
+try await scheduler.sleep(for: .seconds(1))
+
+// Perform work every 1 second
+for await instant in scheduler.timer(interval: .seconds(1)) {
+  ...
+}
+``` 
 
 ### `Publishers.Timer`
 

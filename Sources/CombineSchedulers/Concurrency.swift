@@ -55,6 +55,8 @@ extension Scheduler {
 
   /// Returns a stream that repeatedly yields the current time of the scheduler on a given interval.
   ///
+  /// If the task is cancelled, the sequence will terminate.
+  ///
   /// ```
   /// for await instant in scheduler.timer(interval: .seconds(1)) {
   ///   print("now:", instant)
