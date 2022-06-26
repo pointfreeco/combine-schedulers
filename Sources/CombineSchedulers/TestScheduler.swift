@@ -121,7 +121,6 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
         self.scheduled.removeFirst()
         await Task.megaYield()
         action()
-        await Task.megaYield()
       }
     }
   }
