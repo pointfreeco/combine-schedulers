@@ -60,7 +60,7 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
 
   private var lastSequence: UInt = 0
   public let minimumTolerance: SchedulerTimeType.Stride = .zero
-  public private(set) var now: SchedulerTimeType
+  public internal(set) var now: SchedulerTimeType
   var scheduled: [(sequence: UInt, date: SchedulerTimeType, action: () -> Void)] = []
 
   /// Creates a test scheduler with the given date.
