@@ -82,19 +82,17 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
       self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
 
       guard
-        let nextDate = self.scheduled.first?.date,
-        finalDate >= nextDate
+        let next = self.scheduled.first,
+        finalDate >= next.date
       else {
         self.now = finalDate
         return
       }
 
-      self.now = nextDate
+      self.now = next.date
 
-      while let (_, date, action) = self.scheduled.first, date == nextDate {
-        self.scheduled.removeFirst()
-        action()
-      }
+      self.scheduled.removeFirst()
+      next.action()
     }
   }
 
