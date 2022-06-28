@@ -3,9 +3,9 @@
   import CombineSchedulers
   import XCTest
 
-  final class FailingSchedulerTests: XCTestCase {
+  final class UnimplementedSchedulerTests: XCTestCase {
     func testFailure() {
-      let scheduler = RunLoop.failing
+      let scheduler = RunLoop.unimplemented
 
       XCTExpectFailure { _ = scheduler.now }
       XCTExpectFailure { _ = scheduler.minimumTolerance }

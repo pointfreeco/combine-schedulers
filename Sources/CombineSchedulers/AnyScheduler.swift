@@ -9,21 +9,23 @@ import Foundation
 /// example, suppose you have a view model `ObservableObject` that performs an API request when a
 /// method is called:
 ///
-///     class EpisodeViewModel: ObservableObject {
-///       @Published var episode: Episode?
+/// ```swift
+/// class EpisodeViewModel: ObservableObject {
+///   @Published var episode: Episode?
 ///
-///       let apiClient: ApiClient
+///   let apiClient: ApiClient
 ///
-///       init(apiClient: ApiClient) {
-///         self.apiClient = apiClient
-///       }
+///   init(apiClient: ApiClient) {
+///     self.apiClient = apiClient
+///   }
 ///
-///       func reloadButtonTapped() {
-///         self.apiClient.fetchEpisode()
-///           .receive(on: DispatchQueue.main)
-///           .assign(to: &self.$episode)
-///       }
-///     }
+///   func reloadButtonTapped() {
+///     self.apiClient.fetchEpisode()
+///       .receive(on: DispatchQueue.main)
+///       .assign(to: &self.$episode)
+///   }
+/// }
+/// ```
 ///
 /// Notice that we are using `DispatchQueue.main` in the `reloadButtonTapped` method because the
 /// `fetchEpisode` endpoint most likely delivers its output on a background thread (as is the case
@@ -39,23 +41,25 @@ import Foundation
 /// with no thread hops. In order to allow for this we would need to inject a scheduler into our
 /// view model so that we can control it from the outside:
 ///
-///     class EpisodeViewModel<S: Scheduler>: ObservableObject {
-///       @Published var episode: Episode?
+/// ```swift
+/// class EpisodeViewModel<S: Scheduler>: ObservableObject {
+///   @Published var episode: Episode?
 ///
-///       let apiClient: ApiClient
-///       let scheduler: S
+///   let apiClient: ApiClient
+///   let scheduler: S
 ///
-///       init(apiClient: ApiClient, scheduler: S) {
-///         self.apiClient = apiClient
-///         self.scheduler = scheduler
-///       }
+///   init(apiClient: ApiClient, scheduler: S) {
+///     self.apiClient = apiClient
+///     self.scheduler = scheduler
+///   }
 ///
-///       func reloadButtonTapped() {
-///         self.apiClient.fetchEpisode()
-///           .receive(on: self.scheduler)
-///           .assign(to: &self.$episode)
-///       }
-///     }
+///   func reloadButtonTapped() {
+///     self.apiClient.fetchEpisode()
+///       .receive(on: self.scheduler)
+///       .assign(to: &self.$episode)
+///   }
+/// }
+/// ```
 ///
 /// Now we can initialize this view model in production by using `DispatchQueue.main` and we can
 /// initialize it in tests using `DispatchQueue.immediate`. Sounds like a win!
@@ -73,46 +77,54 @@ import Foundation
 /// Instead of holding a generic scheduler in our view model we can say that we only want a
 /// scheduler whose associated types match that of `DispatchQueue`:
 ///
-///     class EpisodeViewModel: ObservableObject {
-///       @Published var episode: Episode?
+/// ```swift
+/// class EpisodeViewModel: ObservableObject {
+///   @Published var episode: Episode?
 ///
-///       let apiClient: ApiClient
-///       let scheduler: AnySchedulerOf<DispatchQueue>
+///   let apiClient: ApiClient
+///   let scheduler: AnySchedulerOf<DispatchQueue>
 ///
-///       init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
-///         self.apiClient = apiClient
-///         self.scheduler = scheduler
-///       }
+///   init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
+///     self.apiClient = apiClient
+///     self.scheduler = scheduler
+///   }
 ///
-///       func reloadButtonTapped() {
-///         self.apiClient.fetchEpisode()
-///           .receive(on: self.scheduler)
-///           .assign(to: &self.$episode)
-///       }
-///     }
+///   func reloadButtonTapped() {
+///     self.apiClient.fetchEpisode()
+///       .receive(on: self.scheduler)
+///       .assign(to: &self.$episode)
+///   }
+/// }
+/// ```
 ///
 /// Then, in production we can create a view model that uses a live `DispatchQueue`, but we just
 /// have to first erase its type:
 ///
-///     let viewModel = EpisodeViewModel(
-///       apiClient: ...,
-///       scheduler: DispatchQueue.main.eraseToAnyScheduler()
-///     )
+/// ```swift
+/// let viewModel = EpisodeViewModel(
+///   apiClient: ...,
+///   scheduler: DispatchQueue.main.eraseToAnyScheduler()
+/// )
+/// ```
 ///
 /// For common schedulers, like `DispatchQueue`, `OperationQueue`, and `RunLoop`, there is even a
 /// static helper on `AnyScheduler` that further simplifies this:
 ///
-///     let viewModel = EpisodeViewModel(
-///       apiClient: ...,
-///       scheduler: .main
-///     )
+/// ```swift
+/// let viewModel = EpisodeViewModel(
+///   apiClient: ...,
+///   scheduler: .main
+/// )
+/// ```
 ///
 /// And in tests we can use an immediate scheduler:
 ///
-///     let viewModel = EpisodeViewModel(
-///       apiClient: ...,
-///       scheduler: .immediate
-///     )
+/// ```swift
+/// let viewModel = EpisodeViewModel(
+///   apiClient: ...,
+///   scheduler: .immediate
+/// )
+/// ```
 ///
 /// So, in general, `AnyScheduler` is great for allowing one to control what scheduler is used
 /// in classes, functions, etc. without needing to introduce a generic, which can help simplify

@@ -10,46 +10,56 @@ import Foundation
 /// For example, consider the following `race` operator that runs two futures in parallel, but
 /// only emits the first one that completes:
 ///
-///     func race<Output, Failure: Error>(
-///       _ first: Future<Output, Failure>,
-///       _ second: Future<Output, Failure>
-///     ) -> AnyPublisher<Output, Failure> {
-///       first
-///         .merge(with: second)
-///         .prefix(1)
-///         .eraseToAnyPublisher()
-///     }
+/// ```swift
+/// func race<Output, Failure: Error>(
+///   _ first: Future<Output, Failure>,
+///   _ second: Future<Output, Failure>
+/// ) -> AnyPublisher<Output, Failure> {
+///   first
+///     .merge(with: second)
+///     .prefix(1)
+///     .eraseToAnyPublisher()
+/// }
+/// ```
 ///
 /// Although this publisher is quite simple we may still want to write some tests for it.
 ///
 /// To do this we can create a test scheduler and create two futures, one that emits after a
 /// second and one that emits after two seconds:
 ///
-///     let scheduler = DispatchQueue.test
-///     let first = Future<Int, Never> { callback in
-///       scheduler.schedule(after: scheduler.now.advanced(by: 1)) { callback(.success(1)) }
-///     }
-///     let second = Future<Int, Never> { callback in
-///       scheduler.schedule(after: scheduler.now.advanced(by: 2)) { callback(.success(2)) }
-///     }
+/// ```swift
+/// let scheduler = DispatchQueue.test
+/// let first = Future<Int, Never> { callback in
+///   scheduler.schedule(after: scheduler.now.advanced(by: 1)) { callback(.success(1)) }
+/// }
+/// let second = Future<Int, Never> { callback in
+///   scheduler.schedule(after: scheduler.now.advanced(by: 2)) { callback(.success(2)) }
+/// }
+/// ```
 ///
 /// And then we can race these futures and collect their emissions into an array:
 ///
-///     var output: [Int] = []
-///     let cancellable = race(first, second).sink { output.append($0) }
+/// ```swift
+/// var output: [Int] = []
+/// let cancellable = race(first, second).sink { output.append($0) }
+/// ```
 ///
 /// And then we can deterministically move time forward in the scheduler to see how the publisher
 /// emits. We can start by moving time forward by one second:
 ///
-///     scheduler.advance(by: 1)
-///     XCTAssertEqual(output, [1])
+/// ```swift
+/// scheduler.advance(by: 1)
+/// XCTAssertEqual(output, [1])
+/// ```
 ///
 /// This proves that we get the first emission from the publisher since one second of time has
 /// passed. If we further advance by one more second we can prove that we do not get anymore
 /// emissions:
 ///
-///     scheduler.advance(by: 1)
-///     XCTAssertEqual(output, [1])
+/// ```swift
+/// scheduler.advance(by: 1)
+/// XCTAssertEqual(output, [1])
+/// ```
 ///
 /// This is a very simple example of how to control the flow of time with the test scheduler,
 /// but this technique can be used to test any publisher that involves Combine's asynchronous
@@ -83,19 +93,17 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
       self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
 
       guard
-        let nextDate = self.scheduled.first?.date,
-        finalDate >= nextDate
+        let next = self.scheduled.first,
+        finalDate >= next.date
       else {
         self.now = finalDate
         return
       }
 
-      self.now = nextDate
+      self.now = next.date
 
-      while let (_, date, action) = self.scheduled.first, date == nextDate {
-        self.scheduled.removeFirst()
-        action()
-      }
+      self.scheduled.removeFirst()
+      next.action()
     }
   }
 

@@ -10,14 +10,11 @@ on:
 
 jobs:
   library:
-    runs-on: macOS-11
+    runs-on: macOS-12
     strategy:
       matrix:
         xcode:
-          - '11.7'
-          - '12.4'
-          - '12.5.1'
-          - '13.0'
+          - '13.4.1'
     steps:
       - uses: actions/checkout@v2
       - name: Select Xcode ${{ matrix.xcode }}

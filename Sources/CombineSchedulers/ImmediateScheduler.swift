@@ -17,77 +17,85 @@ import Foundation
 /// As a basic example, suppose you have a view model that loads some data after waiting for 10
 /// seconds from when a button is tapped:
 ///
-///     class HomeViewModel: ObservableObject {
-///       @Published var episodes: [Episode]?
+/// ```swift
+/// class HomeViewModel: ObservableObject {
+///   @Published var episodes: [Episode]?
 ///
-///       let apiClient: ApiClient
+///   let apiClient: ApiClient
 ///
-///       init(apiClient: ApiClient) {
-///         self.apiClient = apiClient
-///       }
+///   init(apiClient: ApiClient) {
+///     self.apiClient = apiClient
+///   }
 ///
-///       func reloadButtonTapped() {
-///         Just(())
-///           .delay(for: .seconds(10), scheduler: DispatchQueue.main)
-///           .flatMap { apiClient.fetchEpisodes() }
-///           .assign(to: &self.episodes)
-///       }
-///     }
+///   func reloadButtonTapped() {
+///     Just(())
+///       .delay(for: .seconds(10), scheduler: DispatchQueue.main)
+///       .flatMap { apiClient.fetchEpisodes() }
+///       .assign(to: &self.episodes)
+///   }
+/// }
+/// ```
 ///
 /// In order to test this code you would literally need to wait 10 seconds for the publisher to
 /// emit:
 ///
-///     func testViewModel() {
-///       let viewModel = HomeViewModel(apiClient: .mock)
+/// ```swift
+/// func testViewModel() {
+///   let viewModel = HomeViewModel(apiClient: .mock)
 ///
-///       viewModel.reloadButtonTapped()
+///   viewModel.reloadButtonTapped()
 ///
-///       _ = XCTWaiter.wait(for: [XCTestExpectation()], timeout: 10)
+///   _ = XCTWaiter.wait(for: [XCTestExpectation()], timeout: 10)
 ///
-///       XCTAssert(viewModel.episodes, [Episode(id: 42)])
-///     }
+///   XCTAssert(viewModel.episodes, [Episode(id: 42)])
+/// }
+/// ```
 ///
 /// Alternatively, we can explicitly pass a scheduler into the view model initializer so that it
 /// can be controller from the outside:
 ///
-///     class HomeViewModel: ObservableObject {
-///       @Published var episodes: [Episode]?
+/// ```swift
+/// class HomeViewModel: ObservableObject {
+///   @Published var episodes: [Episode]?
 ///
-///       let apiClient: ApiClient
-///       let scheduler: AnySchedulerOf<DispatchQueue>
+///   let apiClient: ApiClient
+///   let scheduler: AnySchedulerOf<DispatchQueue>
 ///
-///       init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
-///         self.apiClient = apiClient
-///         self.scheduler = scheduler
-///       }
+///   init(apiClient: ApiClient, scheduler: AnySchedulerOf<DispatchQueue>) {
+///     self.apiClient = apiClient
+///     self.scheduler = scheduler
+///   }
 ///
-///       func reloadButtonTapped() {
-///         Just(())
-///           .delay(for: .seconds(10), scheduler: self.scheduler)
-///           .flatMap { self.apiClient.fetchEpisodes() }
-///           .assign(to: &self.$episodes)
-///       }
-///     }
+///   func reloadButtonTapped() {
+///     Just(())
+///       .delay(for: .seconds(10), scheduler: self.scheduler)
+///       .flatMap { self.apiClient.fetchEpisodes() }
+///       .assign(to: &self.$episodes)
+///   }
+/// }
+/// ```
 ///
 /// And then in tests use an immediate scheduler:
 ///
-///     func testViewModel() {
-///       let viewModel = HomeViewModel(
-///         apiClient: .mock,
-///         scheduler: .immediate
-///       )
+/// ```swift
+/// func testViewModel() {
+///   let viewModel = HomeViewModel(
+///     apiClient: .mock,
+///     scheduler: .immediate
+///   )
 ///
-///       viewModel.reloadButtonTapped()
+///   viewModel.reloadButtonTapped()
 ///
-///       // No more waiting...
+///   // No more waiting...
 ///
-///       XCTAssert(viewModel.episodes, [Episode(id: 42)])
-///     }
+///   XCTAssert(viewModel.episodes, [Episode(id: 42)])
+/// }
+/// ```
 ///
-/// - Note: This scheduler can _not_ be used to test publishers with more complex timing logic,
-///   like those that use `Debounce`, `Throttle`, or `Timer.Publisher`, and in fact
-///   `ImmediateScheduler` will not schedule this work in a defined way. Use a `TestScheduler`
-///   instead to capture your publisher's timing behavior.
+/// > Note: This scheduler can _not_ be used to test publishers with more complex timing logic,
+/// > like those that use `Debounce`, `Throttle`, or `Timer.Publisher`, and in fact
+/// > `ImmediateScheduler` will not schedule this work in a defined way. Use a `TestScheduler`
+/// > instead to capture your publisher's timing behavior.
 ///
 public struct ImmediateScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
 where
