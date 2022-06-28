@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.5
 
 import PackageDescription
 
@@ -23,13 +23,13 @@ let package = Package(
     .target(
       name: "CombineSchedulers",
       dependencies: [
-        "XCTestDynamicOverlay"
+        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
       ]
     ),
     .testTarget(
       name: "CombineSchedulersTests",
       dependencies: [
-        "CombineSchedulers"
+        "CombineSchedulers",
       ]
     ),
   ]
