@@ -4,7 +4,7 @@ PLATFORM_TVOS = tvOS Simulator,name=Apple TV
 PLATFORM_WATCHOS = watchOS Simulator,name=Apple Watch Series 5 - 44mm
 
 test:
-	swift test --enable-test-discovery
+	swift test
 	xcodebuild test \
 		-scheme combine-schedulers \
 		-destination platform="$(PLATFORM_IOS)"
