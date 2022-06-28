@@ -47,19 +47,21 @@ import XCTestDynamicOverlay
 /// Tapping the favorite button, however, involves no scheduling. This means that a test can be
 /// written with an unimplemented scheduler:
 ///
-///     func testFavoriteButton() {
-///       let viewModel = EpisodeViewModel(
-///         apiClient: .mock,
-///         mainQueue: .unimplemented
-///       )
-///       viewModel.episode = .mock
+/// ```swift
+/// func testFavoriteButton() {
+///   let viewModel = EpisodeViewModel(
+///     apiClient: .mock,
+///     mainQueue: .unimplemented
+///   )
+///   viewModel.episode = .mock
 ///
-///       viewModel.favoriteButtonTapped()
-///       XCTAssert(viewModel.episode?.isFavorite == true)
+///   viewModel.favoriteButtonTapped()
+///   XCTAssert(viewModel.episode?.isFavorite == true)
 ///
-///       viewModel.favoriteButtonTapped()
-///       XCTAssert(viewModel.episode?.isFavorite == false)
-///     }
+///   viewModel.favoriteButtonTapped()
+///   XCTAssert(viewModel.episode?.isFavorite == false)
+/// }
+/// ```
 ///
 /// With `.unimplemented`, this test pretty strongly declares that favoriting an episode does not
 /// need a scheduler to do the job, which means it is reasonable to assume that the feature is

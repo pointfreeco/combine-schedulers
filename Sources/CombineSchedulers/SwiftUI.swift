@@ -9,49 +9,55 @@ extension Scheduler {
   /// pipe its output into a `@Published` field, you may be tempted to use the `.assign(to:)`
   /// operator:
   ///
-  ///     class ViewModel: ObservableObject {
-  ///       @Published var articles: [Article] = []
+  /// ```swift
+  /// class ViewModel: ObservableObject {
+  ///   @Published var articles: [Article] = []
   ///
-  ///       init() {
-  ///         apiClient.loadArticles()
-  ///           .receive(on: DispatchQueue.main)
-  ///           .assign(to: &self.$articles)
-  ///       }
-  ///     }
+  ///   init() {
+  ///     apiClient.loadArticles()
+  ///       .receive(on: DispatchQueue.main)
+  ///       .assign(to: &self.$articles)
+  ///   }
+  /// }
+  /// ```
   ///
   /// However, this prevents you from wrapping the `articles` mutation in `withAnimation` since
   /// that is hidden from you in the `.assign(to:)` operator. In this situation you can simply
   /// use the `.animation` operator on `Scheduler` to transform `DispatchQueue.main` into a
   /// scheduler that performs its work inside `withAnimation`:
   ///
-  ///     class ViewModel: ObservableObject {
-  ///       @Published var articles: [Article] = []
+  /// ```swift
+  /// class ViewModel: ObservableObject {
+  ///   @Published var articles: [Article] = []
   ///
-  ///       init() {
-  ///         apiClient.loadArticles()
-  ///           .receive(on: DispatchQueue.main.animation())
-  ///           .assign(to: &self.$articles)
-  ///       }
-  ///     }
+  ///   init() {
+  ///     apiClient.loadArticles()
+  ///       .receive(on: DispatchQueue.main.animation())
+  ///       .assign(to: &self.$articles)
+  ///   }
+  /// }
+  /// ```
   ///
   /// Another common use case is when you have a Combine publisher made up of many publishers
   /// that have been merged or concatenated. You may want to animate the outputs of each of
   /// those publishers differently:
   ///
-  ///     class ViewModel: ObservableObject {
-  ///       @Published var articles: [Article] = []
+  /// ```swift
+  /// class ViewModel: ObservableObject {
+  ///   @Published var articles: [Article] = []
   ///
-  ///       init() {
-  ///         cachedArticles()
-  ///           // Don't animate cached articles when they load
-  ///           .receive(on: DispatchQueue.main.animation(nil))
-  ///           .append(
-  ///             apiClient.loadArticles()
-  ///               // Animate the fresh articles when they load
-  ///               .receive(on: DispatchQueue.main.animation())
-  ///           )
-  ///       }
-  ///     }
+  ///   init() {
+  ///     cachedArticles()
+  ///       // Don't animate cached articles when they load
+  ///       .receive(on: DispatchQueue.main.animation(nil))
+  ///       .append(
+  ///         apiClient.loadArticles()
+  ///           // Animate the fresh articles when they load
+  ///           .receive(on: DispatchQueue.main.animation())
+  ///       )
+  ///   }
+  /// }
+  /// ```
   ///
   /// - Parameter animation: An animation to be performed.
   /// - Returns: A scheduler that performs an animation when a scheduled action is run.
