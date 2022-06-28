@@ -12,7 +12,7 @@ A few schedulers that make working with Combine more testable and more versatile
   * [`TestScheduler`](#testscheduler)
   * [`ImmediateScheduler`](#immediatescheduler)
   * [Animated schedulers](#animated-schedulers)
-  * [`FailingScheduler`](#failingscheduler)
+  * [`UnimplementedScheduler`](#unimplementedscheduler)
   * [`UIScheduler`](#uischeduler)
   * [`Publishers.Timer`](#publisherstimer)
 * [Installation](#installation)
@@ -307,13 +307,13 @@ self.apiClient.fetchEpisode()
   .assign(to: &self.$episode)
 ```
 
-### `FailingScheduler`
+### `UnimplementedScheduler`
 
 A scheduler that causes a test to fail if it is used.
 
 This scheduler can provide an additional layer of certainty that a tested code path does not require the use of a scheduler.
 
-As a view model becomes more complex, only some of its logic may require a scheduler. When writing unit tests for any logic that does _not_ require a scheduler, one should provide a failing scheduler, instead. This documents, directly in the test, that the feature does not use a scheduler. If it did, or ever does in the future, the test will fail.
+As a view model becomes more complex, only some of its logic may require a scheduler. When writing unit tests for any logic that does _not_ require a scheduler, one should provide an unimplemented scheduler, instead. This documents, directly in the test, that the feature does not use a scheduler. If it did, or ever does in the future, the test will fail.
 
 For example, the following view model has a couple responsibilities:
 
@@ -346,13 +346,13 @@ class EpisodeViewModel: ObservableObject {
 
 The API client delivers the episode on a background queue, so the view model must receive it on its main queue before mutating its state.
 
-Tapping the favorite button, however, involves no scheduling. This means that a test can be written with a failing scheduler:
+Tapping the favorite button, however, involves no scheduling. This means that a test can be written with an unimplemented scheduler:
 
 ```swift
 func testFavoriteButton() {
   let viewModel = EpisodeViewModel(
     apiClient: .mock,
-    mainQueue: .failing
+    mainQueue: .unimplemented
   )
   viewModel.episode = .mock
 
@@ -364,7 +364,7 @@ func testFavoriteButton() {
 }
 ```
 
-With `.failing`, this test strongly declares that favoriting an episode does not need a scheduler to do the job, which means it is reasonable to assume that the feature is simple and does not involve any asynchrony.
+With `.unimplemented`, this test strongly declares that favoriting an episode does not need a scheduler to do the job, which means it is reasonable to assume that the feature is simple and does not involve any asynchrony.
 
 In the future, should favoriting an episode fire off an API request that involves a scheduler, this test will begin to fail, which is a good thing! This will force us to address the complexity that was introduced. Had we used any other scheduler, it would quietly receive this additional work and the test would continue to pass.
 

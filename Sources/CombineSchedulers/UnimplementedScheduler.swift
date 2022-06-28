@@ -8,33 +8,35 @@ import XCTestDynamicOverlay
 /// require the use of a scheduler.
 ///
 /// As a view model becomes more complex, only some of its logic may require a scheduler. When
-/// writing unit tests for any logic that does _not_ require a scheduler, one should provide a
-/// failing scheduler, instead. This documents, directly in the test, that the feature does not
-/// use a scheduler. If it did, or ever does in the future, the test will fail.
+/// writing unit tests for any logic that does _not_ require a scheduler, one should provide an
+/// unimplemented scheduler, instead. This documents, directly in the test, that the feature does
+/// not use a scheduler. If it did, or ever does in the future, the test will fail.
 ///
 /// For example, the following view model has a couple responsibilities:
 ///
-///     class EpisodeViewModel: ObservableObject {
-///       @Published var episode: Episode?
+/// ```swift
+/// class EpisodeViewModel: ObservableObject {
+///   @Published var episode: Episode?
 ///
-///       let apiClient: ApiClient
-///       let mainQueue: AnySchedulerOf<DispatchQueue>
+///   let apiClient: ApiClient
+///   let mainQueue: AnySchedulerOf<DispatchQueue>
 ///
-///       init(apiClient: ApiClient, mainQueue: AnySchedulerOf<DispatchQueue>) {
-///         self.apiClient = apiClient
-///         self.mainQueue = mainQueue
-///       }
+///   init(apiClient: ApiClient, mainQueue: AnySchedulerOf<DispatchQueue>) {
+///     self.apiClient = apiClient
+///     self.mainQueue = mainQueue
+///   }
 ///
-///       func reloadButtonTapped() {
-///         self.apiClient.fetchEpisode()
-///           .receive(on: self.mainQueue)
-///           .assign(to: &self.$episode)
-///       }
+///   func reloadButtonTapped() {
+///     self.apiClient.fetchEpisode()
+///       .receive(on: self.mainQueue)
+///       .assign(to: &self.$episode)
+///   }
 ///
-///       func favoriteButtonTapped() {
-///         self.episode?.isFavorite.toggle()
-///       }
-///     }
+///   func favoriteButtonTapped() {
+///     self.episode?.isFavorite.toggle()
+///   }
+/// }
+/// ```
 ///
 ///   * It lets the user tap a button to refresh some episode data
 ///   * It lets the user toggle if the episode is one of their favorites
@@ -43,12 +45,12 @@ import XCTestDynamicOverlay
 /// on its main queue before mutating its state.
 ///
 /// Tapping the favorite button, however, involves no scheduling. This means that a test can be
-/// written with a failing scheduler:
+/// written with an unimplemented scheduler:
 ///
 ///     func testFavoriteButton() {
 ///       let viewModel = EpisodeViewModel(
 ///         apiClient: .mock,
-///         mainQueue: .failing
+///         mainQueue: .unimplemented
 ///       )
 ///       viewModel.episode = .mock
 ///
@@ -59,15 +61,15 @@ import XCTestDynamicOverlay
 ///       XCTAssert(viewModel.episode?.isFavorite == false)
 ///     }
 ///
-/// With `.failing`, this test pretty strongly declares that favoriting an episode does not need
-/// a scheduler to do the job, which means it is reasonable to assume that the feature is simple
-/// and does not involve any asynchrony.
+/// With `.unimplemented`, this test pretty strongly declares that favoriting an episode does not
+/// need a scheduler to do the job, which means it is reasonable to assume that the feature is
+/// simple and does not involve any asynchrony.
 ///
 /// In the future, should favoriting an episode fire off an API request that involves a scheduler,
 /// this test will begin to fail, which is a good thing! This will force us to address the
 /// complexity that was introduced. Had we used any other scheduler, it would quietly receive this
 /// additional work and the test would continue to pass.
-public struct FailingScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
+public struct UnimplementedScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
 where
   SchedulerTimeType: Strideable,
   SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
@@ -77,7 +79,7 @@ where
     XCTFail(
       """
       \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
-      A failing scheduler was asked its minimum tolerance.
+      An unimplemented scheduler was asked its minimum tolerance.
       """
     )
     return self._minimumTolerance
@@ -87,7 +89,7 @@ where
     XCTFail(
       """
       \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
-      A failing scheduler was asked the current time.
+      An unimplemented scheduler was asked the current time.
       """
     )
     return self._now
@@ -97,11 +99,11 @@ where
   private let _minimumTolerance: SchedulerTimeType.Stride = .zero
   private let _now: SchedulerTimeType
 
-  /// Creates a failing test scheduler with the given date.
+  /// Creates an unimplemented scheduler with the given date.
   ///
   /// - Parameters:
   ///   - prefix: A string that identifies this scheduler and will prefix all failure messages.
-  ///   - now: now: The current date of the failing scheduler.
+  ///   - now: now: The current date of the unimplemented scheduler.
   public init(_ prefix: String = "", now: SchedulerTimeType) {
     self._now = now
     self.prefix = prefix
@@ -111,7 +113,7 @@ where
     XCTFail(
       """
       \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
-      A failing scheduler scheduled an action to run immediately.
+      An unimplemented scheduler scheduled an action to run immediately.
       """
     )
   }
@@ -125,7 +127,7 @@ where
     XCTFail(
       """
       \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
-      A failing scheduler scheduled an action to run later.
+      An unimplemented scheduler scheduled an action to run later.
       """
     )
   }
@@ -140,7 +142,7 @@ where
     XCTFail(
       """
       \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
-      A failing scheduler scheduled an action to run on a timer.
+      An unimplemented scheduler scheduled an action to run on a timer.
       """
     )
     return AnyCancellable {}
@@ -148,50 +150,50 @@ where
 }
 
 extension DispatchQueue {
-  /// A failing scheduler that can substitute itself for a dispatch queue.
-  public static var failing: FailingSchedulerOf<DispatchQueue> {
-    Self.failing("DispatchQueue")
+  /// An unimplemented scheduler that can substitute itself for a dispatch queue.
+  public static var unimplemented: UnimplementedSchedulerOf<DispatchQueue> {
+    Self.unimplemented("DispatchQueue")
   }
 
-  /// A failing scheduler that can substitute itself for a dispatch queue.
+  /// An unimplemented scheduler that can substitute itself for a dispatch queue.
   ///
   /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
   ///   messages.
-  /// - Returns: A failing scheduler.
-  public static func failing(_ prefix: String) -> FailingSchedulerOf<DispatchQueue> {
+  /// - Returns: An unimplemented scheduler.
+  public static func unimplemented(_ prefix: String) -> UnimplementedSchedulerOf<DispatchQueue> {
     // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
     .init(prefix, now: .init(.init(uptimeNanoseconds: 1)))
   }
 }
 
 extension OperationQueue {
-  /// A failing scheduler that can substitute itself for an operation queue.
-  public static var failing: FailingSchedulerOf<OperationQueue> {
-    Self.failing("OperationQueue")
+  /// An unimplemented scheduler that can substitute itself for an operation queue.
+  public static var unimplemented: UnimplementedSchedulerOf<OperationQueue> {
+    Self.unimplemented("OperationQueue")
   }
 
-  /// A failing scheduler that can substitute itself for an operation queue.
+  /// An unimplemented scheduler that can substitute itself for an operation queue.
   ///
   /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
   ///   messages.
-  /// - Returns: A failing scheduler.
-  public static func failing(_ prefix: String) -> FailingSchedulerOf<OperationQueue> {
+  /// - Returns: An unimplemented scheduler.
+  public static func unimplemented(_ prefix: String) -> UnimplementedSchedulerOf<OperationQueue> {
     .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
   }
 }
 
 extension RunLoop {
-  /// A failing scheduler that can substitute itself for a run loop.
-  public static var failing: FailingSchedulerOf<RunLoop> {
-    Self.failing("RunLoop")
+  /// An unimplemented scheduler that can substitute itself for a run loop.
+  public static var unimplemented: UnimplementedSchedulerOf<RunLoop> {
+    Self.unimplemented("RunLoop")
   }
 
-  /// A failing scheduler that can substitute itself for a run loop.
+  /// An unimplemented scheduler that can substitute itself for a run loop.
   ///
   /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
   ///   messages.
-  /// - Returns: A failing scheduler.
-  public static func failing(_ prefix: String) -> FailingSchedulerOf<RunLoop> {
+  /// - Returns: An unimplemented scheduler.
+  public static func unimplemented(_ prefix: String) -> UnimplementedSchedulerOf<RunLoop> {
     .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
   }
 }
@@ -201,18 +203,18 @@ where
   SchedulerTimeType == DispatchQueue.SchedulerTimeType,
   SchedulerOptions == DispatchQueue.SchedulerOptions
 {
-  /// A failing scheduler that can substitute itself for a dispatch queue.
-  public static var failing: Self {
-    DispatchQueue.failing.eraseToAnyScheduler()
+  /// An unimplemented scheduler that can substitute itself for a dispatch queue.
+  public static var unimplemented: Self {
+    DispatchQueue.unimplemented.eraseToAnyScheduler()
   }
 
-  /// A failing scheduler that can substitute itself for a dispatch queue.
+  /// An unimplemented scheduler that can substitute itself for a dispatch queue.
   ///
   /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
   ///   messages.
-  /// - Returns: A failing scheduler.
-  public static func failing(_ prefix: String) -> Self {
-    DispatchQueue.failing(prefix).eraseToAnyScheduler()
+  /// - Returns: An unimplemented scheduler.
+  public static func unimplemented(_ prefix: String) -> Self {
+    DispatchQueue.unimplemented(prefix).eraseToAnyScheduler()
   }
 }
 
@@ -221,18 +223,18 @@ where
   SchedulerTimeType == OperationQueue.SchedulerTimeType,
   SchedulerOptions == OperationQueue.SchedulerOptions
 {
-  /// A failing scheduler that can substitute itself for an operation queue.
-  public static var failing: Self {
-    OperationQueue.failing.eraseToAnyScheduler()
+  /// An unimplemented scheduler that can substitute itself for an operation queue.
+  public static var unimplemented: Self {
+    OperationQueue.unimplemented.eraseToAnyScheduler()
   }
 
-  /// A failing scheduler that can substitute itself for an operation queue.
+  /// An unimplemented scheduler that can substitute itself for an operation queue.
   ///
   /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
   ///   messages.
-  /// - Returns: A failing scheduler.
-  public static func failing(_ prefix: String) -> Self {
-    OperationQueue.failing(prefix).eraseToAnyScheduler()
+  /// - Returns: An unimplemented scheduler.
+  public static func unimplemented(_ prefix: String) -> Self {
+    OperationQueue.unimplemented(prefix).eraseToAnyScheduler()
   }
 }
 
@@ -241,23 +243,23 @@ where
   SchedulerTimeType == RunLoop.SchedulerTimeType,
   SchedulerOptions == RunLoop.SchedulerOptions
 {
-  /// A failing scheduler that can substitute itself for a run loop.
-  public static var failing: Self {
-    RunLoop.failing.eraseToAnyScheduler()
+  /// An unimplemented scheduler that can substitute itself for a run loop.
+  public static var unimplemented: Self {
+    RunLoop.unimplemented.eraseToAnyScheduler()
   }
 
-  /// A failing scheduler that can substitute itself for a run loop.
+  /// An unimplemented scheduler that can substitute itself for a run loop.
   ///
   /// - Parameter prefix: A string that identifies this scheduler and will prefix all failure
   ///   messages.
-  /// - Returns: A failing scheduler.
-  public static func failing(_ prefix: String) -> Self {
-    RunLoop.failing(prefix).eraseToAnyScheduler()
+  /// - Returns: An unimplemented scheduler.
+  public static func unimplemented(_ prefix: String) -> Self {
+    RunLoop.unimplemented(prefix).eraseToAnyScheduler()
   }
 }
 
-/// A convenience type to specify a `FailingScheduler` by the scheduler it wraps rather than by
-/// the time type and options type.
-public typealias FailingSchedulerOf<Scheduler> = FailingScheduler<
+/// A convenience type to specify an `UnimplementedScheduler` by the scheduler it wraps rather than
+/// by the time type and options type.
+public typealias UnimplementedSchedulerOf<Scheduler> = UnimplementedScheduler<
   Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
 > where Scheduler: Combine.Scheduler
