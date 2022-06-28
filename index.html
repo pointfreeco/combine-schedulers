@@ -68,15 +68,6 @@ many types of schedulers without needing to actually introduce a generic to your
 
 </dd>
 <dt class="structure">
-    <a href="/combine-schedulers/FailingScheduler" title="structure - FailingScheduler">
-        Failing​Scheduler
-    </a>
-</dt>
-<dd>
-    <p>A scheduler that causes the current XCTest test case to fail if it is used.</p>
-
-</dd>
-<dt class="structure">
     <a href="/combine-schedulers/ImmediateScheduler" title="structure - ImmediateScheduler">
         Immediate​Scheduler
     </a>
@@ -92,6 +83,15 @@ many types of schedulers without needing to actually introduce a generic to your
 </dt>
 <dd>
     <p>A scheduler that executes its work on the main queue as soon as possible.</p>
+
+</dd>
+<dt class="structure">
+    <a href="/combine-schedulers/UnimplementedScheduler" title="structure - UnimplementedScheduler">
+        Unimplemented​Scheduler
+    </a>
+</dt>
+<dd>
+    <p>A scheduler that causes the current XCTest test case to fail if it is used.</p>
 
 </dd>
         </dl>
@@ -110,16 +110,6 @@ time type and options type.</p>
 
 </dd>
 <dt class="typealias">
-    <a href="/combine-schedulers/FailingSchedulerOf" title="typealias - FailingSchedulerOf">
-        Failing​Scheduler​Of
-    </a>
-</dt>
-<dd>
-    <p>A convenience type to specify a <code>FailingScheduler</code> by the scheduler it wraps rather than by
-the time type and options type.</p>
-
-</dd>
-<dt class="typealias">
     <a href="/combine-schedulers/ImmediateSchedulerOf" title="typealias - ImmediateSchedulerOf">
         Immediate​Scheduler​Of
     </a>
@@ -130,6 +120,22 @@ the time type and options type.</p>
 
 </dd>
 <dt class="typealias">
+    <a href="/combine-schedulers/FailingScheduler" title="typealias - FailingScheduler">
+        Failing​Scheduler
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="typealias">
+    <a href="/combine-schedulers/FailingSchedulerOf" title="typealias - FailingSchedulerOf">
+        Failing​Scheduler​Of
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="typealias">
     <a href="/combine-schedulers/TestSchedulerOf" title="typealias - TestSchedulerOf">
         Test​Scheduler​Of
     </a>
@@ -137,6 +143,16 @@ the time type and options type.</p>
 <dd>
     <p>A convenience type to specify a <code>TestScheduler</code> by the scheduler it wraps rather than by the
 time type and options type.</p>
+
+</dd>
+<dt class="typealias">
+    <a href="/combine-schedulers/UnimplementedSchedulerOf" title="typealias - UnimplementedSchedulerOf">
+        Unimplemented​Scheduler​Of
+    </a>
+</dt>
+<dd>
+    <p>A convenience type to specify an <code>UnimplementedScheduler</code> by the scheduler it wraps rather than
+by the time type and options type.</p>
 
 </dd>
         </dl>
@@ -167,7 +183,7 @@ time type and options type.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2021-09-21T14:38:25+0000">September 21, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+    Generated on <time datetime="2022-06-28T19:38:46+0000">June 28, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>

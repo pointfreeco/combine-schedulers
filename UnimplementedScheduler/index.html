@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CombineSchedulers - UnimplementedScheduler</title>
+    <link rel="stylesheet" type="text/css" href="/combine-schedulers/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/combine-schedulers/">
+            <strong>
+                CombineSchedulers
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#relationships">Relationships</a><ul><li><a href="#relationships">Conforms To</a></li></ul></li><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#unimplementedscheduler.init(_:now:)">init(_:​now:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#unimplementedscheduler.minimumtolerance">minimum​Tolerance</a></li><li class="variable"><a href="#unimplementedscheduler.now">now</a></li><li class="variable"><a href="#unimplementedscheduler.prefix">prefix</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#unimplementedscheduler.schedule(options:_:)">schedule(options:​_:​)</a></li><li class="function"><a href="#unimplementedscheduler.schedule(after:tolerance:options:_:)">schedule(after:​tolerance:​options:​_:​)</a></li><li class="function"><a href="#unimplementedscheduler.schedule(after:interval:tolerance:options:_:)">schedule(after:​interval:​tolerance:​options:​_:​)</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Structure</small>
+    <code class="name">Unimplemented​Scheduler</code>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">UnimplementedScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span>
+<span class="keyword">where</span>
+  <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>,
+  <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A scheduler that causes the current XCTest test case to fail if it is used.</p>
+
+</div>
+<div class="discussion">
+    <p>This scheduler can provide an additional layer of certainty that a tested code path does not
+require the use of a scheduler.</p>
+
+<p>As a view model becomes more complex, only some of its logic may require a scheduler. When
+writing unit tests for any logic that does <em>not</em> require a scheduler, one should provide an
+unimplemented scheduler, instead. This documents, directly in the test, that the feature does
+not use a scheduler. If it did, or ever does in the future, the test will fail.</p>
+
+<p>For example, the following view model has a couple responsibilities:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">class</span> <span class="type">EpisodeViewModel</span>: <span class="type">ObservableObject</span> {
+  <span class="attribute">@</span><span class="type">Published</span> <span class="keyword">var</span> <span class="variable">episode</span>: <span class="type">Episode</span>?
+
+  <span class="keyword">let</span> <span class="variable">apiClient</span>: <span class="type">ApiClient</span>
+  <span class="keyword">let</span> <span class="variable">mainQueue</span>: <a href="/combine-schedulers/AnySchedulerOf"><span class="type">AnySchedulerOf</span></a>&lt;<span class="type">DispatchQueue</span>&gt;
+
+  <span class="keyword">init</span>(<span class="variable">apiClient</span>: <span class="type">ApiClient</span>, <span class="variable">mainQueue</span>: <a href="/combine-schedulers/AnySchedulerOf"><span class="type">AnySchedulerOf</span></a>&lt;<span class="type">DispatchQueue</span>&gt;) {
+    <span class="keyword">self</span>.<span class="variable">apiClient</span> = <span class="variable">apiClient</span>
+    <span class="keyword">self</span>.<span class="variable">mainQueue</span> = <span class="variable">mainQueue</span>
+  }
+
+  <span class="keyword">func</span> <span class="function">reloadButtonTapped</span>() {
+    <span class="keyword">self</span>.<span class="variable">apiClient</span>.<span class="variable">fetchEpisode</span>()
+      .<span class="variable">receive</span>(<span class="variable">on</span>: <span class="keyword">self</span>.<span class="variable">mainQueue</span>)
+      .<span class="variable">assign</span>(<span class="variable">to</span>: &amp;<span class="keyword">self</span>.<span class="variable">$episode</span>)
+  }
+
+  <span class="keyword">func</span> <span class="function">favoriteButtonTapped</span>() {
+    <span class="keyword">self</span>.<span class="variable">episode</span>?.<span class="variable">isFavorite</span>.<span class="variable">toggle</span>()
+  }
+}
+</code></pre></body></html>
+<ul>
+<li>
+<p>It lets the user tap a button to refresh some episode data</p>
+</li>
+<li>
+<p>It lets the user toggle if the episode is one of their favorites</p>
+</li>
+</ul>
+
+<p>The API client delivers the episode on a background queue, so the view model must receive it
+on its main queue before mutating its state.</p>
+
+<p>Tapping the favorite button, however, involves no scheduling. This means that a test can be
+written with an unimplemented scheduler:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">func</span> <span class="function">testFavoriteButton</span>() {
+  <span class="keyword">let</span> <span class="variable">viewModel</span> = <span class="variable">EpisodeViewModel</span>(
+    <span class="variable">apiClient</span>: .<span class="variable">mock</span>,
+    <span class="variable">mainQueue</span>: .<span class="variable">unimplemented</span>
+  )
+  <span class="variable">viewModel</span>.<span class="variable">episode</span> = .<span class="variable">mock</span>
+
+  <span class="variable">viewModel</span>.<span class="variable">favoriteButtonTapped</span>()
+  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="variable">episode</span>?.<span class="variable">isFavorite</span> == <span class="keyword">true</span>)
+
+  <span class="variable">viewModel</span>.<span class="variable">favoriteButtonTapped</span>()
+  <span class="variable">XCTAssert</span>(<span class="variable">viewModel</span>.<span class="variable">episode</span>?.<span class="variable">isFavorite</span> == <span class="keyword">false</span>)
+}
+</code></pre></body></html>
+<p>With <code>.unimplemented</code>, this test pretty strongly declares that favoriting an episode does not
+need a scheduler to do the job, which means it is reasonable to assume that the feature is
+simple and does not involve any asynchrony.</p>
+
+<p>In the future, should favoriting an episode fire off an API request that involves a scheduler,
+this test will begin to fail, which is a good thing! This will force us to address the
+complexity that was introduced. Had we used any other scheduler, it would quietly receive this
+additional work and the test would continue to pass.</p>
+
+</div>
+<section id="relationships">
+    <h2 hidden>Relationships</h2>
+        <figure>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: %23 Pages: 1 -->
+<svg width="872pt" height="116pt"
+ viewBox="0.00 0.00 872.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
+<title>%23</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-112 868,-112 868,4 -4,4"/>
+<!-- UnimplementedScheduler -->
+<g id="node1" class="node structure current">
+<title>UnimplementedScheduler</title>
+<g id="a_node1"><a xlink:href="/combine-schedulers/UnimplementedScheduler" xlink:title="UnimplementedScheduler">
+<path fill="none" stroke="#000000" stroke-width="3" d="M528,-108C528,-108 336,-108 336,-108 330,-108 324,-102 324,-96 324,-96 324,-84 324,-84 324,-78 330,-72 336,-72 336,-72 528,-72 528,-72 534,-72 540,-78 540,-84 540,-84 540,-96 540,-96 540,-102 534,-108 528,-108"/>
+<text text-anchor="middle" x="432" y="-86.3" font-family="Menlo" font-size="14.00" fill="#000000">UnimplementedScheduler</text>
+</a>
+</g>
+</g>
+<!-- Scheduler -->
+<g id="node2" class="node unknown">
+<title>Scheduler</title>
+<path fill="none" stroke="#000000" d="M528,-36C528,-36 336,-36 336,-36 330,-36 324,-30 324,-24 324,-24 324,-12 324,-12 324,-6 330,0 336,0 336,0 528,0 528,0 534,0 540,-6 540,-12 540,-12 540,-24 540,-24 540,-30 534,-36 528,-36"/>
+<text text-anchor="middle" x="432" y="-14.3" font-family="Menlo" font-size="14.00" fill="#000000">Scheduler</text>
+</g>
+<!-- UnimplementedScheduler&#45;&gt;Scheduler -->
+<g id="edge1" class="edge conformsTo">
+<title>UnimplementedScheduler&#45;&gt;Scheduler</title>
+<path fill="none" stroke="#000000" d="M432,-71.8314C432,-64.131 432,-54.9743 432,-46.4166"/>
+<polygon fill="#000000" stroke="#000000" points="435.5001,-46.4132 432,-36.4133 428.5001,-46.4133 435.5001,-46.4132"/>
+</g>
+</g>
+</svg>
+
+
+    <figcaption hidden>Inheritance graph for UnimplementedScheduler.</figcaption>
+</figure>
+        <h3>Conforms To</h3>
+<dl>
+    <dt class="unknown"><code>Scheduler</code></dt>
+</dl>
+</section>
+    <section id="initializers">
+        <h2>Initializers</h2>
+
+        <div role="article" class="initializer" id="unimplementedscheduler.init(_:now:)">
+    <h3>
+        <code><a href="#unimplementedscheduler.init(_:now:)">init(_:​now:​)</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">init</span>(<span class="keyword">_</span> <span class="variable">prefix</span>: <span class="type">String</span> = <span class="string literal">"</span><span class="string literal"/><span class="string literal">"</span>, <span class="variable">now</span>: <span class="type">SchedulerTimeType</span>)  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Creates an unimplemented scheduler with the given date.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>prefix</th>
+    <td><code class="type">String</code></td>
+    <td><p>A string that identifies this scheduler and will prefix all failure messages.</p>
+</td>
+</tr>
+<tr>
+    <th>now</th>
+    <td><code class="type">Scheduler​Time​Type</code></td>
+    <td><p>now: The current date of the unimplemented scheduler.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="unimplementedscheduler.minimumtolerance">
+    <h3>
+        <code><a href="#unimplementedscheduler.minimumtolerance">minimum​Tolerance</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">minimumTolerance</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>  </body></html></code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="unimplementedscheduler.now">
+    <h3>
+        <code><a href="#unimplementedscheduler.now">now</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">now</span>: <span class="type">SchedulerTimeType</span>  </body></html></code></pre>
+</div>
+</div>
+<div role="article" class="variable" id="unimplementedscheduler.prefix">
+    <h3>
+        <code><a href="#unimplementedscheduler.prefix">prefix</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">let</span> <span class="variable">prefix</span>: <span class="type">String</span></body></html></code></pre>
+</div>
+</div>
+    </section>
+    <section id="methods">
+        <h2>Methods</h2>
+
+        <div role="article" class="function" id="unimplementedscheduler.schedule(options:_:)">
+    <h3>
+        <code><a href="#unimplementedscheduler.schedule(options:_:)">schedule(options:​_:​)</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>)  </body></html></code></pre>
+</div>
+</div>
+<div role="article" class="function" id="unimplementedscheduler.schedule(after:tolerance:options:_:)">
+    <h3>
+        <code><a href="#unimplementedscheduler.schedule(after:tolerance:options:_:)">schedule(after:​tolerance:​options:​_:​)</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
+    <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
+    <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+    <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+    <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
+  )  </body></html></code></pre>
+</div>
+</div>
+<div role="article" class="function" id="unimplementedscheduler.schedule(after:interval:tolerance:options:_:)">
+    <h3>
+        <code><a href="#unimplementedscheduler.schedule(after:interval:tolerance:options:_:)">schedule(after:​interval:​tolerance:​options:​_:​)</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
+    <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
+    <span class="variable">interval</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+    <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+    <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+    <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
+  ) -&gt; <span class="type">Cancellable</span>  </body></html></code></pre>
+</div>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2022-06-28T19:38:46+0000">June 28, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>
