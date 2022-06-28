@@ -23,13 +23,13 @@ let package = Package(
     .target(
       name: "CombineSchedulers",
       dependencies: [
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
+        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
       ]
     ),
     .testTarget(
       name: "CombineSchedulersTests",
       dependencies: [
-        "CombineSchedulers",
+        "CombineSchedulers"
       ]
     ),
   ]
