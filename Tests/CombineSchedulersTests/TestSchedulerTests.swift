@@ -69,22 +69,6 @@ final class CombineSchedulerTests: XCTestCase {
     XCTAssertEqual(value, 1)
   }
 
-  func testDelay0Advance_Async() async {
-    let scheduler = DispatchQueue.test
-
-    var value: Int?
-    Just(1)
-      .delay(for: 0, scheduler: scheduler)
-      .sink { value = $0 }
-      .store(in: &self.cancellables)
-
-    XCTAssertEqual(value, nil)
-
-    await scheduler.advance()
-
-    XCTAssertEqual(value, 1)
-  }
-
   func testSubscribeOnAdvance() {
     let scheduler = DispatchQueue.test
 
@@ -165,5 +149,60 @@ final class CombineSchedulerTests: XCTestCase {
     XCTAssertEqual(tickCount, 2)
     await testScheduler.advance(by: .seconds(1_000))
     XCTAssertEqual(tickCount, 1_002)
+  }
+
+  func testDelay0Advance_Async() async {
+    let scheduler = DispatchQueue.test
+
+    var value: Int?
+    Just(1)
+      .delay(for: 0, scheduler: scheduler)
+      .sink { value = $0 }
+      .store(in: &self.cancellables)
+
+    XCTAssertEqual(value, nil)
+
+    await scheduler.advance()
+
+    XCTAssertEqual(value, 1)
+  }
+
+  func testAsyncSleep() async throws {
+    let testScheduler = DispatchQueue.test
+
+    let task = Task {
+      try await testScheduler.sleep(for: .seconds(1))
+    }
+
+    await testScheduler.advance(by: .seconds(1))
+    try await task.value
+  }
+
+  func testAsyncTimer() async throws {
+    let testScheduler = DispatchQueue.test
+
+    let task = Task {
+      await testScheduler.timer(interval: .seconds(1))
+        .prefix(10)
+        .reduce(into: 0) { accum, _ in accum += 1 }
+    }
+
+    await testScheduler.advance(by: .seconds(10))
+    let count = await task.value
+    XCTAssertEqual(count, 10)
+  }
+
+  func testAsyncRun() async throws {
+    let testScheduler = DispatchQueue.test
+
+    let task = Task {
+      await testScheduler.timer(interval: .seconds(1))
+        .prefix(10)
+        .reduce(into: 0) { accum, _ in accum += 1 }
+    }
+
+    await testScheduler.run()
+    let count = await task.value
+    XCTAssertEqual(count, 10)
   }
 }
