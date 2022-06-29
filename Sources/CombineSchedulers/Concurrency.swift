@@ -1,4 +1,8 @@
-@preconcurrency import Combine
+#if swift(>=5.6)
+  @preconcurrency import Combine
+#else
+  import Combine
+#endif
 
 extension Scheduler {
   /// Suspends the current task for at least the given duration.
@@ -86,6 +90,8 @@ extension Scheduler {
       continuation.onTermination = { _ in
         cancellable.cancel()
       }
+      // NB: This explicit cast is needed to work around a compiler bug in Swift 5.5.2
+      as @Sendable (AsyncStream<SchedulerTimeType>.Continuation.Termination) -> Void
     }
   }
 
