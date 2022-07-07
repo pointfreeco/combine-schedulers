@@ -1,5 +1,5 @@
 #if swift(>=5.6)
-  @preconcurrency import Combine
+  import Combine
 #else
   import Combine
 #endif
