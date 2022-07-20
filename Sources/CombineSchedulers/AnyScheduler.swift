@@ -299,30 +299,32 @@ where
   }
 }
 
-/// A convenience to specify a scheduler with the same `SchedulerTimeType` as a concrete scheduler.
-///
-/// This is most useful for injecting a scheduler into some code, such as a SwiftUI
-/// `ObservableObject`, or [Composable Architecture][tca-gh] environment. For example, a view model
-/// that needs time-based scheduling can accept an `any SchedulerOf` as a parameter and then use
-/// the scheduler to sleep for a duration of time:
-///
-/// ```swift
-/// class ViewModel: ObservableObject {
-///   @Published var message: String?
-///
-///   let mainQueue: any SchedulerOf<DispatchQueue>
-///   init(mainQueue: any SchedulerOf<DispatchQueue>) {
-///     self.mainQueue = mainQueue
-///   }
-///
-///   func onAppear() {
-///     Task {
-///       try await self.mainQueue.sleep(for: .seconds(1))
-///       self.message = "Welcome!
-///     }
-///   }
-/// }
-/// ```
-///
-/// [tca-gh]: http://github.com/pointfreeco/swift-composable-architecture
-public typealias SchedulerOf<S: Scheduler> = Scheduler<S.SchedulerTimeType>
+#if swift(>=5.7)
+  /// A convenience to specify a scheduler with the same `SchedulerTimeType` as a concrete scheduler.
+  ///
+  /// This is most useful for injecting a scheduler into some code, such as a SwiftUI
+  /// `ObservableObject`, or [Composable Architecture][tca-gh] environment. For example, a view model
+  /// that needs time-based scheduling can accept an `any SchedulerOf` as a parameter and then use
+  /// the scheduler to sleep for a duration of time:
+  ///
+  /// ```swift
+  /// class ViewModel: ObservableObject {
+  ///   @Published var message: String?
+  ///
+  ///   let mainQueue: any SchedulerOf<DispatchQueue>
+  ///   init(mainQueue: any SchedulerOf<DispatchQueue>) {
+  ///     self.mainQueue = mainQueue
+  ///   }
+  ///
+  ///   func onAppear() {
+  ///     Task {
+  ///       try await self.mainQueue.sleep(for: .seconds(1))
+  ///       self.message = "Welcome!
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// [tca-gh]: http://github.com/pointfreeco/swift-composable-architecture
+  public typealias SchedulerOf<S: Scheduler> = Scheduler<S.SchedulerTimeType>
+#endif
