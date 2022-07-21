@@ -1,36 +1,53 @@
 import Combine
-import CombineSchedulers
 import XCTest
+import CombineSchedulers
 
 final class CombineSchedulerTests: XCTestCase {
   var cancellables: Set<AnyCancellable> = []
+  var scheduler: TestSchedulerOf<DispatchQueue>!
+  var startTime: DispatchTime?
 
-  func testAdvance() {
-    let scheduler = DispatchQueue.test
+  override func setUpWithError() throws {
+    self.scheduler = DispatchQueue.test
+    self.startTime = DispatchTime(
+      uptimeNanoseconds: self.scheduler.now.dispatchTime.uptimeNanoseconds)
+  }
 
+  override func tearDownWithError() throws {
+    self.startTime = nil
+  }
+
+  func testAdvance() throws {
     var value: Int?
     Just(1)
       .delay(for: 1, scheduler: scheduler)
       .sink { value = $0 }
       .store(in: &self.cancellables)
 
+    assertSchedulerAdvanced(millis: 0)
+
+    scheduler.advance(by: .milliseconds(250))
+    assertSchedulerAdvanced(millis: 250)
     XCTAssertEqual(value, nil)
 
     scheduler.advance(by: .milliseconds(250))
-
+    assertSchedulerAdvanced(millis: 500)
     XCTAssertEqual(value, nil)
 
     scheduler.advance(by: .milliseconds(250))
-
+    assertSchedulerAdvanced(millis: 750)
     XCTAssertEqual(value, nil)
 
     scheduler.advance(by: .milliseconds(250))
-
-    XCTAssertEqual(value, nil)
-
-    scheduler.advance(by: .milliseconds(250))
-
+    assertSchedulerAdvanced(millis: 1000)
     XCTAssertEqual(value, 1)
+  }
+
+  func assertSchedulerAdvanced(millis: Int) {
+    let expected = startTime?.advanced(by: .milliseconds(millis)).uptimeNanoseconds ?? 0
+    let actual = scheduler.now.dispatchTime.uptimeNanoseconds
+
+    XCTAssertEqual(expected, actual)
   }
 
   func testRunScheduler() {
