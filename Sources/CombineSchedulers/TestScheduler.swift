@@ -116,22 +116,29 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
 
     while self.lock.sync(operation: { self.now }) <= finalDate {
       await Task.megaYield()
-      self.lock.lock()
-      self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
+      let `return` = {
+        self.lock.lock()
+        self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
 
-      guard
-        let next = self.scheduled.first,
-        finalDate >= next.date
-      else {
-        self.now = finalDate
+        guard
+          let next = self.scheduled.first,
+          finalDate >= next.date
+        else {
+          self.now = finalDate
+          self.lock.unlock()
+          return true
+        }
+
+        self.now = next.date
+        self.scheduled.removeFirst()
         self.lock.unlock()
+        next.action()
+        return false
+      }()
+
+      if `return` {
         return
       }
-
-      self.now = next.date
-      self.scheduled.removeFirst()
-      self.lock.unlock()
-      next.action()
     }
   }
 
