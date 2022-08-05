@@ -7,11 +7,15 @@ import Foundation
 /// > Important: This type is considered "soft" deprecated as of iOS 16 and Swift 5.7. Any place you
 /// > currently use:
 /// >
-/// >     let mainQueue: AnySchedulerOf<DispatchQueue>
+/// > ```swift
+/// > let mainQueue: AnySchedulerOf<DispatchQueue>
+/// > ```
 /// >
 /// > …you can now use:
 /// >
-/// >     let mainQueue: any SchedulerOf<DispatchQueue>
+/// > ```swift
+/// > let mainQueue: any SchedulerOf<DispatchQueue>
+/// > ```
 /// >
 /// > Someday in the future it will be officially deprecated and later removed.
 ///
