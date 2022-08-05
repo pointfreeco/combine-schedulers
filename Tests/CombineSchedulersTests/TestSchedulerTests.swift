@@ -32,7 +32,7 @@ final class CombineSchedulerTests: XCTestCase {
 
     XCTAssertEqual(value, 1)
   }
-  
+
   func testAdvanceTo() {
     let scheduler = DispatchQueue.test
 
@@ -160,7 +160,7 @@ final class CombineSchedulerTests: XCTestCase {
     testScheduler.advance(by: 2)
     XCTAssertEqual(values, [1, 42, 42, 1, 42])
   }
-  
+
   func testRunLoopAdvanceTo() throws {
     let by = RunLoop.test
     let to = RunLoop.test
@@ -174,7 +174,7 @@ final class CombineSchedulerTests: XCTestCase {
     to.advance(to: 2.5)
     XCTAssertEqual(by.now, to.now)
   }
-  
+
   func testOperationQueueAdvanceTo() throws {
     let by = OperationQueue.test
     let to = OperationQueue.test
