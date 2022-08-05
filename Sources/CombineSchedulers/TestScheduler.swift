@@ -209,3 +209,36 @@ extension RunLoop {
 public typealias TestSchedulerOf<Scheduler> = TestScheduler<
   Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
 > where Scheduler: Combine.Scheduler
+
+/// Advances the scheduler to the given time.
+///
+/// - Parameter stride: A stride, representing distant from the first moment of the time
+public extension TestScheduler where SchedulerTimeType == DispatchQueue.SchedulerTimeType {
+  func advance(to stride: SchedulerTimeType.Stride) {
+    let finalDate: SchedulerTimeType = .init(.init(uptimeNanoseconds: UInt64(stride.magnitude) + 1))
+    let stride = self.now.distance(to: finalDate)
+    advance(by: stride)
+  }
+}
+
+public extension TestScheduler where SchedulerTimeType == RunLoop.SchedulerTimeType {
+  /// Advances the scheduler to the given time.
+  ///
+  /// - Parameter stride: A stride, representing distant from the first moment of the time
+  func advance(to stride: SchedulerTimeType.Stride) {
+    let finalDate: SchedulerTimeType = .init(Date(timeIntervalSince1970: stride.timeInterval))
+    let stride = self.now.distance(to: finalDate)
+    advance(by: stride)
+  }
+}
+
+/// Advances the scheduler to the given time.
+///
+/// - Parameter stride: A stride, representing distant from the first moment of the time
+public extension TestScheduler where SchedulerTimeType == OperationQueue.SchedulerTimeType {
+  func advance(to stride: SchedulerTimeType.Stride) {
+    let finalDate: SchedulerTimeType = .init(Date(timeIntervalSince1970: stride.timeInterval))
+    let stride = self.now.distance(to: finalDate)
+    advance(by: stride)
+  }
+}
