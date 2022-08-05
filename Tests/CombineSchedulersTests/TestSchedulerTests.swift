@@ -35,6 +35,7 @@ final class CombineSchedulerTests: XCTestCase {
 
   func testAdvanceTo() {
     let scheduler = DispatchQueue.test
+    let start = scheduler.now
 
     var value: Int?
     Just(1)
@@ -44,19 +45,19 @@ final class CombineSchedulerTests: XCTestCase {
 
     XCTAssertEqual(value, nil)
 
-    scheduler.advance(to: .milliseconds(250))
+    scheduler.advance(to: start.advanced(by: .milliseconds(250)))
 
     XCTAssertEqual(value, nil)
 
-    scheduler.advance(to: .milliseconds(500))
+    scheduler.advance(to: start.advanced(by: .milliseconds(500)))
 
     XCTAssertEqual(value, nil)
 
-    scheduler.advance(to: .milliseconds(750))
+    scheduler.advance(to: start.advanced(by: .milliseconds(750)))
 
     XCTAssertEqual(value, nil)
 
-    scheduler.advance(to: .milliseconds(1000))
+    scheduler.advance(to: start.advanced(by: .milliseconds(1000)))
 
     XCTAssertEqual(value, 1)
   }
@@ -159,33 +160,5 @@ final class CombineSchedulerTests: XCTestCase {
     XCTAssertEqual(values, [1, 42])
     testScheduler.advance(by: 2)
     XCTAssertEqual(values, [1, 42, 42, 1, 42])
-  }
-
-  func testRunLoopAdvanceTo() throws {
-    let by = RunLoop.test
-    let to = RunLoop.test
-    by.advance(by: 1)
-    to.advance(to: 1)
-    XCTAssertEqual(by.now, to.now)
-    by.advance(by: 1)
-    to.advance(to: 2)
-    XCTAssertEqual(by.now, to.now)
-    by.advance(by: 0.5)
-    to.advance(to: 2.5)
-    XCTAssertEqual(by.now, to.now)
-  }
-
-  func testOperationQueueAdvanceTo() throws {
-    let by = OperationQueue.test
-    let to = OperationQueue.test
-    by.advance(by: 1)
-    to.advance(to: 1)
-    XCTAssertEqual(by.now, to.now)
-    by.advance(by: 1)
-    to.advance(to: 2)
-    XCTAssertEqual(by.now, to.now)
-    by.advance(by: 0.5)
-    to.advance(to: 2.5)
-    XCTAssertEqual(by.now, to.now)
   }
 }

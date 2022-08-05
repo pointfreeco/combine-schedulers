@@ -82,11 +82,11 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
 
   /// Advances the scheduler by the given stride.
   ///
-  /// - Parameter stride: A stride. By default this argument is `.zero`, which does not advance the
+  /// - Parameter duration: A stride. By default this argument is `.zero`, which does not advance the
   ///   scheduler's time but does cause the scheduler to execute any units of work that are waiting
   ///   to be performed for right now.
-  public func advance(by stride: SchedulerTimeType.Stride = .zero) {
-    let finalDate = self.now.advanced(by: stride)
+  public func advance(by duration: SchedulerTimeType.Stride = .zero) {
+    let finalDate = self.now.advanced(by: duration)
 
     while self.now <= finalDate {
       self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
@@ -106,33 +106,43 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
     }
   }
 
+  /// Advances the scheduler to the given time.
+  ///
+  /// - Parameter instant: An instant in time to advance to.
+  public func advance(to instant: SchedulerTimeType) {
+    self.advance(by: self.now.distance(to: instant))
+  }
+
   /// Runs the scheduler until it has no scheduled items left.
   ///
   /// This method is useful for proving exhaustively that your publisher eventually completes
   /// and does not run forever. For example, the following code will run an infinite loop forever
   /// because the timer never finishes:
   ///
-  ///     let scheduler = DispatchQueue.test
-  ///     Publishers.Timer(every: .seconds(1), scheduler: scheduler)
-  ///       .autoconnect()
-  ///       .sink { _ in print($0) }
-  ///       .store(in: &cancellables)
+  /// ```swift
+  /// let scheduler = DispatchQueue.test
+  /// Publishers.Timer(every: .seconds(1), scheduler: scheduler)
+  ///   .autoconnect()
+  ///   .sink { _ in print($0) }
+  ///   .store(in: &cancellables)
   ///
-  ///     scheduler.run() // Will never complete
+  /// scheduler.run() // Will never complete
+  /// ```
   ///
   /// If you wanted to make sure that this publisher eventually completes you would need to
   /// chain on another operator that completes it when a certain condition is met. This can be
   /// done in many ways, such as using `prefix`:
   ///
-  ///     let scheduler = DispatchQueue.test
-  ///     Publishers.Timer(every: .seconds(1), scheduler: scheduler)
-  ///       .autoconnect()
-  ///       .prefix(3)
-  ///       .sink { _ in print($0) }
-  ///       .store(in: &cancellables)
+  /// ```swift
+  /// let scheduler = DispatchQueue.test
+  /// Publishers.Timer(every: .seconds(1), scheduler: scheduler)
+  ///   .autoconnect()
+  ///   .prefix(3)
+  ///   .sink { _ in print($0) }
+  ///   .store(in: &cancellables)
   ///
-  ///     scheduler.run() // Prints 3 times and completes.
-  ///
+  /// scheduler.run() // Prints 3 times and completes.
+  /// ```
   public func run() {
     while let date = self.scheduled.first?.date {
       self.advance(by: self.now.distance(to: date))
@@ -209,36 +219,3 @@ extension RunLoop {
 public typealias TestSchedulerOf<Scheduler> = TestScheduler<
   Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
 > where Scheduler: Combine.Scheduler
-
-/// Advances the scheduler to the given time.
-///
-/// - Parameter stride: A stride, representing distant from the first moment of the time
-extension TestScheduler where SchedulerTimeType == DispatchQueue.SchedulerTimeType {
-  public func advance(to stride: SchedulerTimeType.Stride) {
-    let finalDate: SchedulerTimeType = .init(.init(uptimeNanoseconds: UInt64(stride.magnitude) + 1))
-    let stride = self.now.distance(to: finalDate)
-    advance(by: stride)
-  }
-}
-
-extension TestScheduler where SchedulerTimeType == RunLoop.SchedulerTimeType {
-  /// Advances the scheduler to the given time.
-  ///
-  /// - Parameter stride: A stride, representing distant from the first moment of the time
-  public func advance(to stride: SchedulerTimeType.Stride) {
-    let finalDate: SchedulerTimeType = .init(Date(timeIntervalSince1970: stride.timeInterval))
-    let stride = self.now.distance(to: finalDate)
-    advance(by: stride)
-  }
-}
-
-/// Advances the scheduler to the given time.
-///
-/// - Parameter stride: A stride, representing distant from the first moment of the time
-extension TestScheduler where SchedulerTimeType == OperationQueue.SchedulerTimeType {
-  public func advance(to stride: SchedulerTimeType.Stride) {
-    let finalDate: SchedulerTimeType = .init(Date(timeIntervalSince1970: stride.timeInterval))
-    let stride = self.now.distance(to: finalDate)
-    advance(by: stride)
-  }
-}
