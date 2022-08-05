@@ -33,6 +33,35 @@ final class CombineSchedulerTests: XCTestCase {
     XCTAssertEqual(value, 1)
   }
 
+  func testAdvanceTo() {
+    let scheduler = DispatchQueue.test
+    let start = scheduler.now
+
+    var value: Int?
+    Just(1)
+      .delay(for: 1, scheduler: scheduler)
+      .sink { value = $0 }
+      .store(in: &self.cancellables)
+
+    XCTAssertEqual(value, nil)
+
+    scheduler.advance(to: start.advanced(by: .milliseconds(250)))
+
+    XCTAssertEqual(value, nil)
+
+    scheduler.advance(to: start.advanced(by: .milliseconds(500)))
+
+    XCTAssertEqual(value, nil)
+
+    scheduler.advance(to: start.advanced(by: .milliseconds(750)))
+
+    XCTAssertEqual(value, nil)
+
+    scheduler.advance(to: start.advanced(by: .milliseconds(1000)))
+
+    XCTAssertEqual(value, 1)
+  }
+
   func testRunScheduler() {
     let scheduler = DispatchQueue.test
 
