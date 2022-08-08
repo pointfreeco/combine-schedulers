@@ -25,7 +25,8 @@ extension Scheduler {
     options: SchedulerOptions? = nil
   ) async throws {
     try Task.checkCancellation()
-    _ = await self
+    _ =
+      await self
       .timer(interval: duration, tolerance: tolerance, options: options)
       .first { _ in true }
     try Task.checkCancellation()
@@ -87,11 +88,12 @@ extension Scheduler {
       ) {
         continuation.yield(self.now)
       }
-      continuation.onTermination = { _ in
-        cancellable.cancel()
-      }
-      // NB: This explicit cast is needed to work around a compiler bug in Swift 5.5.2
-      as @Sendable (AsyncStream<SchedulerTimeType>.Continuation.Termination) -> Void
+      continuation.onTermination =
+        { _ in
+          cancellable.cancel()
+        }
+        // NB: This explicit cast is needed to work around a compiler bug in Swift 5.5.2
+        as @Sendable (AsyncStream<SchedulerTimeType>.Continuation.Termination) -> Void
     }
   }
 
