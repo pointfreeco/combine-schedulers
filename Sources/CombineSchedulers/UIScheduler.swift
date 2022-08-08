@@ -15,7 +15,7 @@
   /// This scheduler can be useful for situations where you need work executed as quickly as
   /// possible on the main thread, and for which a thread hop would be problematic, such as when
   /// performing animations.
-  public struct UIScheduler: Scheduler {
+  public struct UIScheduler: Scheduler, Sendable {
     public typealias SchedulerOptions = Never
     public typealias SchedulerTimeType = DispatchQueue.SchedulerTimeType
 
@@ -56,10 +56,11 @@
       )
     }
 
-    private init() { _ = setSpecific }
+    private init() {
+      DispatchQueue.main.setSpecific(key: key, value: value)
+    }
   }
 
   private let key = DispatchSpecificKey<UInt8>()
   private let value: UInt8 = 0
-  private var setSpecific: () = { DispatchQueue.main.setSpecific(key: key, value: value) }()
 #endif

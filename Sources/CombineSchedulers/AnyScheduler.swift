@@ -4,6 +4,21 @@ import Foundation
 /// A type-erasing wrapper for the `Scheduler` protocol, which can be useful for being generic over
 /// many types of schedulers without needing to actually introduce a generic to your code.
 ///
+/// > Important: This type is considered "soft" deprecated as of iOS 16 and Swift 5.7. Any place you
+/// > currently use:
+/// >
+/// > ```swift
+/// > let mainQueue: AnySchedulerOf<DispatchQueue>
+/// > ```
+/// >
+/// > …you can now use:
+/// >
+/// > ```swift
+/// > let mainQueue: any SchedulerOf<DispatchQueue>
+/// > ```
+/// >
+/// > Someday in the future it will be officially deprecated and later removed.
+///
 /// This type is useful for times that you want to be able to customize the scheduler used in some
 /// code from the outside, but you don't want to introduce a generic to make it customizable. For
 /// example, suppose you have a view model `ObservableObject` that performs an API request when a
@@ -130,7 +145,7 @@ import Foundation
 /// in classes, functions, etc. without needing to introduce a generic, which can help simplify
 /// the code and reduce implementation details from leaking out.
 ///
-public struct AnyScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
+public struct AnyScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler, @unchecked Sendable
 where
   SchedulerTimeType: Strideable,
   SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
@@ -287,3 +302,33 @@ where
     RunLoop.main.eraseToAnyScheduler()
   }
 }
+
+#if swift(>=5.7)
+  /// A convenience to specify a scheduler with the same `SchedulerTimeType` as a concrete scheduler.
+  ///
+  /// This is most useful for injecting a scheduler into some code, such as a SwiftUI
+  /// `ObservableObject`, or [Composable Architecture][tca-gh] environment. For example, a view model
+  /// that needs time-based scheduling can accept an `any SchedulerOf` as a parameter and then use
+  /// the scheduler to sleep for a duration of time:
+  ///
+  /// ```swift
+  /// class ViewModel: ObservableObject {
+  ///   @Published var message: String?
+  ///
+  ///   let mainQueue: any SchedulerOf<DispatchQueue>
+  ///   init(mainQueue: any SchedulerOf<DispatchQueue>) {
+  ///     self.mainQueue = mainQueue
+  ///   }
+  ///
+  ///   func onAppear() {
+  ///     Task {
+  ///       try await self.mainQueue.sleep(for: .seconds(1))
+  ///       self.message = "Welcome!
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// [tca-gh]: http://github.com/pointfreeco/swift-composable-architecture
+  public typealias SchedulerOf<S: Scheduler> = Scheduler<S.SchedulerTimeType>
+#endif

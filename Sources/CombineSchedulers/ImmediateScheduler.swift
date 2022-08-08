@@ -138,6 +138,9 @@ where
   }
 }
 
+extension ImmediateScheduler: Sendable
+where SchedulerTimeType: Sendable, SchedulerTimeType.Stride: Sendable {}
+
 extension DispatchQueue {
   /// An immediate scheduler that can substitute itself for a dispatch queue.
   public static var immediate: ImmediateSchedulerOf<DispatchQueue> {

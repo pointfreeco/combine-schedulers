@@ -51,33 +51,36 @@
     /// It can be used much like Foundation's timer, except you specify a scheduler rather than a
     /// run loop:
     ///
-    ///     Publishers.Timer(every: .seconds(1), scheduler: DispatchQueue.main)
-    ///       .autoconnect()
-    ///       .sink { print("Timer", $0) }
+    /// ```swift
+    /// Publishers.Timer(every: .seconds(1), scheduler: DispatchQueue.main)
+    ///   .autoconnect()
+    ///   .sink { print("Timer", $0) }
+    /// ```
     ///
     /// But more importantly, you can use it with `TestScheduler` so that any Combine code you write
     /// involving timers becomes more testable. This shows how we can easily simulate the idea of
     /// moving time forward 1,000 seconds in a timer:
     ///
-    ///     let scheduler = DispatchQueue.test
-    ///     var output: [Int] = []
+    /// ```swift
+    /// let scheduler = DispatchQueue.test
+    /// var output: [Int] = []
     ///
-    ///     Publishers.Timer(every: 1, scheduler: scheduler)
-    ///       .autoconnect()
-    ///       .sink { _ in output.append(output.count) }
-    ///       .store(in: &self.cancellables)
+    /// Publishers.Timer(every: 1, scheduler: scheduler)
+    ///   .autoconnect()
+    ///   .sink { _ in output.append(output.count) }
+    ///   .store(in: &self.cancellables)
     ///
-    ///     XCTAssertEqual(output, [])
+    /// XCTAssertEqual(output, [])
     ///
-    ///     scheduler.advance(by: 1)
-    ///     XCTAssertEqual(output, [0])
+    /// scheduler.advance(by: 1)
+    /// XCTAssertEqual(output, [0])
     ///
-    ///     scheduler.advance(by: 1)
-    ///     XCTAssertEqual(output, [0, 1])
+    /// scheduler.advance(by: 1)
+    /// XCTAssertEqual(output, [0, 1])
     ///
-    ///     scheduler.advance(by: 1_000)
-    ///     XCTAssertEqual(output, Array(0...1_001))
-    ///
+    /// scheduler.advance(by: 1_000)
+    /// XCTAssertEqual(output, Array(0...1_001))
+    /// ```
     public final class Timer<S: Scheduler>: ConnectablePublisher {
       public typealias Output = S.SchedulerTimeType
       public typealias Failure = Never

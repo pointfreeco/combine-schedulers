@@ -65,10 +65,12 @@ import Foundation
 /// but this technique can be used to test any publisher that involves Combine's asynchronous
 /// operations.
 ///
-public final class TestScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
+public final class TestScheduler<SchedulerTimeType, SchedulerOptions>:
+  Scheduler, @unchecked Sendable
 where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
 
   private var lastSequence: UInt = 0
+  private let lock = NSRecursiveLock()
   public let minimumTolerance: SchedulerTimeType.Stride = .zero
   public private(set) var now: SchedulerTimeType
   private var scheduled: [(sequence: UInt, date: SchedulerTimeType, action: () -> Void)] = []
@@ -82,13 +84,14 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
 
   /// Advances the scheduler by the given stride.
   ///
-  /// - Parameter duration: A stride. By default this argument is `.zero`, which does not advance the
-  ///   scheduler's time but does cause the scheduler to execute any units of work that are waiting
-  ///   to be performed for right now.
+  /// - Parameter duration: A stride. By default this argument is `.zero`, which does not advance
+  ///   the scheduler's time but does cause the scheduler to execute any units of work that are
+  ///   waiting to be performed for right now.
   public func advance(by duration: SchedulerTimeType.Stride = .zero) {
-    let finalDate = self.now.advanced(by: duration)
+    let finalDate = self.lock.sync { self.now.advanced(by: duration) }
 
-    while self.now <= finalDate {
+    while self.lock.sync(operation: { self.now }) <= finalDate {
+      self.lock.lock()
       self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
 
       guard
@@ -96,21 +99,66 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
         finalDate >= next.date
       else {
         self.now = finalDate
+        self.lock.unlock()
         return
       }
 
       self.now = next.date
-
       self.scheduled.removeFirst()
+      self.lock.unlock()
       next.action()
     }
   }
 
-  /// Advances the scheduler to the given time.
+  /// Advances the scheduler by the given stride.
+  ///
+  /// - Parameter duration: A stride. By default this argument is `.zero`, which does not advance
+  ///   the scheduler's time but does cause the scheduler to execute any units of work that are
+  ///   waiting to be performed for right now.
+  @MainActor
+  public func advance(by duration: SchedulerTimeType.Stride = .zero) async {
+    let finalDate = self.lock.sync { self.now.advanced(by: duration) }
+
+    while self.lock.sync(operation: { self.now }) <= finalDate {
+      await Task.megaYield()
+      let `return` = { () -> Bool in
+        self.lock.lock()
+        self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
+
+        guard
+          let next = self.scheduled.first,
+          finalDate >= next.date
+        else {
+          self.now = finalDate
+          self.lock.unlock()
+          return true
+        }
+
+        self.now = next.date
+        self.scheduled.removeFirst()
+        self.lock.unlock()
+        next.action()
+        return false
+      }()
+
+      if `return` {
+        return
+      }
+    }
+  }
+
+  /// Advances the scheduler to the given instant.
   ///
   /// - Parameter instant: An instant in time to advance to.
   public func advance(to instant: SchedulerTimeType) {
     self.advance(by: self.now.distance(to: instant))
+  }
+
+  /// Advances the scheduler to the given instant.
+  ///
+  /// - Parameter instant: An instant in time to advance to.
+  public func advance(to instant: SchedulerTimeType) async {
+    await self.advance(by: self.now.distance(to: instant))
   }
 
   /// Runs the scheduler until it has no scheduled items left.
@@ -144,8 +192,16 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
   /// scheduler.run() // Prints 3 times and completes.
   /// ```
   public func run() {
-    while let date = self.scheduled.first?.date {
-      self.advance(by: self.now.distance(to: date))
+    while let date = self.lock.sync(operation: { self.scheduled.first?.date }) {
+      self.advance(by: self.lock.sync { self.now.distance(to: date) })
+    }
+  }
+
+  @MainActor
+  public func run() async {
+    await Task.megaYield()
+    while let date = self.lock.sync(operation: { self.scheduled.first?.date }) {
+      await self.advance(by: self.lock.sync { self.now.distance(to: date) })
     }
   }
 
@@ -156,20 +212,22 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
     options _: SchedulerOptions?,
     _ action: @escaping () -> Void
   ) -> Cancellable {
-    let sequence = self.nextSequence()
+    let sequence = self.lock.sync { self.nextSequence() }
 
     func scheduleAction(for date: SchedulerTimeType) -> () -> Void {
       return { [weak self] in
         let nextDate = date.advanced(by: interval)
-        self?.scheduled.append((sequence, nextDate, scheduleAction(for: nextDate)))
+        self?.lock.sync {
+          self?.scheduled.append((sequence, nextDate, scheduleAction(for: nextDate)))
+        }
         action()
       }
     }
 
-    self.scheduled.append((sequence, date, scheduleAction(for: date)))
+    self.lock.sync { self.scheduled.append((sequence, date, scheduleAction(for: date))) }
 
     return AnyCancellable { [weak self] in
-      self?.scheduled.removeAll(where: { $0.sequence == sequence })
+      self?.lock.sync { self?.scheduled.removeAll(where: { $0.sequence == sequence }) }
     }
   }
 
@@ -179,11 +237,11 @@ where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeInte
     options _: SchedulerOptions?,
     _ action: @escaping () -> Void
   ) {
-    self.scheduled.append((self.nextSequence(), date, action))
+    self.lock.sync { self.scheduled.append((self.nextSequence(), date, action)) }
   }
 
   public func schedule(options _: SchedulerOptions?, _ action: @escaping () -> Void) {
-    self.scheduled.append((self.nextSequence(), self.now, action))
+    self.lock.sync { self.scheduled.append((self.nextSequence(), self.now, action)) }
   }
 
   private func nextSequence() -> UInt {
@@ -219,3 +277,11 @@ extension RunLoop {
 public typealias TestSchedulerOf<Scheduler> = TestScheduler<
   Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
 > where Scheduler: Combine.Scheduler
+
+extension Task where Success == Failure, Failure == Never {
+  static func megaYield(count: Int = 3) async {
+    for _ in 1...count {
+      await Task<Void, Never>.detached(priority: .low) { await Task.yield() }.value
+    }
+  }
+}
