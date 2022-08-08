@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CombineSchedulers - UnimplementedSchedulerOf</title>
+    <title>CombineSchedulers - schedule(options:_:)</title>
     <link rel="stylesheet" type="text/css" href="/combine-schedulers/all.css" media="all" />
 </head>
 <body>
@@ -32,19 +32,12 @@
     <main>
         <article>
             <h1>
-    <small>Typealias</small>
-    <span class="name">Unimplemented​Scheduler​Of</span>
+<small>Function</small>
+<span class="name">schedule(options:​_:​)</span>
 </h1>
 
 <div class="declaration">
-<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">UnimplementedSchedulerOf</span>&lt;<span class="variable">Scheduler</span>&gt; = <a href="/combine-schedulers/UnimplementedScheduler"><span class="type">UnimplementedScheduler</span></a>&lt;
-  <span class="type">Scheduler</span>.<span class="type">SchedulerTimeType</span>, <span class="type">Scheduler</span>.<span class="type">SchedulerOptions</span>
-&gt; <span class="keyword">where</span> <span class="type">Scheduler</span>: <span class="type">Combine</span>.<span class="type">Scheduler</span></body></html></code></pre>
-</div>
-<div class="summary" role="doc-abstract">
-    <p>A convenience type to specify an <code>UnimplementedScheduler</code> by the scheduler it wraps rather than
-by the time type and options type.</p>
-
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(<span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?, <span class="keyword">_</span> <span class="variable">action</span>: <span class="attribute">@</span><span class="attribute">escaping</span> () -&gt; <span class="type">Void</span>)  </body></html></code></pre>
 </div>
         </article>
     </main>

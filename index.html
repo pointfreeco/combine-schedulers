@@ -25,7 +25,7 @@
     <nav>
         <div class="wrapper">
             <h2>On This Page</h2>
-            <ol><li><a href="#classes">Classes</a></li><li><a href="#structures">Structures</a></li><li><a href="#typealiases">Typealiases</a></li><li><a href="#extensions">Extensions</a></li></ol>
+            <ol><li><a href="#classes">Classes</a></li><li><a href="#structures">Structures</a></li><li><a href="#typealiases">Typealiases</a></li><li><a href="#functions">Functions</a></li><li><a href="#variables">Variables</a></li><li><a href="#extensions">Extensions</a></li></ol>
         </div>
     </nav>
 
@@ -35,15 +35,6 @@
         <h2>Classes</h2>
         <dl>
             <dt class="class">
-    <a href="/combine-schedulers/TestScheduler" title="class - TestScheduler">
-        Test​Scheduler
-    </a>
-</dt>
-<dd>
-    <p>A scheduler whose current time and execution can be controlled in a deterministic manner.</p>
-
-</dd>
-<dt class="class">
     <a href="/combine-schedulers/Publishers_Timer" title="class - Publishers.Timer">
         Publishers.​Timer
     </a>
@@ -110,6 +101,15 @@ time type and options type.</p>
 
 </dd>
 <dt class="typealias">
+    <a href="/combine-schedulers/SchedulerOf" title="typealias - SchedulerOf">
+        Scheduler​Of
+    </a>
+</dt>
+<dd>
+    <p>A convenience to specify a scheduler with the same <code>SchedulerTimeType</code> as a concrete scheduler.</p>
+
+</dd>
+<dt class="typealias">
     <a href="/combine-schedulers/ImmediateSchedulerOf" title="typealias - ImmediateSchedulerOf">
         Immediate​Scheduler​Of
     </a>
@@ -157,6 +157,145 @@ by the time type and options type.</p>
 </dd>
         </dl>
     </section>
+    <section id="functions">
+        <h2>Functions</h2>
+        <dl>
+            <dt class="function">
+    <a href="/combine-schedulers/sleep(for_tolerance_options_)" title="function - sleep(for:tolerance:options:)">
+        sleep(for:​tolerance:​options:​)
+    </a>
+</dt>
+<dd>
+    <p>Suspends the current task for at least the given duration.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/sleep(until_tolerance_options_)" title="function - sleep(until:tolerance:options:)">
+        sleep(until:​tolerance:​options:​)
+    </a>
+</dt>
+<dd>
+    <p>Suspend task execution until a given deadline within a tolerance.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/timer(interval_tolerance_options_)" title="function - timer(interval:tolerance:options:)">
+        timer(interval:​tolerance:​options:​)
+    </a>
+</dt>
+<dd>
+    <p>Returns a stream that repeatedly yields the current time of the scheduler on a given interval.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/measure(__)" title="function - measure(_:)">
+        measure(_:​)
+    </a>
+</dt>
+<dd>
+    <p>Measure the elapsed time to execute a closure.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/advance(by_)" title="function - advance(by:)">
+        advance(by:​)
+    </a>
+</dt>
+<dd>
+    <p>Advances the scheduler by the given stride.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/advance(by_)" title="function - advance(by:)">
+        advance(by:​)
+    </a>
+</dt>
+<dd>
+    <p>Advances the scheduler by the given stride.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/advance(to_)" title="function - advance(to:)">
+        advance(to:​)
+    </a>
+</dt>
+<dd>
+    <p>Advances the scheduler to the given instant.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/advance(to_)" title="function - advance(to:)">
+        advance(to:​)
+    </a>
+</dt>
+<dd>
+    <p>Advances the scheduler to the given instant.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/run()" title="function - run()">
+        run()
+    </a>
+</dt>
+<dd>
+    <p>Runs the scheduler until it has no scheduled items left.</p>
+
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/run()" title="function - run()">
+        run()
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/schedule(after_interval_tolerance_options___)" title="function - schedule(after:interval:tolerance:options:_:)">
+        schedule(after:​interval:​tolerance:​options:​_:​)
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/schedule(after_tolerance_options___)" title="function - schedule(after:tolerance:options:_:)">
+        schedule(after:​tolerance:​options:​_:​)
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="function">
+    <a href="/combine-schedulers/schedule(options___)" title="function - schedule(options:_:)">
+        schedule(options:​_:​)
+    </a>
+</dt>
+<dd>
+    
+</dd>
+        </dl>
+    </section>
+    <section id="variables">
+        <h2>Variables</h2>
+        <dl>
+            <dt class="variable">
+    <a href="/combine-schedulers/minimumTolerance" title="variable - minimumTolerance">
+        minimum​Tolerance
+    </a>
+</dt>
+<dd>
+    
+</dd>
+<dt class="variable">
+    <a href="/combine-schedulers/now" title="variable - now">
+        now
+    </a>
+</dt>
+<dd>
+    
+</dd>
+        </dl>
+    </section>
 <section id="extensions">
     <h2>Extensions</h2>
     <dl>
@@ -183,7 +322,7 @@ by the time type and options type.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2022-06-28T19:38:46+0000">June 28, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+    Generated on <time datetime="2022-08-08T04:49:27+0000">August 8, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>

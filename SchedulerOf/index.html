@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CombineSchedulers - SchedulerOf</title>
+    <link rel="stylesheet" type="text/css" href="/combine-schedulers/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/combine-schedulers/">
+            <strong>
+                CombineSchedulers
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol/>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Typealias</small>
+    <span class="name">Scheduler​Of</span>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">typealias</span> <span class="variable">SchedulerOf</span>&lt;<span class="variable">S</span>: <span class="type">Scheduler</span>&gt; = <span class="type">Scheduler</span>&lt;<span class="type">S</span>.<span class="type">SchedulerTimeType</span>&gt;</body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A convenience to specify a scheduler with the same <code>SchedulerTimeType</code> as a concrete scheduler.</p>
+
+</div>
+<div class="discussion">
+    <p>This is most useful for injecting a scheduler into some code, such as a SwiftUI
+<code>ObservableObject</code>, or <a href="http://github.com/pointfreeco/swift-composable-architecture">Composable Architecture</a> environment. For example, a view model
+that needs time-based scheduling can accept an <code>any SchedulerOf</code> as a parameter and then use
+the scheduler to sleep for a duration of time:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">class</span> <span class="type">ViewModel</span>: <span class="type">ObservableObject</span> {
+  <span class="attribute">@</span><span class="type">Published</span> <span class="keyword">var</span> <span class="variable">message</span>: <span class="type">String</span>?
+
+  <span class="keyword">let</span> <span class="variable">mainQueue</span>: <span class="type">any</span> <span class="variable">SchedulerOf</span>&lt;<span class="variable">DispatchQueue</span>&gt;
+  <span class="keyword">init</span>(<span class="variable">mainQueue</span>: <span class="type">any</span> <span class="type">SchedulerOf</span>&lt;<span class="type">DispatchQueue</span>&gt;) {
+    <span class="keyword">self</span>.<span class="variable">mainQueue</span> = <span class="variable">mainQueue</span>
+  }
+
+  <span class="keyword">func</span> <span class="function">onAppear</span>() {
+    <span class="variable">Task</span> {
+      <span class="keyword">try</span> <span class="variable">await</span> <span class="keyword">self</span>.<span class="variable">mainQueue</span>.<span class="variable">sleep</span>(<span class="variable">for</span>: .<span class="variable">seconds</span>(<span class="number literal">1</span>))
+      <span class="keyword">self</span>.<span class="variable">message</span> = <span class="string literal">"Welcome!</span>
+    }
+  }
+}
+</code></pre></body></html>
+</div>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2022-08-08T04:49:27+0000">August 8, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>

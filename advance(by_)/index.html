@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CombineSchedulers - advance(by:)</title>
+    <link rel="stylesheet" type="text/css" href="/combine-schedulers/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/combine-schedulers/">
+            <strong>
+                CombineSchedulers
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol/>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+<small>Function</small>
+<span class="name">advance(by:​)</span>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">advance</span>(<span class="variable">by</span> <span class="variable">duration</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span> = .<span class="variable">zero</span>)  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Advances the scheduler by the given stride.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>duration</th>
+    <td><code class="type">Scheduler​Time​Type.​Stride</code></td>
+    <td><p>A stride. By default this argument is <code>.zero</code>, which does not advance the scheduler's time but does cause the scheduler to execute any units of work that are waiting to be performed for right now.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="attribute">@</span><span class="type">MainActor</span>
+  <span class="keyword">public</span> <span class="keyword">func</span> <span class="function">advance</span>(<span class="variable">by</span> <span class="variable">duration</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span> = .<span class="variable">zero</span>) </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Advances the scheduler by the given stride.</p>
+
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>duration</th>
+    <td><code class="type">Scheduler​Time​Type.​Stride</code></td>
+    <td><p>A stride. By default this argument is <code>.zero</code>, which does not advance the scheduler's time but does cause the scheduler to execute any units of work that are waiting to be performed for right now.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2022-08-08T04:49:26+0000">August 8, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>

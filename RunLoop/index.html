@@ -25,7 +25,7 @@
     <nav>
         <div class="wrapper">
             <h2>On This Page</h2>
-            <ol><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#runloop.failing">failing</a></li><li class="variable"><a href="#runloop.test">test</a></li><li class="variable"><a href="#runloop.immediate">immediate</a></li><li class="variable"><a href="#runloop.unimplemented">unimplemented</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#runloop.failing(_:)">failing(_:​)</a></li><li class="function"><a href="#runloop.unimplemented(_:)">unimplemented(_:​)</a></li></ul></li></ol>
+            <ol><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#runloop.immediate">immediate</a></li><li class="variable"><a href="#runloop.unimplemented">unimplemented</a></li><li class="variable"><a href="#runloop.test">test</a></li><li class="variable"><a href="#runloop.failing">failing</a></li></ul></li><li><a href="#methods">Methods</a><ul><li class="function"><a href="#runloop.unimplemented(_:)">unimplemented(_:​)</a></li><li class="function"><a href="#runloop.failing(_:)">failing(_:​)</a></li></ul></li></ol>
         </div>
     </nav>
 
@@ -38,31 +38,7 @@
     <section id="properties">
         <h2>Properties</h2>
 
-        <div role="article" class="variable" id="runloop.failing">
-    <h3>
-        <code><a href="#runloop.failing">failing</a></code>
-    </h3>
-    <div class="declaration">
-<pre class="highlight"><code><html><body><span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">iOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
-  <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">macOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
-  <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">tvOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
-  <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">watchOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
-  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> <span class="variable">failing</span>: <span class="type">UnimplementedSchedulerOf</span>&lt;<span class="type">RunLoop</span>&gt;  </body></html></code></pre>
-</div>
-</div>
-<div role="article" class="variable" id="runloop.test">
-    <h3>
-        <code><a href="#runloop.test">test</a></code>
-    </h3>
-    <div class="declaration">
-<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> <span class="variable">test</span>: <span class="type">TestSchedulerOf</span>&lt;<span class="type">RunLoop</span>&gt;  </body></html></code></pre>
-</div>
-<div class="summary" role="doc-abstract">
-    <p>A test scheduler of run loops.</p>
-
-</div>
-</div>
-<div role="article" class="variable" id="runloop.immediate">
+        <div role="article" class="variable" id="runloop.immediate">
     <h3>
         <code><a href="#runloop.immediate">immediate</a></code>
     </h3>
@@ -86,23 +62,35 @@
 
 </div>
 </div>
-    </section>
-    <section id="methods">
-        <h2>Methods</h2>
-
-        <div role="article" class="function" id="runloop.failing(_:)">
+<div role="article" class="variable" id="runloop.test">
     <h3>
-        <code><a href="#runloop.failing(_:)">failing(_:​)</a></code>
+        <code><a href="#runloop.test">test</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> <span class="variable">test</span>: <span class="type">TestSchedulerOf</span>&lt;<span class="type">RunLoop</span>&gt;  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A test scheduler of run loops.</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="runloop.failing">
+    <h3>
+        <code><a href="#runloop.failing">failing</a></code>
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><html><body><span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">iOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
   <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">macOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
   <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">tvOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
   <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">watchOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
-  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">failing</span>(<span class="keyword">_</span> <span class="variable">prefix</span>: <span class="type">String</span>) -&gt; <span class="type">UnimplementedSchedulerOf</span>&lt;<span class="type">RunLoop</span>&gt;  </body></html></code></pre>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> <span class="variable">failing</span>: <span class="type">UnimplementedSchedulerOf</span>&lt;<span class="type">RunLoop</span>&gt;  </body></html></code></pre>
 </div>
 </div>
-<div role="article" class="function" id="runloop.unimplemented(_:)">
+    </section>
+    <section id="methods">
+        <h2>Methods</h2>
+
+        <div role="article" class="function" id="runloop.unimplemented(_:)">
     <h3>
         <code><a href="#runloop.unimplemented(_:)">unimplemented(_:​)</a></code>
     </h3>
@@ -136,13 +124,25 @@
   <p>An unimplemented scheduler.</p>
 
 </div>
+<div role="article" class="function" id="runloop.failing(_:)">
+    <h3>
+        <code><a href="#runloop.failing(_:)">failing(_:​)</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">iOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
+  <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">macOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
+  <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">tvOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
+  <span class="attribute">@</span><span class="attribute">available</span>(<span class="variable">watchOS</span>, <span class="variable">deprecated</span>: <span class="number literal">9999.0</span>, <span class="variable">renamed</span>: <span class="string literal">"unimplemented"</span>)
+  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">func</span> <span class="function">failing</span>(<span class="keyword">_</span> <span class="variable">prefix</span>: <span class="type">String</span>) -&gt; <span class="type">UnimplementedSchedulerOf</span>&lt;<span class="type">RunLoop</span>&gt;  </body></html></code></pre>
+</div>
+</div>
     </section>
         </article>
     </main>
 
     <footer>
         <p>
-    Generated on <time datetime="2022-06-28T19:38:46+0000">June 28, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+    Generated on <time datetime="2022-08-08T04:49:26+0000">August 8, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>
