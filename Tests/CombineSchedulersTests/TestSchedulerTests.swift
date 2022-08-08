@@ -2,6 +2,7 @@ import Combine
 import CombineSchedulers
 import XCTest
 
+@MainActor
 final class CombineSchedulerTests: XCTestCase {
   var cancellables: Set<AnyCancellable> = []
 
