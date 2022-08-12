@@ -38,9 +38,9 @@
 
 <div class="declaration">
 <pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">UnimplementedScheduler</span>&lt;<span class="variable">SchedulerTimeType</span>, <span class="variable">SchedulerOptions</span>&gt;: <span class="type">Scheduler</span>
-<span class="keyword">where</span>
-  <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>,
-  <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></body></html></code></pre>
+  <span class="keyword">where</span>
+    <span class="type">SchedulerTimeType</span>: <span class="type">Strideable</span>,
+    <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>: <span class="type">SchedulerTimeIntervalConvertible</span></body></html></code></pre>
 </div>
 <div class="summary" role="doc-abstract">
     <p>A scheduler that causes the current XCTest test case to fail if it is used.</p>
@@ -250,11 +250,11 @@ additional work and the test would continue to pass.</p>
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
-    <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
-    <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
-    <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
-    <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
-  )  </body></html></code></pre>
+      <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
+      <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+      <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
+    )  </body></html></code></pre>
 </div>
 </div>
 <div role="article" class="function" id="unimplementedscheduler.schedule(after:interval:tolerance:options:_:)">
@@ -263,12 +263,12 @@ additional work and the test would continue to pass.</p>
     </h3>
     <div class="declaration">
 <pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">func</span> <span class="function">schedule</span>(
-    <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
-    <span class="variable">interval</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
-    <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
-    <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
-    <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
-  ) -&gt; <span class="type">Cancellable</span>  </body></html></code></pre>
+      <span class="variable">after</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>,
+      <span class="variable">interval</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">tolerance</span> <span class="keyword">_</span>: <span class="type">SchedulerTimeType</span>.<span class="type">Stride</span>,
+      <span class="variable">options</span> <span class="keyword">_</span>: <span class="type">SchedulerOptions</span>?,
+      <span class="keyword">_</span> <span class="variable">action</span>: () -&gt; <span class="type">Void</span>
+    ) -&gt; <span class="type">Cancellable</span>  </body></html></code></pre>
 </div>
 </div>
     </section>
@@ -280,7 +280,7 @@ additional work and the test would continue to pass.</p>
 
     <footer>
         <p>
-    Generated on <time datetime="2022-08-08T04:49:27+0000">August 8, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+    Generated on <time datetime="2022-08-12T01:30:15+0000">August 12, 2022</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
 </p>
     </footer>
 </body>
