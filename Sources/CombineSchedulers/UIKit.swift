@@ -1,4 +1,4 @@
-#if canImport(UIKit) && !os(watchOS)
+#if canImport(UIKit) && !os(watchOS) && canImport(Combine)
   import Combine
   import UIKit
 
