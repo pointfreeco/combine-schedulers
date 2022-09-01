@@ -76,7 +76,7 @@
       tolerance: SchedulerTimeType.Stride = .zero,
       options: SchedulerOptions? = nil
     ) -> AsyncStream<SchedulerTimeType> {
-      .init { continuation in
+      AsyncStream { continuation in
         let cancellable = self.schedule(
           after: self.now.advanced(by: interval),
           interval: interval,
@@ -91,6 +91,67 @@
           }
           // NB: This explicit cast is needed to work around a compiler bug in Swift 5.5.2
           as @Sendable (AsyncStream<SchedulerTimeType>.Continuation.Termination) -> Void
+      }
+    }
+
+    /// Performs the action at the next possible opportunity.
+    public func schedule(
+      options: SchedulerOptions? = nil,
+      _ action: @escaping () -> Void
+    ) async throws {
+      try await self.schedule(
+        after: self.now,
+        tolerance: .zero,
+        options: options,action
+      )
+    }
+
+    /// Performs the action at some time after the specified date.
+    public func schedule(
+      after date: SchedulerTimeType,
+      tolerance: SchedulerTimeType.Stride,
+      options: SchedulerOptions? = nil,
+      _ action: @escaping () -> Void
+    ) async throws {
+      try Task.checkCancellation()
+      _ =
+        await self
+        .schedule(
+          after: date,
+          interval: .seconds(.max),
+          tolerance: tolerance,
+          options: options,
+          action
+        )
+        .first { _ in true }
+      try Task.checkCancellation()
+    }
+
+    /// Performs the action at some time after the specified date, at the
+    /// specified frequency, taking into account tolerance if possible.
+    public func schedule(
+      after date: SchedulerTimeType,
+      interval: SchedulerTimeType.Stride,
+      tolerance: SchedulerTimeType.Stride,
+      options: SchedulerOptions?,
+      _ action: @escaping () -> Void
+    ) -> AsyncStream<Void> {
+      AsyncStream { continuation in
+        let cancellable = self.schedule(
+          after: self.now.advanced(by: interval),
+          interval: interval,
+          tolerance: tolerance,
+          options: options
+        ) {
+          action()
+          continuation.yield()
+        }
+        continuation.onTermination =
+          { _ in
+            cancellable.cancel()
+          }
+          // NB: This explicit cast is needed to work around a compiler bug in Swift 5.5.2
+          as @Sendable (AsyncStream<Void>.Continuation.Termination) -> Void
       }
     }
 
