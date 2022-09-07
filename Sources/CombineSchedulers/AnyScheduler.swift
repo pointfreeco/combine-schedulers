@@ -288,4 +288,19 @@
       RunLoop.main.eraseToAnyScheduler()
     }
   }
+
+  extension AnyScheduler
+  where
+    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
+    SchedulerOptions == Never
+  {
+    /// The type-erased UI scheduler shared instance.
+    ///
+    /// The UI scheduler is a scheduler that executes its work on the main
+    /// queue as soon as possible (avoiding unnecessary thread hops). See
+    /// `UIScheduler` for more information.
+    public static var shared: Self {
+      UIScheduler.shared.eraseToAnyScheduler()
+    }
+  }
 #endif
