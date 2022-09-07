@@ -258,7 +258,7 @@
       .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
   }
-  
+
   extension UIScheduler {
     /// A test scheduler compatible with type erased UI schedulers.
     public static var test: TestSchedulerOf<Self> {
