@@ -257,9 +257,11 @@
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
-
+  }
+  
+  extension UIScheduler {
     /// A test scheduler compatible with type erased UI schedulers.
-    public static var uiTest: TestScheduler<DispatchQueue.SchedulerTimeType, Never> {
+    public static var test: TestSchedulerOf<Self> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
