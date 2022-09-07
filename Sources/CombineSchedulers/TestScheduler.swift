@@ -280,7 +280,7 @@
   > where Scheduler: Combine.Scheduler
 
   extension Task where Success == Failure, Failure == Never {
-    static func megaYield(count: Int = 3) async {
+    static func megaYield(count: Int = 6) async {
       for _ in 1...count {
         await Task<Void, Never>.detached(priority: .low) { await Task.yield() }.value
       }
