@@ -299,7 +299,7 @@
     /// The UI scheduler is a scheduler that executes its work on the main
     /// queue as soon as possible (avoiding unnecessary thread hops). See
     /// `UIScheduler` for more information.
-    public static var ui: Self {
+    public static var shared: Self {
       UIScheduler.shared.eraseToAnyScheduler()
     }
   }
