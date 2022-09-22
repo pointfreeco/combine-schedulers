@@ -89,17 +89,32 @@
     ///   the scheduler's time but does cause the scheduler to execute any units of work that are
     ///   waiting to be performed for right now.
     public func advance(by duration: SchedulerTimeType.Stride = .zero) {
-      let finalDate = self.lock.sync { self.now.advanced(by: duration) }
+      self.advance(to: self.now.advanced(by: duration))
+    }
 
-      while self.lock.sync(operation: { self.now }) <= finalDate {
+    /// Advances the scheduler by the given stride.
+    ///
+    /// - Parameter duration: A stride. By default this argument is `.zero`, which does not advance
+    ///   the scheduler's time but does cause the scheduler to execute any units of work that are
+    ///   waiting to be performed for right now.
+    @MainActor
+    public func advance(by duration: SchedulerTimeType.Stride = .zero) async {
+      await self.advance(to: self.now.advanced(by: duration))
+    }
+
+    /// Advances the scheduler to the given instant.
+    ///
+    /// - Parameter instant: An instant in time to advance to.
+    public func advance(to instant: SchedulerTimeType) {
+      while self.lock.sync(operation: { self.now }) <= instant {
         self.lock.lock()
         self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
 
         guard
           let next = self.scheduled.first,
-          finalDate >= next.date
+          instant >= next.date
         else {
-          self.now = finalDate
+          self.now = instant
           self.lock.unlock()
           return
         }
@@ -111,16 +126,11 @@
       }
     }
 
-    /// Advances the scheduler by the given stride.
+    /// Advances the scheduler to the given instant.
     ///
-    /// - Parameter duration: A stride. By default this argument is `.zero`, which does not advance
-    ///   the scheduler's time but does cause the scheduler to execute any units of work that are
-    ///   waiting to be performed for right now.
-    @MainActor
-    public func advance(by duration: SchedulerTimeType.Stride = .zero) async {
-      let finalDate = self.lock.sync { self.now.advanced(by: duration) }
-
-      while self.lock.sync(operation: { self.now }) <= finalDate {
+    /// - Parameter instant: An instant in time to advance to.
+    public func advance(to instant: SchedulerTimeType) async {
+      while self.lock.sync(operation: { self.now }) <= instant {
         await Task.megaYield()
         let `return` = { () -> Bool in
           self.lock.lock()
@@ -128,9 +138,9 @@
 
           guard
             let next = self.scheduled.first,
-            finalDate >= next.date
+            instant >= next.date
           else {
-            self.now = finalDate
+            self.now = instant
             self.lock.unlock()
             return true
           }
@@ -146,20 +156,6 @@
           return
         }
       }
-    }
-
-    /// Advances the scheduler to the given instant.
-    ///
-    /// - Parameter instant: An instant in time to advance to.
-    public func advance(to instant: SchedulerTimeType) {
-      self.advance(by: self.now.distance(to: instant))
-    }
-
-    /// Advances the scheduler to the given instant.
-    ///
-    /// - Parameter instant: An instant in time to advance to.
-    public func advance(to instant: SchedulerTimeType) async {
-      await self.advance(by: self.now.distance(to: instant))
     }
 
     /// Runs the scheduler until it has no scheduled items left.
@@ -288,9 +284,9 @@
   > where Scheduler: Combine.Scheduler
 
   extension Task where Success == Failure, Failure == Never {
-    static func megaYield(count: Int = 6) async {
+    static func megaYield(count: Int = 10) async {
       for _ in 1...count {
-        await Task<Void, Never>.detached(priority: .low) { await Task.yield() }.value
+        await Task<Void, Never>.detached(priority: .background) { await Task.yield() }.value
       }
     }
   }
