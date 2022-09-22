@@ -105,16 +105,16 @@
     /// Advances the scheduler to the given instant.
     ///
     /// - Parameter instant: An instant in time to advance to.
-    public func advance(to deadline: SchedulerTimeType) {
-      while self.lock.sync(operation: { self.now }) <= deadline {
+    public func advance(to instant: SchedulerTimeType) {
+      while self.lock.sync(operation: { self.now }) <= instant {
         self.lock.lock()
         self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
 
         guard
           let next = self.scheduled.first,
-          deadline >= next.date
+          instant >= next.date
         else {
-          self.now = deadline
+          self.now = instant
           self.lock.unlock()
           return
         }
@@ -129,8 +129,8 @@
     /// Advances the scheduler to the given instant.
     ///
     /// - Parameter instant: An instant in time to advance to.
-    public func advance(to deadline: SchedulerTimeType) async {
-      while self.lock.sync(operation: { self.now }) <= deadline {
+    public func advance(to instant: SchedulerTimeType) async {
+      while self.lock.sync(operation: { self.now }) <= instant {
         await Task.megaYield()
         let `return` = { () -> Bool in
           self.lock.lock()
@@ -138,9 +138,9 @@
 
           guard
             let next = self.scheduled.first,
-            deadline >= next.date
+            instant >= next.date
           else {
-            self.now = deadline
+            self.now = instant
             self.lock.unlock()
             return true
           }
