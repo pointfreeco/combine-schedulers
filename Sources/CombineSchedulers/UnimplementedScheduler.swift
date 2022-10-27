@@ -118,6 +118,7 @@
         An unimplemented scheduler scheduled an action to run immediately.
         """
       )
+      action()
     }
 
     public func schedule(
@@ -132,6 +133,7 @@
         An unimplemented scheduler scheduled an action to run later.
         """
       )
+      action()
     }
 
     public func schedule(
@@ -147,6 +149,7 @@
         An unimplemented scheduler scheduled an action to run on a timer.
         """
       )
+      action()
       return AnyCancellable {}
     }
   }

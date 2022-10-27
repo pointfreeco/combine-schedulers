@@ -235,4 +235,18 @@ final class CombineSchedulerTests: XCTestCase {
     let count = await task.value
     XCTAssertEqual(count, 10)
   }
+
+  func testNowIsAdvanced() {
+    let testScheduler = DispatchQueue.test
+    let start = testScheduler.now
+
+    testScheduler.advance(by: .seconds(1))
+    XCTAssertEqual(testScheduler.now, start.advanced(by: .seconds(1)))
+
+    testScheduler.advance()
+    XCTAssertEqual(testScheduler.now, start.advanced(by: .seconds(1)))
+
+    testScheduler.advance(by: .seconds(1))
+    XCTAssertEqual(testScheduler.now, start.advanced(by: .seconds(2)))
+  }
 }
