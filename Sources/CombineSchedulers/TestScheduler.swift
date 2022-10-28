@@ -129,6 +129,7 @@
     /// Advances the scheduler to the given instant.
     ///
     /// - Parameter instant: An instant in time to advance to.
+    @MainActor
     public func advance(to instant: SchedulerTimeType) async {
       while self.lock.sync(operation: { self.now }) <= instant {
         await Task.megaYield()
