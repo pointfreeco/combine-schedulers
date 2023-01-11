@@ -33,6 +33,40 @@ final class CombineSchedulerTests: XCTestCase {
 
     XCTAssertEqual(value, 1)
   }
+	
+	func testAdvanceWithInaccuracy() {
+		let scheduler = DispatchQueue.inaccurate(by: .milliseconds(50))
+		var start = scheduler.now
+		var time: DispatchQueue.SchedulerTimeType?
+		
+		Just(())
+			.delay(for: 1, scheduler: scheduler)
+			.sink { time = scheduler.now }
+			.store(in: &cancellables)
+		
+		XCTAssertEqual(time, nil)
+		
+		scheduler.advance(by: .milliseconds(250))
+		
+		XCTAssertEqual(time, nil)
+		
+		scheduler.advance(by: .milliseconds(250))
+		
+		XCTAssertEqual(time, nil)
+		
+		scheduler.advance(by: .milliseconds(250))
+		
+		XCTAssertEqual(time, nil)
+		
+		scheduler.advance(by: .milliseconds(250))
+		
+		XCTAssertEqual(
+			time,
+			start
+				.advanced(by: .seconds(1))
+				.advanced(by: .milliseconds(50))
+		)
+	}
 
   func testAdvanceTo() {
     let scheduler = DispatchQueue.test
@@ -62,9 +96,43 @@ final class CombineSchedulerTests: XCTestCase {
 
     XCTAssertEqual(value, 1)
   }
+	
+	func testAdvanceToWithInaccuracy() {
+		let scheduler = DispatchQueue.inaccurate(by: .milliseconds(50))
+		let start = scheduler.now
+		var time: DispatchQueue.SchedulerTimeType?
+		
+		Just(())
+			.delay(for: 1, scheduler: scheduler)
+			.sink { time = scheduler.now }
+			.store(in: &self.cancellables)
+		
+		XCTAssertEqual(time, nil)
+		
+		scheduler.advance(to: start.advanced(by: .milliseconds(250)))
+		
+		XCTAssertEqual(time, nil)
+		
+		scheduler.advance(to: start.advanced(by: .milliseconds(500)))
+		
+		XCTAssertEqual(time, nil)
+		
+		scheduler.advance(to: start.advanced(by: .milliseconds(750)))
+		
+		XCTAssertEqual(time, nil)
+		
+		scheduler.advance(to: start.advanced(by: .milliseconds(1000)))
+		
+		XCTAssertEqual(
+			time,
+			start
+				.advanced(by: .seconds(1))
+				.advanced(by: .milliseconds(50))
+		)
+	}
 
   func testRunScheduler() {
-    let scheduler = DispatchQueue.test
+		let scheduler = DispatchQueue.test
 
     var value: Int?
     Just(1)
