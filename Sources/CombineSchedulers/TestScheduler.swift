@@ -275,8 +275,9 @@
     
     /// A test scheduler compatible with type erased UI schedulers that simulates the inaccuracy of
     /// real schedulers.
-    public static func inaccurate(
-      by minimumTolerance: SchedulerTimeType.Stride
+    @_disfavoredOverload
+    public static func test(
+      minimumTolerance: SchedulerTimeType.Stride
     ) -> TestSchedulerOf<UIScheduler> {
       .init(now: .init(.init(uptimeNanoseconds: 1)), minimumTolerance: minimumTolerance)
     }
