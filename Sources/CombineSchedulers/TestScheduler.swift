@@ -122,7 +122,7 @@
           return
         }
         
-        self.now = next.date.advanced(by: minimumTolerance)
+        self.now = next.date
         self.scheduled.removeFirst()
         self.lock.unlock()
         next.action()
@@ -149,7 +149,7 @@
             return true
           }
           
-          self.now = next.date.advanced(by: minimumTolerance)
+          self.now = next.date
           self.scheduled.removeFirst()
           self.lock.unlock()
           next.action()
@@ -214,18 +214,27 @@
       _ action: @escaping () -> Void
     ) -> Cancellable {
       let sequence = self.lock.sync { self.nextSequence() }
-
+      let minimumTolerance = self.minimumTolerance
+      
       func scheduleAction(for date: SchedulerTimeType) -> () -> Void {
         return { [weak self] in
           let nextDate = date.advanced(by: interval)
           self?.lock.sync {
-            self?.scheduled.append((sequence, nextDate, scheduleAction(for: nextDate)))
+            self?.scheduled.append((
+              sequence,
+              nextDate.advanced(by: minimumTolerance),
+              scheduleAction(for: nextDate)
+            ))
           }
           action()
         }
       }
 
-      self.lock.sync { self.scheduled.append((sequence, date, scheduleAction(for: date))) }
+      self.lock.sync { self.scheduled.append((
+        sequence,
+        date.advanced(by: minimumTolerance),
+        scheduleAction(for: date)
+      )) }
 
       return AnyCancellable { [weak self] in
         self?.lock.sync { self?.scheduled.removeAll(where: { $0.sequence == sequence }) }
@@ -238,7 +247,11 @@
       options _: SchedulerOptions?,
       _ action: @escaping () -> Void
     ) {
-      self.lock.sync { self.scheduled.append((self.nextSequence(), date, action)) }
+      self.lock.sync { self.scheduled.append((
+        self.nextSequence(),
+        date.advanced(by: minimumTolerance),
+        action
+      )) }
     }
 
     public func schedule(options _: SchedulerOptions?, _ action: @escaping () -> Void) {
