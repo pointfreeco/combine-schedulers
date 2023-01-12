@@ -290,8 +290,9 @@
     }
 		
     /// A test scheduler of operations queues that simulates the inaccuracy of real schedulers.
-    public static func inaccurate(
-      by minimumTolerance: SchedulerTimeType.Stride
+    @_disfavoredOverload
+    public static func test(
+      minimumTolerance: SchedulerTimeType.Stride
     ) -> TestSchedulerOf<OperationQueue> {
       .init(now: .init(.init(timeIntervalSince1970: 0)), minimumTolerance: minimumTolerance)
     }
