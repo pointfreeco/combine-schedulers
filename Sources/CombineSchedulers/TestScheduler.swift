@@ -305,8 +305,9 @@
     }
 		
     /// A test scheduler of run loops that simulates the inaccuracy of real schedulers.
-    public static func inaccurate(
-      by minimumTolerance: SchedulerTimeType.Stride
+    @_disfavoredOverload
+    public static func test(
+      minimumTolerance: SchedulerTimeType.Stride
     ) -> TestSchedulerOf<RunLoop> {
       .init(now: .init(.init(timeIntervalSince1970: 0)), minimumTolerance: minimumTolerance)
     }
