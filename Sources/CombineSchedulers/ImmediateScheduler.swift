@@ -142,7 +142,7 @@
 
   extension DispatchQueue {
     /// An immediate scheduler that can substitute itself for a dispatch queue.
-    public static var immediate: ImmediateSchedulerOf<DispatchQueue> {
+    public static var immediate: ImmediateScheduler<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
@@ -150,14 +150,14 @@
 
   extension OperationQueue {
     /// An immediate scheduler that can substitute itself for an operation queue.
-    public static var immediate: ImmediateSchedulerOf<OperationQueue> {
+    public static var immediate: ImmediateScheduler<OperationQueue> {
       .init(now: .init(.init(timeIntervalSince1970: 0)))
     }
   }
 
   extension RunLoop {
     /// An immediate scheduler that can substitute itself for a run loop.
-    public static var immediate: ImmediateSchedulerOf<RunLoop> {
+    public static var immediate: ImmediateScheduler<RunLoop> {
       .init(now: .init(.init(timeIntervalSince1970: 0)))
     }
   }

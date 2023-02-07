@@ -126,7 +126,7 @@
     SchedulerOptions == DispatchQueue.SchedulerOptions
   {
     @available(*, deprecated, renamed: "immediate")
-    public static var immediateScheduler: ImmediateSchedulerOf<Self> {
+    public static var immediateScheduler: ImmediateScheduler<Self> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       ImmediateScheduler(now: SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
     }
@@ -138,7 +138,7 @@
     SchedulerOptions == RunLoop.SchedulerOptions
   {
     @available(*, deprecated, renamed: "immediate")
-    public static var immediateScheduler: ImmediateSchedulerOf<Self> {
+    public static var immediateScheduler: ImmediateScheduler<Self> {
       ImmediateScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
@@ -149,7 +149,7 @@
     SchedulerOptions == OperationQueue.SchedulerOptions
   {
     @available(*, deprecated, renamed: "immediate")
-    public static var immediateScheduler: ImmediateSchedulerOf<Self> {
+    public static var immediateScheduler: ImmediateScheduler<Self> {
       ImmediateScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
