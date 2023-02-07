@@ -98,11 +98,9 @@
   /// > `ImmediateScheduler` will not schedule this work in a defined way. Use a `TestScheduler`
   /// > instead to capture your publisher's timing behavior.
   ///
-  public struct ImmediateScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
-  where
-    SchedulerTimeType: Strideable,
-    SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
-  {
+  public struct ImmediateScheduler<S: Scheduler>: Scheduler {
+    public typealias SchedulerTimeType = S.SchedulerTimeType
+    public typealias SchedulerOptions = S.SchedulerOptions
 
     public let minimumTolerance: SchedulerTimeType.Stride = .zero
     public let now: SchedulerTimeType
@@ -197,9 +195,11 @@
     }
   }
 
+  @available(iOS, deprecated: 9999.0, message: "Use ImmediateScheduler type directly instead.")
+  @available(macOS, deprecated: 9999.0, message: "Use ImmediateScheduler type directly instead.")
+  @available(tvOS, deprecated: 9999.0, message: "Use ImmediateScheduler type directly instead.")
+  @available(watchOS, deprecated: 9999.0, message: "Use ImmediateScheduler type directly instead.")
   /// A convenience type to specify an `ImmediateScheduler` by the scheduler it wraps rather than by
   /// the time type and options type.
-  public typealias ImmediateSchedulerOf<Scheduler> = ImmediateScheduler<
-    Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  public typealias ImmediateSchedulerOf<Scheduler> = ImmediateScheduler<Scheduler> where Scheduler: Combine.Scheduler
 #endif
