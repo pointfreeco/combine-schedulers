@@ -250,7 +250,7 @@
 
   extension DispatchQueue {
     /// A test scheduler of dispatch queues.
-    public static var test: TestSchedulerOf<DispatchQueue> {
+    public static var test: TestScheduler<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
@@ -258,7 +258,7 @@
 
   extension UIScheduler {
     /// A test scheduler compatible with type erased UI schedulers.
-    public static var test: TestSchedulerOf<Self> {
+    public static var test: TestScheduler<Self> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
@@ -266,7 +266,7 @@
 
   extension OperationQueue {
     /// A test scheduler of operation queues.
-    public static var test: TestSchedulerOf<OperationQueue> {
+    public static var test: TestScheduler<OperationQueue> {
       .init(now: .init(.init(timeIntervalSince1970: 0)))
     }
   }
@@ -278,6 +278,10 @@
     }
   }
 
+  @available(iOS, deprecated: 9999.0, message: "Use TestScheduler type directly instead.")
+  @available(macOS, deprecated: 9999.0, message: "Use TestScheduler type directly instead.")
+  @available(tvOS, deprecated: 9999.0, message: "Use TestScheduler type directly instead.")
+  @available(watchOS, deprecated: 9999.0, message: "Use TestScheduler type directly instead.")
   /// A convenience type to specify a `TestScheduler` by the scheduler it wraps rather than by the
   /// time type and options type.
   public typealias TestSchedulerOf<Scheduler> = TestScheduler<Scheduler> where Scheduler: Combine.Scheduler

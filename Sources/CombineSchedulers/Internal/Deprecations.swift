@@ -130,39 +130,27 @@
     }
   }
 
-  extension Scheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  extension DispatchQueue {
     /// A test scheduler of dispatch queues.
     @available(*, deprecated, renamed: "test")
-    public static var testScheduler: TestSchedulerOf<Self> {
+    public static var testScheduler: TestScheduler<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       TestScheduler(now: SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
     }
   }
 
-  extension Scheduler
-  where
-    SchedulerTimeType == OperationQueue.SchedulerTimeType,
-    SchedulerOptions == OperationQueue.SchedulerOptions
-  {
+  extension OperationQueue {
     /// A test scheduler of operation queues.
     @available(*, deprecated, renamed: "test")
-    public static var testScheduler: TestSchedulerOf<Self> {
+    public static var testScheduler: TestScheduler<OperationQueue> {
       TestScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
 
-  extension Scheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
+  extension RunLoop {
     /// A test scheduler of run loops.
     @available(*, deprecated, renamed: "test")
-    public static var testScheduler: TestSchedulerOf<Self> {
+    public static var testScheduler: TestScheduler<RunLoop> {
       TestScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
