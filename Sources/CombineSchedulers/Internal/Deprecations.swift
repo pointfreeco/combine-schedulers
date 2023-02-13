@@ -64,11 +64,7 @@
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  extension AnyScheduler<DispatchQueue> {
     @available(iOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")
@@ -82,11 +78,7 @@
     public static func failing(_ prefix: String) -> Self { Self.unimplemented(prefix) }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == OperationQueue.SchedulerTimeType,
-    SchedulerOptions == OperationQueue.SchedulerOptions
-  {
+  extension AnyScheduler<OperationQueue> {
     @available(iOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")
@@ -100,11 +92,7 @@
     public static func failing(_ prefix: String) -> Self { Self.unimplemented(prefix) }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
+  extension AnyScheduler<RunLoop> {
     @available(iOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")

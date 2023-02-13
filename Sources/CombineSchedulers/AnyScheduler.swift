@@ -131,11 +131,9 @@
   /// in classes, functions, etc. without needing to introduce a generic, which can help simplify
   /// the code and reduce implementation details from leaking out.
   ///
-  public struct AnyScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler, @unchecked Sendable
-  where
-    SchedulerTimeType: Strideable,
-    SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
-  {
+	public struct AnyScheduler<S: Scheduler>: Scheduler {
+		public typealias SchedulerTimeType = S.SchedulerTimeType
+		public typealias SchedulerOptions = S.SchedulerOptions
 
     private let _minimumTolerance: () -> SchedulerTimeType.Stride
     private let _now: () -> SchedulerTimeType
@@ -240,22 +238,16 @@
 
   /// A convenience type to specify an `AnyScheduler` by the scheduler it wraps rather than by the
   /// time type and options type.
-  public typealias AnySchedulerOf<Scheduler> = AnyScheduler<
-    Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+	public typealias AnySchedulerOf<S> = AnyScheduler<S> where S: Scheduler
 
   extension Scheduler {
     /// Wraps this scheduler with a type eraser.
-    public func eraseToAnyScheduler() -> AnyScheduler<SchedulerTimeType, SchedulerOptions> {
+    public func eraseToAnyScheduler() -> AnyScheduler<Self> {
       AnyScheduler(self)
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  extension AnyScheduler<DispatchQueue> {
     /// A type-erased main dispatch queue.
     public static var main: Self {
       DispatchQueue.main.eraseToAnyScheduler()
@@ -267,33 +259,21 @@
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == OperationQueue.SchedulerTimeType,
-    SchedulerOptions == OperationQueue.SchedulerOptions
-  {
+  extension AnyScheduler<OperationQueue> {
     /// A type-erased main operation queue.
     public static var main: Self {
       OperationQueue.main.eraseToAnyScheduler()
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
+  extension AnyScheduler<RunLoop> {
     /// A type-erased main run loop.
     public static var main: Self {
       RunLoop.main.eraseToAnyScheduler()
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == Never
-  {
+  extension AnyScheduler<UIScheduler> {
     /// The type-erased UI scheduler shared instance.
     ///
     /// The UI scheduler is a scheduler that executes its work on the main

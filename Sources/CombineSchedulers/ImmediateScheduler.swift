@@ -162,36 +162,24 @@
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  extension AnyScheduler<DispatchQueue> {
     /// An immediate scheduler that can substitute itself for a dispatch queue.
     public static var immediate: Self {
-      DispatchQueue.immediate.eraseToAnyScheduler()
+      .init(DispatchQueue.immediate)
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == OperationQueue.SchedulerTimeType,
-    SchedulerOptions == OperationQueue.SchedulerOptions
-  {
+  extension AnyScheduler<OperationQueue> {
     /// An immediate scheduler that can substitute itself for an operation queue.
     public static var immediate: Self {
-      OperationQueue.immediate.eraseToAnyScheduler()
+      .init(OperationQueue.immediate)
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
+  extension AnyScheduler<RunLoop> {
     /// An immediate scheduler that can substitute itself for a run loop.
     public static var immediate: Self {
-      RunLoop.immediate.eraseToAnyScheduler()
+      .init(RunLoop.immediate)
     }
   }
 
