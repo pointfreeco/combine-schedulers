@@ -236,6 +236,12 @@
     }
   }
 
+  extension AnyScheduler {
+    public func eraseToAnyScheduler() -> AnyScheduler<S> {
+      .init(self)
+    }
+  }
+
   @available(iOS, deprecated: 9999.0, message: "Use AnyScheduler type directly instead.")
   @available(macOS, deprecated: 9999.0, message: "Use AnyScheduler type directly instead.")
   @available(tvOS, deprecated: 9999.0, message: "Use AnyScheduler type directly instead.")

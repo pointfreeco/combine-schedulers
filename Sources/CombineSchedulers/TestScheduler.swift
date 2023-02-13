@@ -248,6 +248,12 @@
     }
   }
 
+  extension TestScheduler {
+    public func eraseToAnyScheduler() -> AnyScheduler<S> {
+      .init(self)
+    }
+  }
+
   extension DispatchQueue {
     /// A test scheduler of dispatch queues.
     public static var test: TestScheduler<DispatchQueue> {
