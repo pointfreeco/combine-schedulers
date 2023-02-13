@@ -10,24 +10,24 @@
   @available(watchOS, deprecated: 9999.0, renamed: "UnimplementedScheduler")
   public typealias FailingScheduler = UnimplementedScheduler
 
-  @available(iOS, deprecated: 9999.0, renamed: "UnimplementedSchedulerOf")
-  @available(macOS, deprecated: 9999.0, renamed: "UnimplementedSchedulerOf")
-  @available(tvOS, deprecated: 9999.0, renamed: "UnimplementedSchedulerOf")
-  @available(watchOS, deprecated: 9999.0, renamed: "UnimplementedSchedulerOf")
-  public typealias FailingSchedulerOf = UnimplementedSchedulerOf
+  @available(iOS, deprecated: 9999.0, renamed: "UnimplementedScheduler")
+  @available(macOS, deprecated: 9999.0, renamed: "UnimplementedScheduler")
+  @available(tvOS, deprecated: 9999.0, renamed: "UnimplementedScheduler")
+  @available(watchOS, deprecated: 9999.0, renamed: "UnimplementedScheduler")
+  public typealias FailingSchedulerOf = UnimplementedScheduler
 
   extension DispatchQueue {
     @available(iOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(watchOS, deprecated: 9999.0, renamed: "unimplemented")
-    public static var failing: UnimplementedSchedulerOf<DispatchQueue> { Self.unimplemented }
+    public static var failing: UnimplementedScheduler<DispatchQueue> { Self.unimplemented }
 
     @available(iOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(watchOS, deprecated: 9999.0, renamed: "unimplemented")
-    public static func failing(_ prefix: String) -> UnimplementedSchedulerOf<DispatchQueue> {
+    public static func failing(_ prefix: String) -> UnimplementedScheduler<DispatchQueue> {
       Self.unimplemented(prefix)
     }
   }
@@ -37,13 +37,13 @@
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(watchOS, deprecated: 9999.0, renamed: "unimplemented")
-    public static var failing: UnimplementedSchedulerOf<OperationQueue> { Self.unimplemented }
+    public static var failing: UnimplementedScheduler<OperationQueue> { Self.unimplemented }
 
     @available(iOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(watchOS, deprecated: 9999.0, renamed: "unimplemented")
-    public static func failing(_ prefix: String) -> UnimplementedSchedulerOf<OperationQueue> {
+    public static func failing(_ prefix: String) -> UnimplementedScheduler<OperationQueue> {
       Self.unimplemented(prefix)
     }
   }
@@ -53,13 +53,13 @@
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(watchOS, deprecated: 9999.0, renamed: "unimplemented")
-    public static var failing: UnimplementedSchedulerOf<RunLoop> { Self.unimplemented }
+    public static var failing: UnimplementedScheduler<RunLoop> { Self.unimplemented }
 
     @available(iOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(macOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(tvOS, deprecated: 9999.0, renamed: "unimplemented")
     @available(watchOS, deprecated: 9999.0, renamed: "unimplemented")
-    public static func failing(_ prefix: String) -> UnimplementedSchedulerOf<RunLoop> {
+    public static func failing(_ prefix: String) -> UnimplementedScheduler<RunLoop> {
       Self.unimplemented(prefix)
     }
   }

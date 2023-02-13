@@ -265,6 +265,10 @@
     }
   }
 
+  @available(iOS, deprecated: 9999.0, message: "Use UnimplementedScheduler type directly instead.")
+  @available(macOS, deprecated: 9999.0, message: "Use UnimplementedScheduler type directly instead.")
+  @available(tvOS, deprecated: 9999.0, message: "Use UnimplementedScheduler type directly instead.")
+  @available(watchOS, deprecated: 9999.0, message: "Use UnimplementedScheduler type directly instead.")
   /// A convenience type to specify an `UnimplementedScheduler` by the scheduler it wraps rather than
   /// by the time type and options type.
   public typealias UnimplementedSchedulerOf<S> = UnimplementedScheduler<S> where S: Combine.Scheduler
