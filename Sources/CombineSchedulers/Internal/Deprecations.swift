@@ -120,36 +120,24 @@
 
   // NB: Deprecated after 0.4.1:
 
-  extension Scheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  extension DispatchQueue {
     @available(*, deprecated, renamed: "immediate")
-    public static var immediateScheduler: ImmediateScheduler<Self> {
+    public static var immediateScheduler: ImmediateScheduler<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       ImmediateScheduler(now: SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
     }
   }
 
-  extension Scheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
+  extension RunLoop {
     @available(*, deprecated, renamed: "immediate")
-    public static var immediateScheduler: ImmediateScheduler<Self> {
+    public static var immediateScheduler: ImmediateScheduler<RunLoop> {
       ImmediateScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
 
-  extension Scheduler
-  where
-    SchedulerTimeType == OperationQueue.SchedulerTimeType,
-    SchedulerOptions == OperationQueue.SchedulerOptions
-  {
+  extension OperationQueue {
     @available(*, deprecated, renamed: "immediate")
-    public static var immediateScheduler: ImmediateScheduler<Self> {
+    public static var immediateScheduler: ImmediateScheduler<OperationQueue> {
       ImmediateScheduler(now: SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
