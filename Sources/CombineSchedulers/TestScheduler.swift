@@ -66,9 +66,9 @@
   /// but this technique can be used to test any publisher that involves Combine's asynchronous
   /// operations.
   ///
-  public final class TestScheduler<SchedulerTimeType, SchedulerOptions>:
-    Scheduler, @unchecked Sendable
-  where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
+  public final class TestScheduler<S: Scheduler>: Scheduler, @unchecked Sendable {
+    public typealias SchedulerTimeType = S.SchedulerTimeType
+    public typealias SchedulerOptions = S.SchedulerOptions
 
     private var lastSequence: UInt = 0
     private let lock = NSRecursiveLock()
@@ -273,16 +273,14 @@
 
   extension RunLoop {
     /// A test scheduler of run loops.
-    public static var test: TestSchedulerOf<RunLoop> {
+    public static var test: TestScheduler<RunLoop> {
       .init(now: .init(.init(timeIntervalSince1970: 0)))
     }
   }
 
   /// A convenience type to specify a `TestScheduler` by the scheduler it wraps rather than by the
   /// time type and options type.
-  public typealias TestSchedulerOf<Scheduler> = TestScheduler<
-    Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  public typealias TestSchedulerOf<Scheduler> = TestScheduler<Scheduler> where Scheduler: Combine.Scheduler
 
   extension Task where Success == Failure, Failure == Never {
     static func megaYield(count: Int = 10) async {
