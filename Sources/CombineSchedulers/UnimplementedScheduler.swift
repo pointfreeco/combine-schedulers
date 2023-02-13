@@ -72,11 +72,10 @@
   /// this test will begin to fail, which is a good thing! This will force us to address the
   /// complexity that was introduced. Had we used any other scheduler, it would quietly receive this
   /// additional work and the test would continue to pass.
-  public struct UnimplementedScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
-  where
-    SchedulerTimeType: Strideable,
-    SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
-  {
+  public struct UnimplementedScheduler<S: Scheduler>: Scheduler {
+    public typealias SchedulerTimeType = S.SchedulerTimeType
+    public typealias SchedulerOptions = S.SchedulerOptions
+
     public var minimumTolerance: SchedulerTimeType.Stride {
       XCTFail(
         """
@@ -268,7 +267,5 @@
 
   /// A convenience type to specify an `UnimplementedScheduler` by the scheduler it wraps rather than
   /// by the time type and options type.
-  public typealias UnimplementedSchedulerOf<Scheduler> = UnimplementedScheduler<
-    Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  public typealias UnimplementedSchedulerOf<S> = UnimplementedScheduler<S> where S: Combine.Scheduler
 #endif
