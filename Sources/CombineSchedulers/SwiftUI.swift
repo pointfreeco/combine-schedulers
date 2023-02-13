@@ -62,7 +62,7 @@
     ///
     /// - Parameter animation: An animation to be performed.
     /// - Returns: A scheduler that performs an animation when a scheduled action is run.
-    public func animation(_ animation: Animation? = .default) -> AnySchedulerOf<Self> {
+    public func animation(_ animation: Animation? = .default) -> AnyScheduler<Self> {
       AnyScheduler(
         minimumTolerance: { self.minimumTolerance },
         now: { self.now },
@@ -88,7 +88,7 @@
     ///
     /// - Parameter transaction: A transaction.
     /// - Returns: A scheduler that wraps scheduled actions in a transaction.
-    public func transaction(_ transaction: Transaction) -> AnySchedulerOf<Self> {
+    public func transaction(_ transaction: Transaction) -> AnyScheduler<Self> {
       AnyScheduler(
         minimumTolerance: { self.minimumTolerance },
         now: { self.now },

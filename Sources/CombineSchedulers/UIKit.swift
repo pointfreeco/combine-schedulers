@@ -14,7 +14,7 @@
       withDuration duration: TimeInterval,
       delay: TimeInterval = 0,
       options animationOptions: UIView.AnimationOptions = []
-    ) -> AnySchedulerOf<Self> {
+    ) -> AnyScheduler<Self> {
       AnyScheduler(
         minimumTolerance: { self.minimumTolerance },
         now: { self.now },
@@ -66,7 +66,7 @@
       usingSpringWithDamping dampingRatio: CGFloat,
       initialSpringVelocity velocity: CGFloat,
       options animationOptions: UIView.AnimationOptions
-    ) -> AnySchedulerOf<Self> {
+    ) -> AnyScheduler<Self> {
       AnyScheduler(
         minimumTolerance: { self.minimumTolerance },
         now: { self.now },

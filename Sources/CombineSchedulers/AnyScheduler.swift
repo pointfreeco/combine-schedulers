@@ -236,6 +236,10 @@
     }
   }
 
+  @available(iOS, deprecated: 9999.0, message: "Use AnyScheduler type directly instead.")
+  @available(macOS, deprecated: 9999.0, message: "Use AnyScheduler type directly instead.")
+  @available(tvOS, deprecated: 9999.0, message: "Use AnyScheduler type directly instead.")
+  @available(watchOS, deprecated: 9999.0, message: "Use AnyScheduler type directly instead.")
   /// A convenience type to specify an `AnyScheduler` by the scheduler it wraps rather than by the
   /// time type and options type.
 	public typealias AnySchedulerOf<S> = AnyScheduler<S> where S: Scheduler
