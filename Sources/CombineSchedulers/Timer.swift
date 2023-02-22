@@ -232,8 +232,8 @@
         }
       }
 
-      public func receive<SC: Subscriber>(subscriber: SC)
-      where Failure == SC.Failure, Output == SC.Input {
+      public func receive<Subscriber: Combine.Subscriber>(subscriber: Subscriber)
+      where Failure == Subscriber.Failure, Output == Subscriber.Input {
         routingSubscription.addSubscriber(subscriber)
       }
 
