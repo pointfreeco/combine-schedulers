@@ -285,8 +285,9 @@
   > where Scheduler: Combine.Scheduler
 
   extension Task where Success == Failure, Failure == Never {
-    static func megaYield(count: Int = 10) async {
-      for _ in 1...count {
+    @TaskLocal public static var yieldCount = 10
+    static func megaYield() async {
+      for _ in 1...yieldCount {
         await Task<Void, Never>.detached(priority: .background) { await Task.yield() }.value
       }
     }
