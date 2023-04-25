@@ -80,14 +80,14 @@
     /// scheduler.advance(by: 1_000)
     /// XCTAssertEqual(output, Array(0...1_001))
     /// ```
-    public final class Timer<S: Scheduler>: ConnectablePublisher {
-      public typealias Output = S.SchedulerTimeType
+    public final class Timer<Scheduler: Combine.Scheduler>: ConnectablePublisher {
+      public typealias Output = Scheduler.SchedulerTimeType
       public typealias Failure = Never
 
-      public let interval: S.SchedulerTimeType.Stride
-      public let options: S.SchedulerOptions?
-      public let scheduler: S
-      public let tolerance: S.SchedulerTimeType.Stride?
+      public let interval: Scheduler.SchedulerTimeType.Stride
+      public let options: Scheduler.SchedulerOptions?
+      public let scheduler: Scheduler
+      public let tolerance: Scheduler.SchedulerTimeType.Stride?
 
       private lazy var routingSubscription: RoutingSubscription = {
         return RoutingSubscription(parent: self)
@@ -99,10 +99,10 @@
       }
 
       public init(
-        every interval: S.SchedulerTimeType.Stride,
-        tolerance: S.SchedulerTimeType.Stride? = nil,
-        scheduler: S,
-        options: S.SchedulerOptions? = nil
+        every interval: Scheduler.SchedulerTimeType.Stride,
+        tolerance: Scheduler.SchedulerTimeType.Stride? = nil,
+        scheduler: Scheduler,
+        options: Scheduler.SchedulerOptions? = nil
       ) {
         self.interval = interval
         self.options = options
@@ -115,7 +115,7 @@
       private class RoutingSubscription: Subscription, Subscriber, CustomStringConvertible,
         CustomReflectable, CustomPlaygroundDisplayConvertible
       {
-        typealias Input = S.SchedulerTimeType
+        typealias Input = Scheduler.SchedulerTimeType
         typealias Failure = Never
 
         private typealias ErasedSubscriber = AnySubscriber<Output, Failure>
@@ -155,7 +155,7 @@
         var playgroundDescription: Any { return description }
         var combineIdentifier: CombineIdentifier { return inner.combineIdentifier }
 
-        init(parent: Publishers.Timer<S>) {
+        init(parent: Publishers.Timer<Scheduler>) {
           self.lock = Lock()
           self.inner = .init(parent, self)
         }
@@ -246,13 +246,13 @@
       private final class Inner<Downstream: Subscriber>: NSObject, Subscription, CustomReflectable,
         CustomPlaygroundDisplayConvertible
       where
-        Downstream.Input == S.SchedulerTimeType,
+        Downstream.Input == Scheduler.SchedulerTimeType,
         Downstream.Failure == Never
       {
         private var cancellable: Cancellable?
         private let lock: Lock
         private var downstream: Downstream?
-        private var parent: Parent<S>?
+        private var parent: Parent<Scheduler>?
         private var started: Bool
         private var demand: Subscribers.Demand
 
@@ -270,7 +270,7 @@
         }
         var playgroundDescription: Any { return description }
 
-        init(_ parent: Parent<S>, _ downstream: Downstream) {
+        init(_ parent: Parent<Scheduler>, _ downstream: Downstream) {
           self.lock = Lock()
           self.parent = parent
           self.downstream = downstream

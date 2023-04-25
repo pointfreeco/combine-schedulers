@@ -18,6 +18,13 @@ test:
 		-scheme combine-schedulers \
 		-destination platform="$(PLATFORM_WATCHOS)"
 
+build-for-library-evolution:
+	swift build \
+		-c release \
+		--target CombineSchedulers \
+		-Xswiftc -emit-module-interface \
+		-Xswiftc -enable-library-evolution
+
 format:
 	swift format --in-place --recursive ./Package.swift ./Sources ./Tests
 
