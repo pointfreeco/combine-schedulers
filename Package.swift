@@ -24,6 +24,12 @@ let package = Package(
       name: "CombineSchedulers",
       dependencies: [
         .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+      ],
+      swiftSettings: [
+        .unsafeFlags(["-Xfrontend", "-application-extension"])
+      ],
+      linkerSettings: [
+        .unsafeFlags(["-Xlinker", "-application_extension"])
       ]
     ),
     .testTarget(
