@@ -1,5 +1,5 @@
-#if canImport(UIKit) && !os(watchOS) && canImport(Combine)
-  import Combine
+#if canImport(UIKit) && !os(watchOS) && canImport(OpenCombineShim)
+  import OpenCombineShim
   import UIKit
 
   extension Scheduler {

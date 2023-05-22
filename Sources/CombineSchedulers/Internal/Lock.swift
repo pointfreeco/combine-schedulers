@@ -42,4 +42,38 @@
       os_unfair_lock_unlock(self)
     }
   }
+
+#elseif os(Windows)
+
+import WinSDK
+
+typealias Lock = UnsafeMutablePointer<CRITICAL_SECTION>
+
+extension UnsafeMutablePointer where Pointee == CRITICAL_SECTION {
+    init() {
+        let cs: UnsafeMutablePointer<CRITICAL_SECTION> = .allocate(capacity: 1)
+        InitializeCriticalSection(cs)
+        self = cs
+    }
+
+    func cleanupLock() {
+        DeleteCriticalSection(self)
+        deallocate()
+    }
+
+    func lock() {
+        EnterCriticalSection(self)
+    }
+
+    func tryLock() -> Bool {
+        let result = TryEnterCriticalSection(self)
+        return result
+    }
+
+    func unlock() {
+        LeaveCriticalSection(self)
+    }
+}
+
+
 #endif

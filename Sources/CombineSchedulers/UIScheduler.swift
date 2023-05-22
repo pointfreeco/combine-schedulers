@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
   import Dispatch
 
   /// A scheduler that executes its work on the main queue as soon as possible.

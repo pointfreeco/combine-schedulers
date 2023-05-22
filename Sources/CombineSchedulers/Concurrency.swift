@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
 
   extension Scheduler {
     /// Suspends the current task for at least the given duration.
