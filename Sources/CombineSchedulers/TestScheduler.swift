@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
   import Foundation
 
   /// A scheduler whose current time and execution can be controlled in a deterministic manner.
@@ -282,7 +282,7 @@
   /// time type and options type.
   public typealias TestSchedulerOf<Scheduler> = TestScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  > where Scheduler: CombineScheduler
 
   extension Task where Success == Failure, Failure == Never {
     // NB: We would love if this was not necessary. See this forum post for more information:

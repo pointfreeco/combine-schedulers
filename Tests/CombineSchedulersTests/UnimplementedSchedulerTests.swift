@@ -1,5 +1,6 @@
-#if compiler(>=5.4)
-  import Combine
+// XCTExpectFailure doesn't exist on non Darwin platforms as of 2023-05-22
+#if compiler(>=5.4) && canImport(Darwin)
+  import OpenCombineShim
   import CombineSchedulers
   import XCTest
 

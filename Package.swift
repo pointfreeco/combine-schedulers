@@ -17,13 +17,15 @@ let package = Package(
     )
   ],
   dependencies: [
+    .package(url: "https://github.com/OpenCombine/OpenCombine.git", from: "0.13.0"),
     .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.8.5")
   ],
   targets: [
     .target(
       name: "CombineSchedulers",
       dependencies: [
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
+        .product(name: "OpenCombineShim", package: "OpenCombine"),
       ]
     ),
     .testTarget(

@@ -1,4 +1,4 @@
-import Combine
+import OpenCombineShim
 import CombineSchedulers
 import XCTest
 
@@ -76,6 +76,7 @@ final class TimerTests: XCTestCase {
     )
   }
 
+#if canImport(Combine) // no `MergeMany` in OpenCombine
   func testInterleavingTimers() {
     let scheduler = DispatchQueue.test
 
@@ -105,6 +106,7 @@ final class TimerTests: XCTestCase {
     scheduler.advance(by: 1)
     XCTAssertEqual(output, [1, 2, 1, 1, 2])
   }
+#endif
 
   func testTimerCancellation() {
     let scheduler = DispatchQueue.test

@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
   import Foundation
 
   // NB: Soft-deprecated after 0.5.3:

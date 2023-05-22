@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim) && canImport(SwiftUI)
+  import OpenCombineShim
   import SwiftUI
 
   extension Scheduler {
