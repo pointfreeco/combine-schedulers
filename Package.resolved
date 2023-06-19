@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "swift-concurrency-extras",
+        "repositoryURL": "https://github.com/pointfreeco/swift-concurrency-extras",
+        "state": {
+          "branch": "main",
+          "revision": "6f0ea35cde8293768ef2cdeb3991c83843c15a05",
+          "version": null
+        }
+      },
+      {
         "package": "xctest-dynamic-overlay",
         "repositoryURL": "https://github.com/pointfreeco/xctest-dynamic-overlay",
         "state": {
