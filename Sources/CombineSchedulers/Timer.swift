@@ -164,10 +164,10 @@
           lock.cleanupLock()
         }
 
-        func addSubscriber<S: Subscriber>(_ sub: S)
+        func addSubscriber<Sub: Subscriber>(_ sub: Sub)
         where
-          S.Failure == Failure,
-          S.Input == Output
+          Sub.Failure == Failure,
+          Sub.Input == Output
         {
           lock.lock()
           subscribers.append(AnySubscriber(sub))
@@ -232,8 +232,8 @@
         }
       }
 
-      public func receive<S: Subscriber>(subscriber: S)
-      where Failure == S.Failure, Output == S.Input {
+      public func receive<Sub: Subscriber>(subscriber: Sub)
+      where Failure == Sub.Failure, Output == Sub.Input {
         routingSubscription.addSubscriber(subscriber)
       }
 
