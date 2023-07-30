@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-concurrency-extras",
         "state": {
           "branch": null,
-          "revision": "ecb065a41bbdd7f64ab2695ffc755ed37c9ff4dc",
-          "version": "0.1.0"
+          "revision": "ea631ce892687f5432a833312292b80db238186a",
+          "version": "1.0.0"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/pointfreeco/xctest-dynamic-overlay",
         "state": {
           "branch": null,
-          "revision": "4af50b38daf0037cfbab15514a241224c3f62f98",
-          "version": "0.8.5"
+          "revision": "302891700c7fa3b92ebde9fe7b42933f8349f3c7",
+          "version": "1.0.0"
         }
       }
     ]
