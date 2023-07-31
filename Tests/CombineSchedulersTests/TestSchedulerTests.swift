@@ -33,6 +33,94 @@ final class CombineSchedulerTests: XCTestCase {
 
     XCTAssertEqual(value, 1)
   }
+	
+  func testAdvanceWithInaccuracy() {
+    let scheduler = DispatchQueue.inaccurate(by: .milliseconds(50))
+    let start = scheduler.now
+    var time: DispatchQueue.SchedulerTimeType?
+    
+    Just(())
+      .delay(for: 1, scheduler: scheduler)
+      .sink { time = scheduler.now }
+      .store(in: &cancellables)
+    
+    XCTAssertEqual(time, nil)
+    
+    scheduler.advance(by: .milliseconds(500))
+    
+    XCTAssertEqual(time, nil)
+    
+    scheduler.advance(by: .milliseconds(500))
+    
+    XCTAssertEqual(time, nil)
+    
+    scheduler.advance(by: .milliseconds(50))
+    
+    XCTAssertEqual(
+      time,
+      start
+        .advanced(by: .seconds(1))
+        .advanced(by: .milliseconds(50))
+    )
+    
+    XCTAssertEqual(
+      scheduler.now,
+      start
+        .advanced(by: .seconds(1))
+        .advanced(by: .milliseconds(50))
+    )
+  }
+  
+  func testAdvanceToWithInaccuracy() {
+    let scheduler = DispatchQueue.inaccurate(by: .milliseconds(50))
+    let start = scheduler.now
+    var time: DispatchQueue.SchedulerTimeType?
+    
+    Just(())
+      .delay(for: 1, scheduler: scheduler)
+      .sink { time = scheduler.now }
+      .store(in: &self.cancellables)
+    
+    XCTAssertEqual(time, nil)
+    
+    scheduler.advance(to: start.advanced(by: .milliseconds(500)))
+    
+    XCTAssertEqual(time, nil)
+    
+    scheduler.advance(to: start.advanced(by: .milliseconds(1000)))
+    
+    XCTAssertEqual(time, nil)
+    
+    scheduler.advance(to: start.advanced(by: .milliseconds(1050)))
+    
+    XCTAssertEqual(
+      time,
+      start
+        .advanced(by: .seconds(1))
+        .advanced(by: .milliseconds(50))
+    )
+  }
+  
+  func testInaccruateAsyncTimer() async throws {
+    let scheduler = DispatchQueue.inaccurate(by: .milliseconds(50))
+    let start = scheduler.now
+    
+    let task = Task {
+      var times = [DispatchQueue.SchedulerTimeType]()
+      for await time in scheduler.timer(interval: .seconds(1)).prefix(3) {
+        times.append(time)
+      }
+      return times
+    }
+    
+    await scheduler.advance(by: .seconds(10))
+    let times = await task.value
+    XCTAssertEqual(times, [
+      start.advanced(by: .milliseconds(1050)),
+      start.advanced(by: .milliseconds(2050)),
+      start.advanced(by: .milliseconds(3050)),
+    ])
+  }
 
   func testAdvanceTo() {
     let scheduler = DispatchQueue.test

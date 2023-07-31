@@ -73,15 +73,18 @@
 
     private var lastSequence: UInt = 0
     private let lock = NSRecursiveLock()
-    public let minimumTolerance: SchedulerTimeType.Stride = .zero
+    public let minimumTolerance: SchedulerTimeType.Stride
     public private(set) var now: SchedulerTimeType
     private var scheduled: [(sequence: UInt, date: SchedulerTimeType, action: () -> Void)] = []
 
     /// Creates a test scheduler with the given date.
     ///
     /// - Parameter now: The current date of the test scheduler.
-    public init(now: SchedulerTimeType) {
+    /// - Parameter minimumTolerance: An additional delay which will be added to the `.now`
+    ///   property before executing units of work.
+    public init(now: SchedulerTimeType, minimumTolerance: SchedulerTimeType.Stride = .zero) {
       self.now = now
+      self.minimumTolerance = minimumTolerance
     }
 
     /// Advances the scheduler by the given stride.
@@ -102,7 +105,7 @@
     public func advance(by duration: SchedulerTimeType.Stride = .zero) async {
       await self.advance(to: self.now.advanced(by: duration))
     }
-
+    
     /// Advances the scheduler to the given instant.
     ///
     /// - Parameter instant: An instant in time to advance to.
@@ -110,7 +113,7 @@
       while self.lock.sync(operation: { self.now }) <= instant {
         self.lock.lock()
         self.scheduled.sort { ($0.date, $0.sequence) < ($1.date, $1.sequence) }
-
+        
         guard
           let next = self.scheduled.first,
           instant >= next.date
@@ -119,7 +122,7 @@
           self.lock.unlock()
           return
         }
-
+        
         self.now = next.date
         self.scheduled.removeFirst()
         self.lock.unlock()
@@ -146,7 +149,7 @@
             self.lock.unlock()
             return true
           }
-
+          
           self.now = next.date
           self.scheduled.removeFirst()
           self.lock.unlock()
@@ -212,18 +215,27 @@
       _ action: @escaping () -> Void
     ) -> Cancellable {
       let sequence = self.lock.sync { self.nextSequence() }
-
+      let minimumTolerance = self.minimumTolerance
+      
       func scheduleAction(for date: SchedulerTimeType) -> () -> Void {
         return { [weak self] in
           let nextDate = date.advanced(by: interval)
           self?.lock.sync {
-            self?.scheduled.append((sequence, nextDate, scheduleAction(for: nextDate)))
+            self?.scheduled.append((
+              sequence,
+              nextDate.advanced(by: minimumTolerance),
+              scheduleAction(for: nextDate)
+            ))
           }
           action()
         }
       }
 
-      self.lock.sync { self.scheduled.append((sequence, date, scheduleAction(for: date))) }
+      self.lock.sync { self.scheduled.append((
+        sequence,
+        date.advanced(by: minimumTolerance),
+        scheduleAction(for: date)
+      )) }
 
       return AnyCancellable { [weak self] in
         self?.lock.sync { self?.scheduled.removeAll(where: { $0.sequence == sequence }) }
@@ -236,7 +248,11 @@
       options _: SchedulerOptions?,
       _ action: @escaping () -> Void
     ) {
-      self.lock.sync { self.scheduled.append((self.nextSequence(), date, action)) }
+      self.lock.sync { self.scheduled.append((
+        self.nextSequence(),
+        date.advanced(by: minimumTolerance),
+        action
+      )) }
     }
 
     public func schedule(options _: SchedulerOptions?, _ action: @escaping () -> Void) {
@@ -255,6 +271,13 @@
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
+    
+    /// A test scheduler of dispatch queues that simulates the inaccuracy of real schedulers.
+    public static func inaccurate(
+      by minimumTolerance: SchedulerTimeType.Stride
+    ) -> TestSchedulerOf<DispatchQueue> {
+      .init(now: .init(.init(uptimeNanoseconds: 1)), minimumTolerance: minimumTolerance)
+    }
   }
 
   extension UIScheduler {
@@ -263,6 +286,15 @@
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
       .init(now: .init(.init(uptimeNanoseconds: 1)))
     }
+    
+    /// A test scheduler compatible with type erased UI schedulers that simulates the inaccuracy of
+    /// real schedulers.
+    @_disfavoredOverload
+    public static func test(
+      minimumTolerance: SchedulerTimeType.Stride
+    ) -> TestSchedulerOf<UIScheduler> {
+      .init(now: .init(.init(uptimeNanoseconds: 1)), minimumTolerance: minimumTolerance)
+    }
   }
 
   extension OperationQueue {
@@ -270,12 +302,28 @@
     public static var test: TestSchedulerOf<OperationQueue> {
       .init(now: .init(.init(timeIntervalSince1970: 0)))
     }
+		
+    /// A test scheduler of operations queues that simulates the inaccuracy of real schedulers.
+    @_disfavoredOverload
+    public static func test(
+      minimumTolerance: SchedulerTimeType.Stride
+    ) -> TestSchedulerOf<OperationQueue> {
+      .init(now: .init(.init(timeIntervalSince1970: 0)), minimumTolerance: minimumTolerance)
+    }
   }
 
   extension RunLoop {
     /// A test scheduler of run loops.
     public static var test: TestSchedulerOf<RunLoop> {
       .init(now: .init(.init(timeIntervalSince1970: 0)))
+    }
+		
+    /// A test scheduler of run loops that simulates the inaccuracy of real schedulers.
+    @_disfavoredOverload
+    public static func test(
+      minimumTolerance: SchedulerTimeType.Stride
+    ) -> TestSchedulerOf<RunLoop> {
+      .init(now: .init(.init(timeIntervalSince1970: 0)), minimumTolerance: minimumTolerance)
     }
   }
 
