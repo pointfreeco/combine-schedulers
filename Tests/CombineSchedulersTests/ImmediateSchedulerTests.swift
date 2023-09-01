@@ -1,3 +1,4 @@
+#if canImport(Combine)
 import Combine
 import CombineSchedulers
 import XCTest
@@ -17,3 +18,4 @@ final class ImmediateSchedulerTests: XCTestCase {
     XCTAssertEqual(worked, 3)
   }
 }
+#endif

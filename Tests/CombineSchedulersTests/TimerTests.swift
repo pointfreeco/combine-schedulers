@@ -1,3 +1,4 @@
+#if canImport(Combine)
 import Combine
 import CombineSchedulers
 import XCTest
@@ -142,3 +143,4 @@ final class TimerTests: XCTestCase {
     XCTAssertEqual(count, 3)
   }
 }
+#endif

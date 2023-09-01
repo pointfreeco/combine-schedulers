@@ -1,3 +1,4 @@
+#if canImport(Combine)
 import Combine
 import CombineSchedulers
 import XCTest
@@ -250,3 +251,4 @@ final class CombineSchedulerTests: XCTestCase {
     XCTAssertEqual(testScheduler.now, start.advanced(by: .seconds(2)))
   }
 }
+#endif

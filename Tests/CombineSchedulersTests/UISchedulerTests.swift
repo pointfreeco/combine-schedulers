@@ -1,3 +1,4 @@
+#if canImport(Combine)
 import Combine
 import CombineSchedulers
 import XCTest
@@ -29,3 +30,4 @@ final class UISchedulerTests: XCTestCase {
     XCTAssertTrue(worked)
   }
 }
+#endif
