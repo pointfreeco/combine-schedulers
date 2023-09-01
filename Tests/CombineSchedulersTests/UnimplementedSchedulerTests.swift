@@ -1,4 +1,5 @@
 #if compiler(>=5.4)
+#if canImport(Combine)
   import Combine
   import CombineSchedulers
   import XCTest
@@ -32,4 +33,5 @@
       }
     }
   }
+#endif // canImport(Combine)
 #endif
