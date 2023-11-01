@@ -292,7 +292,7 @@
   extension AnyScheduler
   where
     SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
+    SchedulerOptions == Never
   {
     /// The type-erased UI scheduler shared instance.
     ///
