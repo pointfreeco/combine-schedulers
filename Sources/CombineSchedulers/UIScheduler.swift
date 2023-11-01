@@ -16,7 +16,7 @@
   /// possible on the main thread, and for which a thread hop would be problematic, such as when
   /// performing animations.
   public struct UIScheduler: Scheduler, Sendable {
-    public typealias SchedulerOptions = Never
+    public typealias SchedulerOptions = DispatchQueue.SchedulerOptions
     public typealias SchedulerTimeType = DispatchQueue.SchedulerTimeType
 
     /// The shared instance of the UI scheduler.
