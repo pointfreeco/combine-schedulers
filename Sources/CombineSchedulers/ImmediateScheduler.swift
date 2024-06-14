@@ -150,6 +150,14 @@
     }
   }
 
+  extension UIScheduler {
+    /// An immediate scheduler that can substitute itself for a UI scheduler.
+    public static var immediate: ImmediateSchedulerOf<UIScheduler> {
+      // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
+      .init(now: .init(.init(uptimeNanoseconds: 1)))
+    }
+  }
+
   extension OperationQueue {
     /// An immediate scheduler that can substitute itself for an operation queue.
     public static var immediate: ImmediateSchedulerOf<OperationQueue> {
