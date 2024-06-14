@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 
 import PackageDescription
 
@@ -34,12 +34,6 @@ let package = Package(
         "CombineSchedulers"
       ]
     ),
-  ]
+  ],
+  swiftLanguageVersions: [.v6]
 )
-
-for target in package.targets {
-  target.swiftSettings = target.swiftSettings ?? []
-  target.swiftSettings!.append(contentsOf: [
-    .enableExperimentalFeature("StrictConcurrency")
-  ])
-}

@@ -1,6 +1,6 @@
 #if canImport(Combine)
   import Combine
-  import Dispatch
+  @preconcurrency import Dispatch
 
   /// A scheduler that executes its work on the main queue as soon as possible.
   ///
