@@ -8,7 +8,7 @@
     ///
     /// This function doesn't block the scheduler.
     ///
-    /// ```
+    /// ```swift
     /// try await in scheduler.sleep(for: .seconds(1))
     /// ```
     ///
@@ -35,7 +35,7 @@
     ///
     /// This function doesn't block the scheduler.
     ///
-    /// ```
+    /// ```swift
     /// try await in scheduler.sleep(until: scheduler.now + .seconds(1))
     /// ```
 
@@ -59,7 +59,7 @@
     ///
     /// If the task is cancelled, the sequence will terminate.
     ///
-    /// ```
+    /// ```swift
     /// for await instant in scheduler.timer(interval: .seconds(1)) {
     ///   print("now:", instant)
     /// }
@@ -76,7 +76,7 @@
       tolerance: SchedulerTimeType.Stride = .zero,
       options: SchedulerOptions? = nil
     ) -> AsyncStream<SchedulerTimeType> {
-      .init { continuation in
+      AsyncStream { continuation in
         let cancellable = self.schedule(
           after: self.now.advanced(by: interval),
           interval: interval,
@@ -96,7 +96,7 @@
 
     /// Measure the elapsed time to execute a closure.
     ///
-    /// ```
+    /// ```swift
     /// let elapsed = scheduler.measure {
     ///   someWork()
     /// }

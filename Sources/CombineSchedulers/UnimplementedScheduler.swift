@@ -170,7 +170,10 @@
     /// - Returns: An unimplemented scheduler.
     public static func unimplemented(_ prefix: String) -> UnimplementedSchedulerOf<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
-      .init(prefix, now: .init(.init(uptimeNanoseconds: 1)))
+      UnimplementedScheduler(
+        prefix,
+        now: DispatchQueue.SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1))
+      )
     }
   }
 
@@ -186,7 +189,10 @@
     ///   messages.
     /// - Returns: An unimplemented scheduler.
     public static func unimplemented(_ prefix: String) -> UnimplementedSchedulerOf<OperationQueue> {
-      .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
+      UnimplementedScheduler(
+        prefix,
+        now: OperationQueue.SchedulerTimeType(Date(timeIntervalSince1970: 0))
+      )
     }
   }
 
@@ -202,15 +208,14 @@
     ///   messages.
     /// - Returns: An unimplemented scheduler.
     public static func unimplemented(_ prefix: String) -> UnimplementedSchedulerOf<RunLoop> {
-      .init(prefix, now: .init(.init(timeIntervalSince1970: 0)))
+      UnimplementedScheduler(
+        prefix,
+        now: RunLoop.SchedulerTimeType(Date(timeIntervalSince1970: 0))
+      )
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  extension AnySchedulerOf<DispatchQueue> {
     /// An unimplemented scheduler that can substitute itself for a dispatch queue.
     public static var unimplemented: Self {
       DispatchQueue.unimplemented.eraseToAnyScheduler()
@@ -226,11 +231,7 @@
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == OperationQueue.SchedulerTimeType,
-    SchedulerOptions == OperationQueue.SchedulerOptions
-  {
+  extension AnySchedulerOf<OperationQueue> {
     /// An unimplemented scheduler that can substitute itself for an operation queue.
     public static var unimplemented: Self {
       OperationQueue.unimplemented.eraseToAnyScheduler()
@@ -246,11 +247,7 @@
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
+  extension AnySchedulerOf<RunLoop> {
     /// An unimplemented scheduler that can substitute itself for a run loop.
     public static var unimplemented: Self {
       RunLoop.unimplemented.eraseToAnyScheduler()

@@ -1,6 +1,11 @@
 #if canImport(Combine)
   import Combine
-  @preconcurrency import Dispatch
+
+  #if swift(>=6)
+    @preconcurrency import Dispatch
+  #else
+    import Dispatch
+  #endif
 
   /// A scheduler that executes its work on the main queue as soon as possible.
   ///
