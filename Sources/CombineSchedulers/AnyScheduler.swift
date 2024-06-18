@@ -131,12 +131,10 @@
   /// in classes, functions, etc. without needing to introduce a generic, which can help simplify
   /// the code and reduce implementation details from leaking out.
   ///
-  public struct AnyScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler, @unchecked Sendable
-  where
-    SchedulerTimeType: Strideable,
-    SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
-  {
-
+  public struct AnyScheduler<
+    SchedulerTimeType: Strideable, SchedulerOptions
+  >: Scheduler, @unchecked Sendable
+  where SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
     private let _minimumTolerance: () -> SchedulerTimeType.Stride
     private let _now: () -> SchedulerTimeType
     private let _scheduleAfterIntervalToleranceOptionsAction:
@@ -193,12 +191,9 @@
     ///
     /// - Parameters:
     ///   - scheduler: A scheduler to wrap with a type-eraser.
-    public init<S>(
+    public init<S: Scheduler<SchedulerTimeType>>(
       _ scheduler: S
-    )
-    where
-      S: Scheduler, S.SchedulerTimeType == SchedulerTimeType, S.SchedulerOptions == SchedulerOptions
-    {
+    ) where S.SchedulerOptions == SchedulerOptions {
       self._now = { scheduler.now }
       self._minimumTolerance = { scheduler.minimumTolerance }
       self._scheduleAfterToleranceOptionsAction = scheduler.schedule
@@ -251,11 +246,7 @@
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  extension AnySchedulerOf<DispatchQueue> {
     /// A type-erased main dispatch queue.
     public static var main: Self {
       DispatchQueue.main.eraseToAnyScheduler()

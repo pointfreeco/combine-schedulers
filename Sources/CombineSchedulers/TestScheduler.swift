@@ -67,9 +67,9 @@
   /// but this technique can be used to test any publisher that involves Combine's asynchronous
   /// operations.
   ///
-  public final class TestScheduler<SchedulerTimeType, SchedulerOptions>:
+  public final class TestScheduler<SchedulerTimeType: Strideable, SchedulerOptions>:
     Scheduler, @unchecked Sendable
-  where SchedulerTimeType: Strideable, SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
+  where SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
 
     private var lastSequence: UInt = 0
     private let lock = NSRecursiveLock()
@@ -98,7 +98,6 @@
     /// - Parameter duration: A stride. By default this argument is `.zero`, which does not advance
     ///   the scheduler's time but does cause the scheduler to execute any units of work that are
     ///   waiting to be performed for right now.
-    @MainActor
     public func advance(by duration: SchedulerTimeType.Stride = .zero) async {
       await self.advance(to: self.now.advanced(by: duration))
     }
@@ -130,7 +129,6 @@
     /// Advances the scheduler to the given instant.
     ///
     /// - Parameter instant: An instant in time to advance to.
-    @MainActor
     public func advance(to instant: SchedulerTimeType) async {
       while self.lock.sync(operation: { self.now }) <= instant {
         await Task.megaYield()
@@ -196,7 +194,6 @@
       }
     }
 
-    @MainActor
     public func run() async {
       await Task.megaYield()
       while let date = self.lock.sync(operation: { self.scheduled.first?.date }) {
@@ -253,7 +250,7 @@
     /// A test scheduler of dispatch queues.
     public static var test: TestSchedulerOf<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
-      .init(now: .init(.init(uptimeNanoseconds: 1)))
+      TestScheduler(now: DispatchQueue.SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
     }
   }
 
@@ -261,21 +258,21 @@
     /// A test scheduler compatible with type erased UI schedulers.
     public static var test: TestSchedulerOf<Self> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
-      .init(now: .init(.init(uptimeNanoseconds: 1)))
+      TestScheduler(now: UIScheduler.SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
     }
   }
 
   extension OperationQueue {
     /// A test scheduler of operation queues.
     public static var test: TestSchedulerOf<OperationQueue> {
-      .init(now: .init(.init(timeIntervalSince1970: 0)))
+      TestScheduler(now: OperationQueue.SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
 
   extension RunLoop {
     /// A test scheduler of run loops.
     public static var test: TestSchedulerOf<RunLoop> {
-      .init(now: .init(.init(timeIntervalSince1970: 0)))
+      TestScheduler(now: RunLoop.SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
 

@@ -98,12 +98,8 @@
   /// > `ImmediateScheduler` will not schedule this work in a defined way. Use a `TestScheduler`
   /// > instead to capture your publisher's timing behavior.
   ///
-  public struct ImmediateScheduler<SchedulerTimeType, SchedulerOptions>: Scheduler
-  where
-    SchedulerTimeType: Strideable,
-    SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
-  {
-
+  public struct ImmediateScheduler<SchedulerTimeType: Strideable, SchedulerOptions>: Scheduler
+  where SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
     public let minimumTolerance: SchedulerTimeType.Stride = .zero
     public let now: SchedulerTimeType
 
@@ -146,7 +142,7 @@
     /// An immediate scheduler that can substitute itself for a dispatch queue.
     public static var immediate: ImmediateSchedulerOf<DispatchQueue> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
-      .init(now: .init(.init(uptimeNanoseconds: 1)))
+      ImmediateScheduler(now: DispatchQueue.SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
     }
   }
 
@@ -154,51 +150,39 @@
     /// An immediate scheduler that can substitute itself for a UI scheduler.
     public static var immediate: ImmediateSchedulerOf<UIScheduler> {
       // NB: `DispatchTime(uptimeNanoseconds: 0) == .now())`. Use `1` for consistency.
-      .init(now: .init(.init(uptimeNanoseconds: 1)))
+      ImmediateScheduler(now: UIScheduler.SchedulerTimeType(DispatchTime(uptimeNanoseconds: 1)))
     }
   }
 
   extension OperationQueue {
     /// An immediate scheduler that can substitute itself for an operation queue.
     public static var immediate: ImmediateSchedulerOf<OperationQueue> {
-      .init(now: .init(.init(timeIntervalSince1970: 0)))
+      ImmediateScheduler(now: OperationQueue.SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
 
   extension RunLoop {
     /// An immediate scheduler that can substitute itself for a run loop.
     public static var immediate: ImmediateSchedulerOf<RunLoop> {
-      .init(now: .init(.init(timeIntervalSince1970: 0)))
+      ImmediateScheduler(now: RunLoop.SchedulerTimeType(Date(timeIntervalSince1970: 0)))
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == DispatchQueue.SchedulerTimeType,
-    SchedulerOptions == DispatchQueue.SchedulerOptions
-  {
+  extension AnySchedulerOf<DispatchQueue> {
     /// An immediate scheduler that can substitute itself for a dispatch queue.
     public static var immediate: Self {
       DispatchQueue.immediate.eraseToAnyScheduler()
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == OperationQueue.SchedulerTimeType,
-    SchedulerOptions == OperationQueue.SchedulerOptions
-  {
+  extension AnySchedulerOf<OperationQueue> {
     /// An immediate scheduler that can substitute itself for an operation queue.
     public static var immediate: Self {
       OperationQueue.immediate.eraseToAnyScheduler()
     }
   }
 
-  extension AnyScheduler
-  where
-    SchedulerTimeType == RunLoop.SchedulerTimeType,
-    SchedulerOptions == RunLoop.SchedulerOptions
-  {
+  extension AnySchedulerOf<RunLoop> {
     /// An immediate scheduler that can substitute itself for a run loop.
     public static var immediate: Self {
       RunLoop.immediate.eraseToAnyScheduler()
