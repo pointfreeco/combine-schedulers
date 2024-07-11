@@ -1,13 +1,12 @@
 {
-  "originHash" : "1db297e1cc8b13e4efd568d84199c6b42369d1e4ae21add07497a1c9717b4837",
   "pins" : [
     {
       "identity" : "swift-concurrency-extras",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
       "state" : {
-        "revision" : "ea631ce892687f5432a833312292b80db238186a",
-        "version" : "1.0.0"
+        "revision" : "bb5059bde9022d69ac516803f4f227d8ac967f71",
+        "version" : "1.1.0"
       }
     },
     {
@@ -16,9 +15,9 @@
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
         "branch" : "swift-testing",
-        "revision" : "6d8747bca288a4d2e9ba3a6d7d7908975ee725f6"
+        "revision" : "b77c8b7198508cf747344c93a592643df2ffff4e"
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
