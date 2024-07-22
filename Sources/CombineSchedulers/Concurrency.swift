@@ -1,5 +1,6 @@
 #if canImport(Combine)
   @preconcurrency import Combine
+  import ConcurrencyExtras
 
   extension Scheduler {
     /// Suspends the current task for at least the given duration.
@@ -76,14 +77,15 @@
       tolerance: SchedulerTimeType.Stride = .zero,
       options: SchedulerOptions? = nil
     ) -> AsyncStream<SchedulerTimeType> {
-      AsyncStream { continuation in
+      @UncheckedSendable var scheduler = self
+      return AsyncStream { [$scheduler] continuation in
         let cancellable = self.schedule(
           after: self.now.advanced(by: interval),
           interval: interval,
           tolerance: tolerance,
           options: options
         ) {
-          continuation.yield(self.now)
+          continuation.yield($scheduler.wrappedValue.now)
         }
         continuation.onTermination =
           { _ in

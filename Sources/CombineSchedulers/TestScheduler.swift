@@ -98,6 +98,7 @@
     /// - Parameter duration: A stride. By default this argument is `.zero`, which does not advance
     ///   the scheduler's time but does cause the scheduler to execute any units of work that are
     ///   waiting to be performed for right now.
+    @MainActor
     public func advance(by duration: SchedulerTimeType.Stride = .zero) async {
       await self.advance(to: self.now.advanced(by: duration))
     }
@@ -129,6 +130,7 @@
     /// Advances the scheduler to the given instant.
     ///
     /// - Parameter instant: An instant in time to advance to.
+    @MainActor
     public func advance(to instant: SchedulerTimeType) async {
       while self.lock.sync(operation: { self.now }) <= instant {
         await Task.megaYield()
@@ -194,6 +196,7 @@
       }
     }
 
+    @MainActor
     public func run() async {
       await Task.megaYield()
       while let date = self.lock.sync(operation: { self.scheduled.first?.date }) {

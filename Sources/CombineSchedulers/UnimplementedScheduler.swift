@@ -1,7 +1,7 @@
 #if canImport(Combine)
   import Combine
   import Foundation
-  import XCTestDynamicOverlay
+  import IssueReporting
 
   /// A scheduler that causes the current XCTest test case to fail if it is used.
   ///
@@ -78,7 +78,7 @@
     SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible
   {
     public var minimumTolerance: SchedulerTimeType.Stride {
-      XCTFail(
+      reportIssue(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         An unimplemented scheduler was asked its minimum tolerance.
@@ -88,7 +88,7 @@
     }
 
     public var now: SchedulerTimeType {
-      XCTFail(
+      reportIssue(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         An unimplemented scheduler was asked the current time.
@@ -112,7 +112,7 @@
     }
 
     public func schedule(options _: SchedulerOptions?, _ action: () -> Void) {
-      XCTFail(
+      reportIssue(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         An unimplemented scheduler scheduled an action to run immediately.
@@ -127,7 +127,7 @@
       options _: SchedulerOptions?,
       _ action: () -> Void
     ) {
-      XCTFail(
+      reportIssue(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         An unimplemented scheduler scheduled an action to run later.
@@ -143,7 +143,7 @@
       options _: SchedulerOptions?,
       _ action: () -> Void
     ) -> Cancellable {
-      XCTFail(
+      reportIssue(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\
         An unimplemented scheduler scheduled an action to run on a timer.
