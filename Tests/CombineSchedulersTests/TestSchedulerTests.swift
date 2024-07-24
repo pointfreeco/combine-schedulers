@@ -1,19 +1,20 @@
 #if canImport(Combine)
   import Combine
   import CombineSchedulers
+  import ConcurrencyExtras
   import XCTest
 
   final class CombineSchedulerTests: XCTestCase {
-    var cancellables: Set<AnyCancellable> = []
-
     func testAdvance() {
+      var cancellables: Set<AnyCancellable> = []
+
       let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
         .delay(for: 1, scheduler: scheduler)
         .sink { value = $0 }
-        .store(in: &self.cancellables)
+        .store(in: &cancellables)
 
       XCTAssertEqual(value, nil)
 
@@ -35,6 +36,8 @@
     }
 
     func testAdvanceTo() {
+      var cancellables: Set<AnyCancellable> = []
+
       let scheduler = DispatchQueue.test
       let start = scheduler.now
 
@@ -42,7 +45,7 @@
       Just(1)
         .delay(for: 1, scheduler: scheduler)
         .sink { value = $0 }
-        .store(in: &self.cancellables)
+        .store(in: &cancellables)
 
       XCTAssertEqual(value, nil)
 
@@ -64,13 +67,15 @@
     }
 
     func testRunScheduler() {
+      var cancellables: Set<AnyCancellable> = []
+
       let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
         .delay(for: 1_000_000_000, scheduler: scheduler)
         .sink { value = $0 }
-        .store(in: &self.cancellables)
+        .store(in: &cancellables)
 
       XCTAssertEqual(value, nil)
 
@@ -84,13 +89,15 @@
     }
 
     func testDelay0Advance() {
+      var cancellables: Set<AnyCancellable> = []
+
       let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
         .delay(for: 0, scheduler: scheduler)
         .sink { value = $0 }
-        .store(in: &self.cancellables)
+        .store(in: &cancellables)
 
       XCTAssertEqual(value, nil)
 
@@ -100,13 +107,15 @@
     }
 
     func testSubscribeOnAdvance() {
+      var cancellables: Set<AnyCancellable> = []
+
       let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
         .subscribe(on: scheduler)
         .sink { value = $0 }
-        .store(in: &self.cancellables)
+        .store(in: &cancellables)
 
       XCTAssertEqual(value, nil)
 
@@ -116,13 +125,15 @@
     }
 
     func testReceiveOnAdvance() {
+      var cancellables: Set<AnyCancellable> = []
+
       let scheduler = DispatchQueue.test
 
       var value: Int?
       Just(1)
         .receive(on: scheduler)
         .sink { value = $0 }
-        .store(in: &self.cancellables)
+        .store(in: &cancellables)
 
       XCTAssertEqual(value, nil)
 
@@ -146,15 +157,17 @@
     }
 
     func testTwoIntervalOrdering() {
+      var cancellables: Set<AnyCancellable> = []
+
       let testScheduler = DispatchQueue.test
 
       var values: [Int] = []
 
       testScheduler.schedule(after: testScheduler.now, interval: 2) { values.append(1) }
-        .store(in: &self.cancellables)
+        .store(in: &cancellables)
 
       testScheduler.schedule(after: testScheduler.now, interval: 1) { values.append(42) }
-        .store(in: &self.cancellables)
+        .store(in: &cancellables)
 
       XCTAssertEqual(values, [])
       testScheduler.advance()
@@ -164,76 +177,90 @@
     }
 
     func testAdvanceToFarFuture() async {
-      let testScheduler = DispatchQueue.test
+      await withMainSerialExecutor {
+        var cancellables: Set<AnyCancellable> = []
 
-      var tickCount = 0
-      Publishers.Timer(every: .seconds(1), scheduler: testScheduler)
-        .autoconnect()
-        .sink { _ in tickCount += 1 }
-        .store(in: &self.cancellables)
+        let testScheduler = DispatchQueue.test
 
-      XCTAssertEqual(tickCount, 0)
-      await testScheduler.advance(by: .seconds(1))
-      XCTAssertEqual(tickCount, 1)
-      await testScheduler.advance(by: .seconds(1))
-      XCTAssertEqual(tickCount, 2)
-      await testScheduler.advance(by: .seconds(1_000))
-      XCTAssertEqual(tickCount, 1_002)
+        var tickCount = 0
+        Publishers.Timer(every: .seconds(1), scheduler: testScheduler)
+          .autoconnect()
+          .sink { _ in tickCount += 1 }
+          .store(in: &cancellables)
+
+        XCTAssertEqual(tickCount, 0)
+        await testScheduler.advance(by: .seconds(1))
+        XCTAssertEqual(tickCount, 1)
+        await testScheduler.advance(by: .seconds(1))
+        XCTAssertEqual(tickCount, 2)
+        await testScheduler.advance(by: .seconds(1_000))
+        XCTAssertEqual(tickCount, 1_002)
+      }
     }
 
     func testDelay0Advance_Async() async {
-      let scheduler = DispatchQueue.test
+      await withMainSerialExecutor {
+        var cancellables: Set<AnyCancellable> = []
 
-      var value: Int?
-      Just(1)
-        .delay(for: 0, scheduler: scheduler)
-        .sink { value = $0 }
-        .store(in: &self.cancellables)
+        let scheduler = DispatchQueue.test
 
-      XCTAssertEqual(value, nil)
+        var value: Int?
+        Just(1)
+          .delay(for: 0, scheduler: scheduler)
+          .sink { value = $0 }
+          .store(in: &cancellables)
 
-      await scheduler.advance()
+        XCTAssertEqual(value, nil)
 
-      XCTAssertEqual(value, 1)
+        await scheduler.advance()
+
+        XCTAssertEqual(value, 1)
+      }
     }
 
     func testAsyncSleep() async throws {
-      let testScheduler = DispatchQueue.test
+      try await withMainSerialExecutor {
+        let testScheduler = DispatchQueue.test
 
-      let task = Task {
-        try await testScheduler.sleep(for: .seconds(1))
+        let task = Task {
+          try await testScheduler.sleep(for: .seconds(1))
+        }
+
+        await testScheduler.advance(by: .seconds(1))
+        try await task.value
       }
-
-      await testScheduler.advance(by: .seconds(1))
-      try await task.value
     }
 
     func testAsyncTimer() async throws {
-      let testScheduler = DispatchQueue.test
+      await withMainSerialExecutor {
+        let testScheduler = DispatchQueue.test
 
-      let task = Task {
-        await testScheduler.timer(interval: .seconds(1))
-          .prefix(10)
-          .reduce(into: 0) { accum, _ in accum += 1 }
+        let task = Task {
+          await testScheduler.timer(interval: .seconds(1))
+            .prefix(10)
+            .reduce(into: 0) { accum, _ in accum += 1 }
+        }
+
+        await testScheduler.advance(by: .seconds(10))
+        let count = await task.value
+        XCTAssertEqual(count, 10)
       }
-
-      await testScheduler.advance(by: .seconds(10))
-      let count = await task.value
-      XCTAssertEqual(count, 10)
     }
 
     func testAsyncRun() async throws {
-      let testScheduler = DispatchQueue.test
+      await withMainSerialExecutor {
+        let testScheduler = DispatchQueue.test
 
-      let task = Task {
-        await testScheduler.timer(interval: .seconds(1))
-          .prefix(10)
-          .reduce(into: 0) { accum, _ in accum += 1 }
+        let task = Task {
+          await testScheduler.timer(interval: .seconds(1))
+            .prefix(10)
+            .reduce(into: 0) { accum, _ in accum += 1 }
+        }
+
+        await testScheduler.run()
+        let count = await task.value
+        XCTAssertEqual(count, 10)
       }
-
-      await testScheduler.run()
-      let count = await task.value
-      XCTAssertEqual(count, 10)
     }
 
     func testNowIsAdvanced() {
