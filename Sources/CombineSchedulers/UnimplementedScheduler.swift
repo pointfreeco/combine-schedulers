@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
   import Foundation
   import IssueReporting
 
@@ -267,5 +267,5 @@
   /// by the time type and options type.
   public typealias UnimplementedSchedulerOf<Scheduler> = UnimplementedScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  >  where Scheduler: OpenCombineShim.Scheduler
 #endif

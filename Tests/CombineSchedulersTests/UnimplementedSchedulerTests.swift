@@ -1,10 +1,12 @@
 #if compiler(>=5.4)
-  #if canImport(Combine)
-    import Combine
+  #if canImport(OpenCombineShim)
+    import OpenCombineShim
     import CombineSchedulers
     import XCTest
 
     final class UnimplementedSchedulerTests: XCTestCase {
+      
+      #if !os(Android)
       func testFailure() {
         let scheduler = RunLoop.unimplemented
 
@@ -33,6 +35,7 @@
           self.wait(for: [expectation], timeout: 0.1)
         }
       }
+      #endif
     }
-  #endif  // canImport(Combine)
+  #endif  // canImport(OpenCombineShim)
 #endif

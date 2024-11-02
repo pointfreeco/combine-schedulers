@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
   import Foundation
 
   /// A scheduler for performing synchronous actions.
@@ -193,5 +193,5 @@
   /// the time type and options type.
   public typealias ImmediateSchedulerOf<Scheduler> = ImmediateScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  > where Scheduler: OpenCombineShim.Scheduler
 #endif

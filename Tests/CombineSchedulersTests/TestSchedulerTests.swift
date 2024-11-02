@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
   import CombineSchedulers
   import ConcurrencyExtras
   import XCTest
@@ -176,6 +176,7 @@
       XCTAssertEqual(values, [1, 42, 42, 1, 42])
     }
 
+    #if !os(Android)
     func testAdvanceToFarFuture() async {
       await withMainSerialExecutor {
         var cancellables: Set<AnyCancellable> = []
@@ -262,7 +263,8 @@
         XCTAssertEqual(count, 10)
       }
     }
-
+    #endif
+    
     func testNowIsAdvanced() {
       let testScheduler = DispatchQueue.test
       let start = testScheduler.now

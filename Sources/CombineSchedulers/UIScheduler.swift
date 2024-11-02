@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
 
   #if swift(>=6)
     @preconcurrency import Dispatch

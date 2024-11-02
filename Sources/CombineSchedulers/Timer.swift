@@ -11,12 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 // Only support 64bit
-#if !(os(iOS) && (arch(i386) || arch(arm))) && canImport(Combine)
-  import Combine
+#if !(os(iOS) && (arch(i386) || arch(arm))) && canImport(OpenCombineShim)
+  import OpenCombineShim
   import Foundation
 
   @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-  extension Scheduler {
+  extension OpenCombineShim.Scheduler {
     /// Returns a publisher that repeatedly emits the scheduler's current time on the given
     /// interval.
     ///
@@ -80,7 +80,7 @@
     /// scheduler.advance(by: 1_000)
     /// XCTAssertEqual(output, Array(0...1_001))
     /// ```
-    public final class Timer<Scheduler: Combine.Scheduler>: ConnectablePublisher {
+    public final class Timer<Scheduler: OpenCombineShim.Scheduler>: ConnectablePublisher {
       public typealias Output = Scheduler.SchedulerTimeType
       public typealias Failure = Never
 
@@ -330,6 +330,33 @@
           demand += n
         }
 
+        #if os(Android)
+        func timerFired() {
+          lock.lock()
+          guard let ds = downstream, let parent = self.parent else {
+            lock.unlock()
+            return
+          }
+
+          // This publisher drops events on the floor when there is no space in the subscriber
+          guard demand > 0 else {
+            lock.unlock()
+            return
+          }
+
+          demand -= 1
+          lock.unlock()
+
+          let extra = ds.receive(parent.scheduler.now)
+          guard extra > 0 else {
+            return
+          }
+
+          lock.lock()
+          demand += extra
+          lock.unlock()
+        }
+        #else
         @objc
         func timerFired() {
           lock.lock()
@@ -356,6 +383,7 @@
           demand += extra
           lock.unlock()
         }
+        #endif
       }
     }
   }

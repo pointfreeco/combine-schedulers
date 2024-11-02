@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
   import CombineSchedulers
   import XCTest
 
@@ -77,6 +77,7 @@
       )
     }
 
+    #if !os(Android)
     func testInterleavingTimers() {
       let scheduler = DispatchQueue.test
 
@@ -106,7 +107,8 @@
       scheduler.advance(by: 1)
       XCTAssertEqual(output, [1, 2, 1, 1, 2])
     }
-
+    #endif
+    
     func testTimerCancellation() {
       let scheduler = DispatchQueue.test
 

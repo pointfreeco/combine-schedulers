@@ -1,5 +1,5 @@
-#if canImport(Combine)
-  import Combine
+#if canImport(OpenCombineShim)
+  import OpenCombineShim
   import CombineSchedulers
   import ConcurrencyExtras
   import XCTest
