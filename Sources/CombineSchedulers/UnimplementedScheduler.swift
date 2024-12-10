@@ -267,5 +267,5 @@
   /// by the time type and options type.
   public typealias UnimplementedSchedulerOf<Scheduler> = UnimplementedScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  >  where Scheduler: OpenCombineShim.Scheduler
+  > where Scheduler: OpenCombineShim.Scheduler
 #endif

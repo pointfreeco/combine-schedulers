@@ -43,20 +43,6 @@
     }
   }
 #else
-//typedef struct os_unfair_lock_s {
-//  uint32_t _os_unfair_lock_opaque;
-//} os_unfair_lock, *os_unfair_lock_t;
-
-public typealias os_unfair_lock_t = Int
-
-func os_unfair_lock() -> os_unfair_lock_t {
-  return 1
-}
-
-func os_unfair_lock_unlock(_ lock: os_unfair_lock_t) {
-  
-}
-
 struct Lock {
   internal init() {
    
