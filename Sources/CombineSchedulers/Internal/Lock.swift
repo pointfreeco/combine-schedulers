@@ -43,25 +43,33 @@
     }
   }
 #else
+import pthread
 struct Lock {
+  private let lockPtr: UnsafeMutablePointer<pthread_mutex_t>
+  
   internal init() {
-   
+    lockPtr = UnsafeMutablePointer<pthread_mutex_t>.allocate(capacity: 1)
+    var attr = pthread_mutexattr_t()
+    pthread_mutexattr_settype(&attr, Int32(PTHREAD_MUTEX_RECURSIVE))
+    pthread_mutex_init(lockPtr, &attr)
   }
-
+  
   internal func cleanupLock() {
-    
+    pthread_mutex_destroy(lockPtr)
+    lockPtr.deinitialize(count: 1)
+    lockPtr.deallocate()
   }
-
+  
   internal func lock() {
-    
+    pthread_mutex_lock(lockPtr)
   }
-
+  
   internal func tryLock() -> Bool {
-    return false
+    return pthread_mutex_trylock(lockPtr) == 0
   }
-
+  
   internal func unlock() {
-    
+    pthread_mutex_unlock(lockPtr)
   }
 }
 #endif
