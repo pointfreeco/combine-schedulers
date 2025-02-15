@@ -40,8 +40,12 @@ jobs:
         run: swift test -c ${{ matrix.config }}
 
   android:
-    name: Android (Swift 6.0.2)
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        swift:
+          - "6.0.2"
+    name: Android
+    runs-on: ubuntu-latest
     steps:
-      - name: Test on Android
-        uses: johankool/swift-android-test-action@v1
+      - uses: actions/checkout@v4
+      - uses: skiptools/swift-android-action@v2
