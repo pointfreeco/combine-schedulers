@@ -238,7 +238,7 @@
         let task = Task {
           await testScheduler.timer(interval: .seconds(1))
             .prefix(10)
-            .reduce(into: 0) { accum, _ in accum += 1 }
+            .reduce(into: 0) { @Sendable accum, _ in accum += 1 }
         }
 
         await testScheduler.advance(by: .seconds(10))
@@ -254,7 +254,7 @@
         let task = Task {
           await testScheduler.timer(interval: .seconds(1))
             .prefix(10)
-            .reduce(into: 0) { accum, _ in accum += 1 }
+            .reduce(into: 0) { @Sendable accum, _ in accum += 1 }
         }
 
         await testScheduler.run()
@@ -278,3 +278,4 @@
     }
   }
 #endif
+
