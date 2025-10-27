@@ -1,5 +1,9 @@
 #if canImport(Combine)
   import Combine
+#elseif canImport(OpenCombineShim)
+  import OpenCombineShim
+#endif
+#if canImport(Combine) || canImport(OpenCombineShim)
   import Foundation
 
   /// A type-erasing wrapper for the `Scheduler` protocol, which can be useful for being generic over
@@ -239,7 +243,7 @@
   /// time type and options type.
   public typealias AnySchedulerOf<Scheduler> = AnyScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  > where Scheduler: SchedulerProtocol
 
   extension Scheduler {
     /// Wraps this scheduler with a type eraser.

@@ -1,5 +1,9 @@
 #if canImport(Combine)
   import Combine
+#elseif canImport(OpenCombineShim)
+  import OpenCombineShim
+#endif
+#if canImport(Combine) || canImport(OpenCombineShim)
   import ConcurrencyExtras
   import Foundation
 
@@ -283,5 +287,5 @@
   /// time type and options type.
   public typealias TestSchedulerOf<Scheduler> = TestScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  > where Scheduler: SchedulerProtocol
 #endif

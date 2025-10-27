@@ -11,8 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 // Only support 64bit
-#if !(os(iOS) && (arch(i386) || arch(arm))) && canImport(Combine)
-  import Combine
+#if !(os(iOS) && (arch(i386) || arch(arm)))
+  #if canImport(Combine)
+    import Combine
+  #elseif canImport(OpenCombineShim)
+    import OpenCombineShim
+  #endif
   import Foundation
 
   @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -80,7 +84,7 @@
     /// scheduler.advance(by: 1_000)
     /// XCTAssertEqual(output, Array(0...1_001))
     /// ```
-    public final class Timer<Scheduler: Combine.Scheduler>: ConnectablePublisher {
+    public final class Timer<Scheduler: SchedulerProtocol>: ConnectablePublisher {
       public typealias Output = Scheduler.SchedulerTimeType
       public typealias Failure = Never
 
@@ -330,7 +334,6 @@
           demand += n
         }
 
-        @objc
         func timerFired() {
           lock.lock()
           guard let ds = downstream, let parent = self.parent else {

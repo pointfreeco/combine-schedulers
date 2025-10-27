@@ -42,4 +42,42 @@
       os_unfair_lock_unlock(self)
     }
   }
+#else
+  import Foundation
+
+  public class os_unfair_lock_s: @unchecked Sendable {
+    private var mutex: pthread_mutex_t
+
+    public init() {
+      var attr = pthread_mutexattr_t()
+      var mutex = pthread_mutex_t()
+      pthread_mutexattr_init(&attr)
+      pthread_mutexattr_settype(&attr, Int32(PTHREAD_MUTEX_ERRORCHECK))
+      pthread_mutex_init(&mutex, &attr)
+      pthread_mutexattr_destroy(&attr)
+      self.mutex = mutex
+    }
+
+    public init(_ mutex: pthread_mutex_t) {
+      self.mutex = mutex
+    }
+
+    public func lock() {
+      pthread_mutex_lock(&mutex)
+    }
+
+    public func unlock() {
+      pthread_mutex_unlock(&mutex)
+    }
+
+    public func cleanupLock() {
+      unlock()
+    }
+
+    deinit {
+      pthread_mutex_destroy(&mutex)
+    }
+  }
+
+  typealias Lock = os_unfair_lock_s
 #endif
