@@ -8,7 +8,7 @@ on:
 jobs:
   swift_format:
     name: swift-format
-    runs-on: macOS-15
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v5
       - name: Xcode Select
