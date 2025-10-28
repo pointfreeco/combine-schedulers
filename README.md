@@ -451,7 +451,8 @@ You can add CombineSchedulers to an Xcode project by adding it as a package depe
       - If you want to use this library from multiple targets you must create a shared framework that depends on **CombineSchedulers**, and then depend on that framework from your other targets.
 
 ### Linux usage
-To use combine-schedulers in as a package dependency on Linux, add the `OpenCombineSchedulers` trait.
+
+To use combine-schedulers as a package dependency on Linux add the `OpenCombineSchedulers` trait.
 ```swift
 let package = Package(
     ...
