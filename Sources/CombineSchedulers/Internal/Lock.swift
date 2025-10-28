@@ -45,10 +45,10 @@
 #else
   import Foundation
 
-  public class os_unfair_lock_s: @unchecked Sendable {
+  class os_unfair_lock_s: @unchecked Sendable {
     private var mutex: pthread_mutex_t
 
-    public init() {
+    init() {
       var attr = pthread_mutexattr_t()
       var mutex = pthread_mutex_t()
       pthread_mutexattr_init(&attr)
@@ -58,19 +58,19 @@
       self.mutex = mutex
     }
 
-    public init(_ mutex: pthread_mutex_t) {
+    init(_ mutex: pthread_mutex_t) {
       self.mutex = mutex
     }
 
-    public func lock() {
+    func lock() {
       pthread_mutex_lock(&mutex)
     }
 
-    public func unlock() {
+    func unlock() {
       pthread_mutex_unlock(&mutex)
     }
 
-    public func cleanupLock() {
+    func cleanupLock() {
       unlock()
     }
 
