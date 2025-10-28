@@ -287,5 +287,5 @@
   /// time type and options type.
   public typealias TestSchedulerOf<Scheduler> = TestScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: SchedulerProtocol
+  > where Scheduler: _CombineScheduler
 #endif

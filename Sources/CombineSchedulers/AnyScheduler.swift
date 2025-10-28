@@ -243,7 +243,7 @@
   /// time type and options type.
   public typealias AnySchedulerOf<Scheduler> = AnyScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: SchedulerProtocol
+  > where Scheduler: _CombineScheduler
 
   extension Scheduler {
     /// Wraps this scheduler with a type eraser.

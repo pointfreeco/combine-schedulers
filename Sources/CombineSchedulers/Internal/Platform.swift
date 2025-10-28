@@ -1,9 +1,9 @@
 #if canImport(Combine)
   import Combine
 
-  public typealias SchedulerProtocol = Combine.Scheduler
+  public typealias _CombineScheduler = Combine.Scheduler
 #elseif canImport(OpenCombine)
   import OpenCombine
 
-  public typealias SchedulerProtocol = OpenCombine.Scheduler
+  public typealias _CombineScheduler = OpenCombine.Scheduler
 #endif

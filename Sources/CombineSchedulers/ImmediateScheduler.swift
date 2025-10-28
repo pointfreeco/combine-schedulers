@@ -197,5 +197,5 @@
   /// the time type and options type.
   public typealias ImmediateSchedulerOf<Scheduler> = ImmediateScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: SchedulerProtocol
+  > where Scheduler: _CombineScheduler
 #endif
