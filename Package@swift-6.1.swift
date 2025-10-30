@@ -16,7 +16,7 @@ let package = Package(
             targets: ["CombineSchedulers"]
         ),
     ],
-    traits: ["OpenCombineSchedulers"],
+    traits: packageTraits(),
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.0.0"),
         .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.2.2"),
@@ -40,3 +40,18 @@ let package = Package(
     ],
     swiftLanguageModes: [.v6]
 )
+
+func packageTraits() -> Set<Trait> {
+    let traits: Set<Trait> = [
+        Trait(
+            name: "OpenCombineSchedulers",
+            description: "Drop in replacement for Combine on non Darwin platforms",
+            enabledTraits: []
+        )
+    ]
+    #if os(Linux)
+        return traits + [.default(enabledTraits: ["OpenCombineSchedulers"])]
+    #else
+        return traits
+    #endif
+}
