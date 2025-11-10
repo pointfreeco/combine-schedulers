@@ -14,7 +14,7 @@ let package = Package(
     .library(
       name: "CombineSchedulers",
       targets: ["CombineSchedulers"]
-    ),
+    )
   ],
   traits: [
     Trait(
@@ -43,7 +43,7 @@ let package = Package(
     .testTarget(
       name: "CombineSchedulersTests",
       dependencies: [
-        "CombineSchedulers",
+        "CombineSchedulers"
       ]
     ),
   ],
