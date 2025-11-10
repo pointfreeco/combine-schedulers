@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 5.9
 
 import PackageDescription
 
@@ -14,12 +14,6 @@ let package = Package(
     .library(
       name: "CombineSchedulers",
       targets: ["CombineSchedulers"]
-    ),
-  ],
-  traits: [
-    Trait(
-      name: "OpenCombineSchedulers",
-      description: "Support for Combine on non-Apple platforms using OpenCombine."
     )
   ],
   dependencies: [
@@ -34,24 +28,21 @@ let package = Package(
         .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
         .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
         .product(
-          name: "OpenCombineShim",
-          package: "OpenCombine",
-          condition: .when(platforms: [.linux], traits: ["OpenCombineSchedulers"])
-        ),
+          name: "OpenCombineShim", package: "OpenCombine", condition: .when(platforms: [.linux])),
       ]
     ),
     .testTarget(
       name: "CombineSchedulersTests",
       dependencies: [
-        "CombineSchedulers",
+        "CombineSchedulers"
       ]
     ),
-  ],
-  swiftLanguageModes: [.v6]
+  ]
 )
 
-#if !canImport(Darwin)
-  package.traits.insert(
-    .default(enabledTraits: ["OpenCombineSchedulers"])
-  )
-#endif
+for target in package.targets {
+  target.swiftSettings = target.swiftSettings ?? []
+  target.swiftSettings!.append(contentsOf: [
+    .enableExperimentalFeature("StrictConcurrency")
+  ])
+}
