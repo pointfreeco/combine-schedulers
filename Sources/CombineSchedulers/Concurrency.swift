@@ -1,5 +1,9 @@
 #if canImport(Combine)
   @preconcurrency import Combine
+#elseif canImport(OpenCombineShim)
+  @preconcurrency import OpenCombineShim
+#endif
+#if canImport(Combine) || canImport(OpenCombineShim)
   import ConcurrencyExtras
 
   extension Scheduler {

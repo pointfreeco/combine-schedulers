@@ -1,4 +1,5 @@
 {
+  "originHash" : "c75d56e4c8f1ec37edf23a57664f6d0505f4d7e5105bc102b9f78db57f218185",
   "pins" : [
     {
       "identity" : "swift-concurrency-extras",
@@ -19,5 +20,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
