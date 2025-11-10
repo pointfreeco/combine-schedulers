@@ -45,7 +45,7 @@
 #else
   import Foundation
 
-  class os_unfair_lock_s: @unchecked Sendable {
+  final class os_unfair_lock_s: @unchecked Sendable {
     private var mutex: pthread_mutex_t
 
     init() {
