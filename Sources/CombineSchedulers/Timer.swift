@@ -17,6 +17,7 @@
   #elseif canImport(OpenCombineShim)
     import OpenCombineShim
   #endif
+  #if canImport(Combine) || canImport(OpenCombineShim)
   import Foundation
 
   @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -362,5 +363,6 @@
       }
     }
   }
+  #endif  // canImport(Combine) || canImport(OpenCombineShim)
 
 #endif /* !(os(iOS) && (arch(i386) || arch(arm))) */
