@@ -1,5 +1,9 @@
 #if canImport(Combine)
   import Combine
+#elseif canImport(OpenCombineShim)
+  import OpenCombineShim
+#endif
+#if canImport(Combine) || canImport(OpenCombineShim)
   import Foundation
 
   /// A type-erasing wrapper for the `Scheduler` protocol, which can be useful for being generic over
@@ -172,13 +176,15 @@
       minimumTolerance: @escaping () -> SchedulerTimeType.Stride,
       now: @escaping () -> SchedulerTimeType,
       scheduleImmediately: @escaping (SchedulerOptions?, @escaping () -> Void) -> Void,
-      delayed: @escaping (
-        SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void
-      ) -> Void,
-      interval: @escaping (
-        SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?,
-        @escaping () -> Void
-      ) -> Cancellable
+      delayed:
+        @escaping (
+          SchedulerTimeType, SchedulerTimeType.Stride, SchedulerOptions?, @escaping () -> Void
+        ) -> Void,
+      interval:
+        @escaping (
+          SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?,
+          @escaping () -> Void
+        ) -> Cancellable
     ) {
       self._minimumTolerance = minimumTolerance
       self._now = now
@@ -237,7 +243,7 @@
   /// time type and options type.
   public typealias AnySchedulerOf<Scheduler> = AnyScheduler<
     Scheduler.SchedulerTimeType, Scheduler.SchedulerOptions
-  > where Scheduler: Combine.Scheduler
+  > where Scheduler: _CombineScheduler
 
   extension Scheduler {
     /// Wraps this scheduler with a type eraser.
