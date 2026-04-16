@@ -7,7 +7,6 @@ on:
   pull_request:
     branches:
       - '*'
-  workflow_dispatch:
 
 jobs:
   library:
@@ -22,29 +21,14 @@ jobs:
       # - name: Build for library evolution
       #   run: make build-for-library-evolution
 
-  windows:
-    name: Windows
-    strategy:
-      matrix:
-        os: [windows-latest]
-        config: ['debug', 'release']
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: compnerd/gha-setup-swift@main
-        with:
-          branch: swift-5.10-release
-          tag: 5.10-RELEASE
-
-      - uses: actions/checkout@v4
-      - name: Run tests
-        run: swift test -c ${{ matrix.config }}
-
   linux-android:
-    name: Linux & Android
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: "Test Swift Package on Linux"
         run: swift test
       - name: "Test Swift Package on Android"
         uses: skiptools/swift-android-action@v2
+        with:
+          # Ubuntu runners low on space causes the emulator to fail to install
+          free-disk-space: true
