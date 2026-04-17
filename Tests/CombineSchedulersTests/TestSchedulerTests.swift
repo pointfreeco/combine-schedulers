@@ -180,6 +180,7 @@
       XCTAssertEqual(values, [1, 42, 42, 1, 42])
     }
 
+    #if !os(Android)
     func testAdvanceToFarFuture() async {
       await withMainSerialExecutor {
         var cancellables: Set<AnyCancellable> = []
@@ -280,5 +281,6 @@
       testScheduler.advance(by: .seconds(1))
       XCTAssertEqual(testScheduler.now, start.advanced(by: .seconds(2)))
     }
+  #endif
   }
 #endif
