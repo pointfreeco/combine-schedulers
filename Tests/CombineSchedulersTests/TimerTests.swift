@@ -81,7 +81,7 @@
       )
     }
 
-    #if !os(Linux)  // No Publishers.MergeMany in OpenCombine
+    #if !os(Linux) && !os(Android)  // No Publishers.MergeMany in OpenCombine
       func testInterleavingTimers() {
         let scheduler = DispatchQueue.test
 
