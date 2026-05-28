@@ -1,10 +1,10 @@
 #if canImport(Combine)
-  import Combine
+public import Combine
 #elseif canImport(OpenCombineShim)
-  import OpenCombineShim
+public import OpenCombineShim
 #endif
 #if canImport(Combine) || canImport(OpenCombineShim)
-  import Foundation
+public import Foundation
   import IssueReporting
 
   /// A scheduler that causes the current XCTest test case to fail if it is used.

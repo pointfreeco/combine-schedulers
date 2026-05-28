@@ -1,10 +1,10 @@
 #if canImport(Combine)
-  import Combine
+  public import Combine
 #elseif canImport(OpenCombineShim)
-  import OpenCombineShim
+  public import OpenCombineShim
 #endif
 #if canImport(Combine) || canImport(OpenCombineShim)
-  import Foundation
+  public import Foundation
 
   /// A scheduler for performing synchronous actions.
   ///

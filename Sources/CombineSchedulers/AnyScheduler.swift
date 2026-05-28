@@ -1,10 +1,10 @@
 #if canImport(Combine)
-  import Combine
+  public import Combine
 #elseif canImport(OpenCombineShim)
-  import OpenCombineShim
+  public import OpenCombineShim
 #endif
 #if canImport(Combine) || canImport(OpenCombineShim)
-  import Foundation
+  public import Foundation
 
   /// A type-erasing wrapper for the `Scheduler` protocol, which can be useful for being generic over
   /// many types of schedulers without needing to actually introduce a generic to your code.
@@ -136,7 +136,8 @@
   /// the code and reduce implementation details from leaking out.
   ///
   public struct AnyScheduler<
-    SchedulerTimeType: Strideable, SchedulerOptions
+    SchedulerTimeType: Strideable,
+    SchedulerOptions
   >: Scheduler, @unchecked Sendable
   where SchedulerTimeType.Stride: SchedulerTimeIntervalConvertible {
     private let _minimumTolerance: () -> SchedulerTimeType.Stride
@@ -227,7 +228,12 @@
       _ action: @escaping () -> Void
     ) -> Cancellable {
       self._scheduleAfterIntervalToleranceOptionsAction(
-        date, interval, tolerance, options, action)
+        date,
+        interval,
+        tolerance,
+        options,
+        action
+      )
     }
 
     /// Performs the action at the next possible opportunity.

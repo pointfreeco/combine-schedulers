@@ -1,7 +1,7 @@
 #if canImport(Combine)
-  @preconcurrency import Combine
+  @preconcurrency public import Combine
 #elseif canImport(OpenCombineShim)
-  @preconcurrency import OpenCombineShim
+  @preconcurrency public import OpenCombineShim
 #endif
 #if canImport(Combine) || canImport(OpenCombineShim)
   import ConcurrencyExtras

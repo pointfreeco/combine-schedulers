@@ -13,9 +13,9 @@
 // Only support 64bit
 #if !(os(iOS) && (arch(i386) || arch(arm)))
   #if canImport(Combine)
-    import Combine
+    public import Combine
   #elseif canImport(OpenCombineShim)
-    import OpenCombineShim
+    public import OpenCombineShim
   #endif
   #if canImport(Combine) || canImport(OpenCombineShim)
     import Foundation
@@ -272,7 +272,8 @@
                 "downstream": downstream as Any,
                 "interval": parent?.interval as Any,
                 "tolerance": parent?.tolerance as Any,
-              ])
+              ]
+            )
           }
           var playgroundDescription: Any { return description }
 

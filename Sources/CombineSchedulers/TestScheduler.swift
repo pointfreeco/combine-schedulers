@@ -1,11 +1,11 @@
 #if canImport(Combine)
-  import Combine
+  public import Combine
 #elseif canImport(OpenCombineShim)
-  import OpenCombineShim
+  public import OpenCombineShim
 #endif
 #if canImport(Combine) || canImport(OpenCombineShim)
   import ConcurrencyExtras
-  import Foundation
+  public import Foundation
 
   /// A scheduler whose current time and execution can be controlled in a deterministic manner.
   ///
