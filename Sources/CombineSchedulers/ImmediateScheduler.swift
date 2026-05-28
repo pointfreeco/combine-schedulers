@@ -133,7 +133,7 @@
       tolerance _: SchedulerTimeType.Stride,
       options _: SchedulerOptions?,
       _ action: () -> Void
-    ) -> Cancellable {
+    ) -> any Cancellable {
       action()
       return AnyCancellable {}
     }

@@ -146,7 +146,7 @@ public import Foundation
       tolerance _: SchedulerTimeType.Stride,
       options _: SchedulerOptions?,
       _ action: () -> Void
-    ) -> Cancellable {
+    ) -> any Cancellable {
       reportIssue(
         """
         \(self.prefix.isEmpty ? "" : "\(self.prefix) - ")\

@@ -214,7 +214,7 @@
       tolerance _: SchedulerTimeType.Stride,
       options _: SchedulerOptions?,
       _ action: @escaping () -> Void
-    ) -> Cancellable {
+    ) -> any Cancellable {
       let sequence = self.lock.sync { self.nextSequence() }
 
       func scheduleAction(for date: SchedulerTimeType) -> () -> Void {

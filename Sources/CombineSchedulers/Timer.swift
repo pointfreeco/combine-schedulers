@@ -181,7 +181,7 @@
             sub.receive(subscription: self)
           }
 
-          func receive(subscription: Subscription) {
+          func receive(subscription: any Subscription) {
             lock.lock()
             let subscribers = self.subscribers
             lock.unlock()
@@ -242,7 +242,7 @@
           routingSubscription.addSubscriber(subscriber)
         }
 
-        public func connect() -> Cancellable {
+        public func connect() -> any Cancellable {
           routingSubscription.isConnected = true
           return routingSubscription
         }
@@ -255,7 +255,7 @@
           Downstream.Input == Scheduler.SchedulerTimeType,
           Downstream.Failure == Never
         {
-          private var cancellable: Cancellable?
+          private var cancellable: (any Cancellable)?
           private let lock: Lock
           private var downstream: Downstream?
           private var parent: Parent<Scheduler>?

@@ -149,7 +149,7 @@
         SchedulerTimeType.Stride,
         SchedulerOptions?,
         @escaping () -> Void
-      ) -> Cancellable
+      ) -> any Cancellable
     private let _scheduleAfterToleranceOptionsAction:
       (
         SchedulerTimeType,
@@ -185,7 +185,7 @@
         @escaping (
           SchedulerTimeType, SchedulerTimeType.Stride, SchedulerTimeType.Stride, SchedulerOptions?,
           @escaping () -> Void
-        ) -> Cancellable
+        ) -> any Cancellable
     ) {
       self._minimumTolerance = minimumTolerance
       self._now = now
@@ -226,7 +226,7 @@
       tolerance: SchedulerTimeType.Stride,
       options: SchedulerOptions?,
       _ action: @escaping () -> Void
-    ) -> Cancellable {
+    ) -> any Cancellable {
       self._scheduleAfterIntervalToleranceOptionsAction(
         date,
         interval,

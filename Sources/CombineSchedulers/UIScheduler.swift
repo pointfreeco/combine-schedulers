@@ -58,7 +58,7 @@
       tolerance: SchedulerTimeType.Stride,
       options: SchedulerOptions? = nil,
       _ action: @escaping () -> Void
-    ) -> Cancellable {
+    ) -> any Cancellable {
       DispatchQueue.main.schedule(
         after: date,
         interval: interval,
