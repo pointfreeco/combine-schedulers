@@ -56,7 +56,7 @@ let package = Package(
   )
 #endif
 
-for target in package.targets where !target.isTest {
+for target in package.targets {
   target.swiftSettings = target.swiftSettings ?? []
   target.swiftSettings?.append(contentsOf: [
     .enableUpcomingFeature("ExistentialAny"),
