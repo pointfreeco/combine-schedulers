@@ -1,13 +1,13 @@
 #if canImport(Combine)
-  import Combine
+  public import Combine
 #elseif canImport(OpenCombineShim)
-  import OpenCombineShim
+  public import OpenCombineShim
 #endif
 #if canImport(Combine) || canImport(OpenCombineShim)
   #if swift(>=6)
-    @preconcurrency import Dispatch
+    @preconcurrency public import Dispatch
   #else
-    import Dispatch
+    public import Dispatch
   #endif
 
   /// A scheduler that executes its work on the main queue as soon as possible.
@@ -58,9 +58,13 @@
       tolerance: SchedulerTimeType.Stride,
       options: SchedulerOptions? = nil,
       _ action: @escaping () -> Void
-    ) -> Cancellable {
+    ) -> any Cancellable {
       DispatchQueue.main.schedule(
-        after: date, interval: interval, tolerance: tolerance, options: nil, action
+        after: date,
+        interval: interval,
+        tolerance: tolerance,
+        options: nil,
+        action
       )
     }
 

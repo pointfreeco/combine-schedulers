@@ -1,6 +1,6 @@
 #if canImport(Combine) && canImport(SwiftUI)
-  import Combine
-  import SwiftUI
+  public import Combine
+  public import SwiftUI
 
   extension Scheduler {
     /// Specifies an animation to perform when an action is scheduled. This can be useful for times

@@ -1,6 +1,6 @@
 #if canImport(UIKit) && !os(watchOS) && canImport(Combine)
-  import Combine
-  import UIKit
+  public import Combine
+  public import UIKit
 
   extension Scheduler {
     /// Wraps scheduled actions in `UIView.animate`.

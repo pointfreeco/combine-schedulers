@@ -13,9 +13,9 @@
 // Only support 64bit
 #if !(os(iOS) && (arch(i386) || arch(arm)))
   #if canImport(Combine)
-    import Combine
+    public import Combine
   #elseif canImport(OpenCombineShim)
-    import OpenCombineShim
+    public import OpenCombineShim
   #endif
   #if canImport(Combine) || canImport(OpenCombineShim)
     import Foundation
@@ -181,7 +181,7 @@
             sub.receive(subscription: self)
           }
 
-          func receive(subscription: Subscription) {
+          func receive(subscription: any Subscription) {
             lock.lock()
             let subscribers = self.subscribers
             lock.unlock()
@@ -242,7 +242,7 @@
           routingSubscription.addSubscriber(subscriber)
         }
 
-        public func connect() -> Cancellable {
+        public func connect() -> any Cancellable {
           routingSubscription.isConnected = true
           return routingSubscription
         }
@@ -255,7 +255,7 @@
           Downstream.Input == Scheduler.SchedulerTimeType,
           Downstream.Failure == Never
         {
-          private var cancellable: Cancellable?
+          private var cancellable: (any Cancellable)?
           private let lock: Lock
           private var downstream: Downstream?
           private var parent: Parent<Scheduler>?
@@ -272,7 +272,8 @@
                 "downstream": downstream as Any,
                 "interval": parent?.interval as Any,
                 "tolerance": parent?.tolerance as Any,
-              ])
+              ]
+            )
           }
           var playgroundDescription: Any { return description }
 
