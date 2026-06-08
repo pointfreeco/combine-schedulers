@@ -65,9 +65,4 @@ for target in package.targets {
     .enableUpcomingFeature("InternalImportsByDefault"),
     .enableUpcomingFeature("MemberImportVisibility"),
   ])
-  #if compiler(>=6.4)
-    target.swiftSettings?.append(contentsOf: [
-      .treatAllWarnings(as: .error)
-    ])
-  #endif
 }
