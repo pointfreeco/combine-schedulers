@@ -20,3 +20,15 @@ jobs:
         run: make test
       # - name: Build for library evolution
       #   run: make build-for-library-evolution
+
+  linux-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: "Test Swift Package on Linux"
+        run: swift test
+      - name: "Test Swift Package on Android"
+        uses: skiptools/swift-android-action@v2
+        with:
+          # Ubuntu runners low on space causes the emulator to fail to install
+          free-disk-space: true
