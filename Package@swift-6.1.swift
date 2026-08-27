@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 
 import PackageDescription
 
@@ -16,6 +16,12 @@ let package = Package(
       targets: ["CombineSchedulers"]
     )
   ],
+  traits: [
+    Trait(
+      name: "OpenCombineSchedulers",
+      description: "Support for Combine on non-Apple platforms using OpenCombine."
+    )
+  ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.0.0"),
     .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.13.0"),
@@ -28,7 +34,9 @@ let package = Package(
         .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
         .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
         .product(
-          name: "OpenCombineShim", package: "OpenCombine", condition: .when(platforms: [.linux])
+          name: "OpenCombineShim",
+          package: "OpenCombine",
+          condition: .when(platforms: [.linux, .android], traits: ["OpenCombineSchedulers"])
         ),
       ]
     ),
@@ -41,3 +49,20 @@ let package = Package(
   ],
   swiftLanguageModes: [.v6]
 )
+
+#if !canImport(Darwin)
+  package.traits.insert(
+    .default(enabledTraits: ["OpenCombineSchedulers"])
+  )
+#endif
+
+for target in package.targets {
+  target.swiftSettings = target.swiftSettings ?? []
+  target.swiftSettings?.append(contentsOf: [
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("ImmutableWeakCaptures"),
+    .enableUpcomingFeature("InferIsolatedConformances"),
+    .enableUpcomingFeature("InternalImportsByDefault"),
+    .enableUpcomingFeature("MemberImportVisibility"),
+  ])
+}

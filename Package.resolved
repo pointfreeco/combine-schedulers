@@ -1,5 +1,5 @@
 {
-  "originHash" : "d01454592cbf2c583e6a7f880c8739435daf3f005ce9e8d8d47d348570a823ad",
+  "originHash" : "0b3cfb1f3f52445d037292e1eedb28c96579210c73ffa9e2bd8902b01b04a7c1",
   "pins" : [
     {
       "identity" : "swift-concurrency-extras",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-issue-reporting",
       "state" : {
-        "revision" : "d6adc8bc81e8ba37d3ecd094b78450853738a89f",
-        "version" : "2.0.0"
+        "revision" : "71c7c9a761d1ca6ed4ccb6ced040fe1c1a39e8e7",
+        "version" : "2.1.0"
       }
     }
   ],

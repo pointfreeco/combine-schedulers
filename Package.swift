@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.4
 
 import PackageDescription
 
@@ -24,7 +24,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.0.0"),
-    .package(url: "https://github.com/pointfreeco/swift-issue-reporting", from: "2.0.0"),
+    .package(url: "https://github.com/pointfreeco/swift-issue-reporting", from: "2.1.0"),
     .package(url: "https://github.com/OpenCombine/OpenCombine.git", from: "0.14.0"),
   ],
   targets: [
