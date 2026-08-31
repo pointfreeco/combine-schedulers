@@ -44,6 +44,9 @@
   }
 #else
   import Foundation
+  #if canImport(CoreFoundation)
+    import CoreFoundation
+  #endif
 
   final class os_unfair_lock_s: @unchecked Sendable {
     private var mutex: pthread_mutex_t
