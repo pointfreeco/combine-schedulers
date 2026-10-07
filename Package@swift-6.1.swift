@@ -50,12 +50,6 @@ let package = Package(
   swiftLanguageModes: [.v6]
 )
 
-#if !canImport(Darwin)
-  package.traits.insert(
-    .default(enabledTraits: ["OpenCombineSchedulers"])
-  )
-#endif
-
 for target in package.targets {
   target.swiftSettings = target.swiftSettings ?? []
   target.swiftSettings?.append(contentsOf: [
